@@ -1,0 +1,119 @@
+.system-page {
+  padding: 24px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.system-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.system-page .page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.system-page .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.system-page .header-actions label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #555;
+  font-size: 12px;
+}
+
+.system-page .header-actions select {
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.system-page .card {
+  flex: 1;
+  min-height: 0;
+  background: #0b1020;
+  color: #d6e1ff;
+  border-radius: 12px;
+  padding: 12px;
+  overflow: auto;
+  border: 1px solid #eee;
+}
+
+.system-page pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 12px;
+}
+
+.system-page .status-bar {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #555;
+  font-size: 13px;
+}
+
+.system-page .status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #aaa;
+}
+
+.system-page .status-indicator.scanning {
+  background: #ff9800;
+}
+
+.system-page .status-indicator.error {
+  background: #f44336;
+}
+
+.system-page .card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.system-page .info-card {
+  background: #fff;
+  border: 1px solid #e8ecf1;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.system-page .title {
+  color: #666;
+  font-size: 12px;
+}
+
+.system-page .value {
+  margin-top: 6px;
+  color: #222;
+  font-weight: 700;
+}
+
+.system-page .sub {
+  margin-top: 4px;
+  color: #777;
+  font-size: 12px;
+}
+
+.system-page .updated-time {
+  margin-top: 10px;
+  color: #777;
+  font-size: 12px;
+}
+

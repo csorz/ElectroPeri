@@ -1,0 +1,69 @@
+.power-page {
+  padding: 24px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.power-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.power-page .page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.power-page .card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.power-page .kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.power-page .k {
+  color: #555;
+  font-size: 13px;
+}
+
+.power-page .v {
+  color: #222;
+  font-weight: 700;
+}
+
+.power-page .status-bar {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #555;
+  font-size: 13px;
+}
+
+.power-page .status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #aaa;
+}
+
+.power-page .status-indicator.scanning {
+  background: #ff9800;
+}
+
+.power-page .status-indicator.error {
+  background: #f44336;
+}
+

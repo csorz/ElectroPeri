@@ -1,0 +1,111 @@
+.storage-page {
+  padding: 24px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.storage-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.storage-page .page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.storage-page .card {
+  flex: 1;
+  min-height: 0;
+  background: #0b1020;
+  color: #d6e1ff;
+  border-radius: 12px;
+  padding: 12px;
+  overflow: auto;
+  border: 1px solid #eee;
+}
+
+.storage-page pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 12px;
+}
+
+.storage-page .status-bar {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #555;
+  font-size: 13px;
+}
+
+.storage-page .status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #aaa;
+}
+
+.storage-page .status-indicator.scanning {
+  background: #ff9800;
+}
+
+.storage-page .status-indicator.error {
+  background: #f44336;
+}
+
+.storage-page .card-list {
+  flex: 1;
+  min-height: 0;
+  background: #fff;
+  border: 1px solid #e8ecf1;
+  border-radius: 12px;
+  padding: 12px;
+  overflow: auto;
+}
+
+.storage-page .section h3 {
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.storage-page table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.storage-page th,
+.storage-page td {
+  border-bottom: 1px solid #edf0f4;
+  padding: 8px;
+  text-align: left;
+  color: #333;
+}
+
+.storage-page .usage-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.storage-page .usage-bar {
+  width: 90px;
+  height: 8px;
+  border-radius: 999px;
+  background: #eef2f6;
+  overflow: hidden;
+}
+
+.storage-page .usage-fill {
+  height: 100%;
+  background: #4caf50;
+}
+

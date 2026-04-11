@@ -1,0 +1,92 @@
+.printer-page {
+  padding: 24px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.printer-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.printer-page .page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.printer-page .card {
+  flex: 1;
+  min-height: 0;
+  background: #0b1020;
+  color: #d6e1ff;
+  border-radius: 12px;
+  padding: 12px;
+  overflow: auto;
+  border: 1px solid #eee;
+}
+
+.printer-page pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 12px;
+}
+
+.printer-page .status-bar {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #555;
+  font-size: 13px;
+}
+
+.printer-page .status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #aaa;
+}
+
+.printer-page .status-indicator.scanning {
+  background: #ff9800;
+}
+
+.printer-page .status-indicator.error {
+  background: #f44336;
+}
+
+.printer-page .card-list {
+  flex: 1;
+  min-height: 0;
+  background: #fff;
+  border: 1px solid #e8ecf1;
+  border-radius: 12px;
+  padding: 12px;
+  overflow: auto;
+}
+
+.printer-page .section h3 {
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.printer-page table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.printer-page th,
+.printer-page td {
+  border-bottom: 1px solid #edf0f4;
+  padding: 8px;
+  text-align: left;
+  color: #333;
+}
+

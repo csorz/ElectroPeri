@@ -43,6 +43,16 @@ export interface BluetoothDevice {
   services?: string[]
 }
 
+// 网络接口类型
+export interface NetworkInterfaceItem {
+  name: string
+  address: string
+  family: 'IPv4' | 'IPv6'
+  mac: string
+  internal: boolean
+  cidr?: string | null
+}
+
 // 设备状态
 export type DeviceStatus = 'idle' | 'scanning' | 'connected' | 'error'
 
@@ -66,6 +76,12 @@ interface DeviceStore {
   bluetoothError: string | null
   bluetoothData: string
 
+  // 网络
+  networkInterfaces: NetworkInterfaceItem[]
+  networkStatus: DeviceStatus
+  networkError: string | null
+  networkData: string
+
   // Actions - 串口
   setSerialPorts: (ports: SerialPortDevice[]) => void
   setSerialStatus: (status: DeviceStatus) => void
@@ -85,6 +101,13 @@ interface DeviceStore {
   setBluetoothStatus: (status: DeviceStatus) => void
   setBluetoothError: (error: string | null) => void
   setBluetoothData: (data: string) => void
+
+  // Actions - 网络
+  setNetworkInterfaces: (items: NetworkInterfaceItem[]) => void
+  setNetworkStatus: (status: DeviceStatus) => void
+  setNetworkError: (error: string | null) => void
+  appendNetworkData: (data: string) => void
+  clearNetworkData: () => void
 }
 
 export const useDeviceStore = create<DeviceStore>((set) => ({
@@ -106,6 +129,12 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
   bluetoothError: null,
   bluetoothData: '',
 
+  // 网络初始状态
+  networkInterfaces: [],
+  networkStatus: 'idle',
+  networkError: null,
+  networkData: '',
+
   // 串口 Actions
   setSerialPorts: (ports) => set({ serialPorts: ports }),
   setSerialStatus: (status) => set({ serialStatus: status }),
@@ -125,5 +154,12 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
   setBluetoothDevices: (devices) => set({ bluetoothDevices: devices }),
   setBluetoothStatus: (status) => set({ bluetoothStatus: status }),
   setBluetoothError: (error) => set({ bluetoothError: error }),
-  setBluetoothData: (data) => set({ bluetoothData: data })
+  setBluetoothData: (data) => set({ bluetoothData: data }),
+
+  // 网络 Actions
+  setNetworkInterfaces: (items) => set({ networkInterfaces: items }),
+  setNetworkStatus: (status) => set({ networkStatus: status }),
+  setNetworkError: (error) => set({ networkError: error }),
+  appendNetworkData: (data) => set((state) => ({ networkData: state.networkData + data })),
+  clearNetworkData: () => set({ networkData: '' })
 }))

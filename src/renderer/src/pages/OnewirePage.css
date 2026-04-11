@@ -1,0 +1,140 @@
+.onewire-page {
+  padding: 24px;
+  min-height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.onewire-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.onewire-page .page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.onewire-page .content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+.onewire-page .device-list,
+.onewire-page .data-panel {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.onewire-page h3 {
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 16px;
+}
+
+.onewire-page .sensor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.onewire-page .sensor-btn {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fff;
+  cursor: pointer;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 12px;
+}
+
+.onewire-page .sensor-item.selected .sensor-btn {
+  border-color: #4cafef;
+  background: #f5faff;
+}
+
+.onewire-page .row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.onewire-page .pill {
+  font-size: 12px;
+  color: #333;
+  background: #f5f6f8;
+  border: 1px solid #eceef3;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.onewire-page .panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.onewire-page .data-display {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #0b1020;
+  color: #d6e1ff;
+  padding: 10px;
+  overflow: auto;
+}
+
+.onewire-page .data-display pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 12px;
+}
+
+.onewire-page .status-bar {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #555;
+  font-size: 13px;
+}
+
+.onewire-page .status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #aaa;
+}
+
+.onewire-page .status-indicator.connected {
+  background: #4caf50;
+}
+
+.onewire-page .status-indicator.scanning {
+  background: #ff9800;
+}
+
+.onewire-page .status-indicator.error {
+  background: #f44336;
+}
+

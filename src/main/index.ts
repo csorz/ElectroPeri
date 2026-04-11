@@ -41,7 +41,7 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   // Dynamic import for electron-toolkit/utils (requires app to be ready)
-  const { electronApp, optimizer, is } = await import('@electron-toolkit/utils')
+  const { electronApp, optimizer } = await import('@electron-toolkit/utils')
 
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
@@ -59,10 +59,38 @@ app.whenReady().then(async () => {
   const { setupSerialHandlers } = await import('./handlers/serial')
   const { setupUsbHandlers } = await import('./handlers/usb')
   const { setupBluetoothHandlers } = await import('./handlers/bluetooth')
+  const { setupNetworkHandlers } = await import('./handlers/network')
+  const { setupHidHandlers } = await import('./handlers/hid')
+  const { setupGpioHandlers } = await import('./handlers/gpio')
+  const { setupI2cHandlers } = await import('./handlers/i2c')
+  const { setupSpiHandlers } = await import('./handlers/spi')
+  const { setupOnewireHandlers } = await import('./handlers/onewire')
+  const { setupSystemHandlers } = await import('./handlers/system')
+  const { setupStorageHandlers } = await import('./handlers/storage')
+  const { setupDisplayHandlers } = await import('./handlers/display')
+  const { setupPowerHandlers } = await import('./handlers/power')
+  const { setupProcessHandlers } = await import('./handlers/process')
+  const { setupPrinterHandlers } = await import('./handlers/printer')
+  const { setupMediaHandlers } = await import('./handlers/media')
+  const { setupHotplugWatcher } = await import('./handlers/hotplug')
 
   setupSerialHandlers()
   setupUsbHandlers()
   setupBluetoothHandlers()
+  setupNetworkHandlers()
+  setupHidHandlers()
+  setupGpioHandlers()
+  setupI2cHandlers()
+  setupSpiHandlers()
+  setupOnewireHandlers()
+  setupSystemHandlers()
+  setupStorageHandlers()
+  setupDisplayHandlers()
+  setupPowerHandlers()
+  setupProcessHandlers()
+  setupPrinterHandlers()
+  setupMediaHandlers()
+  setupHotplugWatcher()
 
   createWindow()
 

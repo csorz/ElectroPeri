@@ -12,6 +12,7 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  min-height: 0;
 }
 
 .logo {
@@ -28,6 +29,60 @@
 .nav {
   padding: 10px 0;
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.nav-group {
+  margin-top: 10px;
+}
+
+.nav-group:first-of-type {
+  margin-top: 8px;
+}
+
+.nav-group-title {
+  width: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #7d7d94;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  transition: color 0.2s;
+}
+
+.nav-group-title:hover {
+  color: #b0b0c0;
+}
+
+.nav-group-title.expanded {
+  color: #c8c8df;
+}
+
+.group-title-text {
+  text-align: left;
+}
+
+.group-toggle-icon {
+  font-size: 12px;
+  color: #9f9fb6;
+}
+
+.nav-group-items {
+  display: none;
+  flex-direction: column;
+}
+
+.nav-group.expanded .nav-group-items {
+  display: flex;
 }
 
 .nav-item {
@@ -55,9 +110,23 @@
   font-size: 16px;
 }
 
+.nav-sub-item {
+  padding-left: 28px;
+}
+
 .main-content {
   flex: 1;
   padding: 20px;
   background: #f5f5f5;
   overflow-y: auto;
+}
+
+.hotplug-notice {
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #b8dfff;
+  background: #eaf6ff;
+  color: #0b4a76;
+  font-size: 13px;
 }

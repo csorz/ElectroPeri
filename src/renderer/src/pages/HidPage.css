@@ -1,0 +1,165 @@
+.hid-page {
+  padding: 24px;
+  min-height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.hid-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.hid-page .page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.hid-page .content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+.hid-page .device-list,
+.hid-page .data-panel {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.hid-page .device-list h3,
+.hid-page .data-panel h3 {
+  margin-bottom: 12px;
+  color: #333;
+  font-size: 16px;
+}
+
+.hid-page .device-list-items {
+  list-style: none;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.hid-page .device-item {
+  padding: 10px 12px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hid-page .device-item.selected {
+  border-color: #4cafef;
+  background: #f5faff;
+}
+
+.hid-page .device-name {
+  font-weight: 700;
+  color: #222;
+}
+
+.hid-page .device-ids {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #555;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+}
+
+.hid-page .data-panel .panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.hid-page .config-panel {
+  margin-bottom: 8px;
+}
+
+.hid-page label {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+  color: #444;
+}
+
+.hid-page input[type='number'],
+.hid-page input[type='text'] {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  outline: none;
+  min-width: 80px;
+}
+
+.hid-page .data-display {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #0b1020;
+  color: #d6e1ff;
+  padding: 10px;
+  overflow: auto;
+  margin-bottom: 8px;
+}
+
+.hid-page .data-display pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 12px;
+}
+
+.hid-page .send-panel {
+  display: flex;
+  gap: 10px;
+}
+
+.hid-page .send-panel input {
+  flex: 1;
+}
+
+.hid-page .status-bar {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #555;
+  font-size: 13px;
+}
+
+.hid-page .status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #aaa;
+}
+
+.hid-page .status-indicator.connected {
+  background: #4caf50;
+}
+
+.hid-page .status-indicator.scanning {
+  background: #ff9800;
+}
+
+.hid-page .status-indicator.error {
+  background: #f44336;
+}
+

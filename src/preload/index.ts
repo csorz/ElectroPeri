@@ -55,11 +55,143 @@ const bluetoothApi = {
   }
 }
 
+// Network API
+const networkApi = {
+  listInterfaces: () => ipcRenderer.invoke('network:listInterfaces'),
+  tcpConnect: (host: string, port: number) => ipcRenderer.invoke('network:tcpConnect', host, port),
+  tcpDisconnect: () => ipcRenderer.invoke('network:tcpDisconnect'),
+  tcpSend: (data: string) => ipcRenderer.invoke('network:tcpSend', data),
+  startEchoServer: (port: number) => ipcRenderer.invoke('network:startEchoServer', port),
+  stopEchoServer: () => ipcRenderer.invoke('network:stopEchoServer'),
+  onTcpData: (callback: (data: string) => void) => {
+    ipcRenderer.on('network:tcpData', (_event, data) => callback(data))
+  },
+  onTcpError: (callback: (error: string) => void) => {
+    ipcRenderer.on('network:tcpError', (_event, error) => callback(error))
+  },
+  onTcpClosed: (callback: () => void) => {
+    ipcRenderer.on('network:tcpClosed', () => callback())
+  },
+  onEchoData: (callback: (data: string) => void) => {
+    ipcRenderer.on('network:echoData', (_event, data) => callback(data))
+  },
+  onEchoError: (callback: (error: string) => void) => {
+    ipcRenderer.on('network:echoError', (_event, error) => callback(error))
+  }
+}
+
+// HID API
+const hidApi = {
+  list: () => ipcRenderer.invoke('hid:list'),
+  open: (vendorId: number, productId: number) => ipcRenderer.invoke('hid:open', vendorId, productId),
+  close: () => ipcRenderer.invoke('hid:close'),
+  send: (reportId: number, data: string) => ipcRenderer.invoke('hid:send', reportId, data),
+  onData: (callback: (data: string) => void) => {
+    ipcRenderer.on('hid:data', (_event, data) => callback(data))
+  },
+  onError: (callback: (error: string) => void) => {
+    ipcRenderer.on('hid:error', (_event, error) => callback(error))
+  },
+  onClosed: (callback: () => void) => {
+    ipcRenderer.on('hid:closed', () => callback())
+  }
+}
+
+// P1 Embedded APIs
+const gpioApi = {
+  open: (pin: number, direction: 'in' | 'out') => ipcRenderer.invoke('gpio:open', pin, direction),
+  close: () => ipcRenderer.invoke('gpio:close'),
+  read: () => ipcRenderer.invoke('gpio:read'),
+  write: (value: 0 | 1) => ipcRenderer.invoke('gpio:write', value),
+  watch: (edge: 'none' | 'rising' | 'falling' | 'both') => ipcRenderer.invoke('gpio:watch', edge),
+  onData: (callback: (value: number) => void) => {
+    ipcRenderer.on('gpio:data', (_event, value) => callback(value))
+  },
+  onError: (callback: (error: string) => void) => {
+    ipcRenderer.on('gpio:error', (_event, error) => callback(error))
+  },
+  onClosed: (callback: () => void) => {
+    ipcRenderer.on('gpio:closed', () => callback())
+  }
+}
+
+const i2cApi = {
+  scan: (bus: number) => ipcRenderer.invoke('i2c:scan', bus),
+  open: (bus: number) => ipcRenderer.invoke('i2c:open', bus),
+  close: () => ipcRenderer.invoke('i2c:close'),
+  write: (addr: number, hex: string) => ipcRenderer.invoke('i2c:write', addr, hex),
+  read: (addr: number, length: number) => ipcRenderer.invoke('i2c:read', addr, length)
+}
+
+const spiApi = {
+  open: (bus: number, cs: number) => ipcRenderer.invoke('spi:open', bus, cs),
+  close: () => ipcRenderer.invoke('spi:close'),
+  transfer: (hexTx: string, rxLength: number, speedHz?: number, mode?: 0 | 1 | 2 | 3) =>
+    ipcRenderer.invoke('spi:transfer', hexTx, rxLength, speedHz, mode)
+}
+
+const onewireApi = {
+  list: () => ipcRenderer.invoke('onewire:list'),
+  read: (sensorId: string) => ipcRenderer.invoke('onewire:read', sensorId)
+}
+
+// P2 System APIs
+const systemApi = {
+  basic: () => ipcRenderer.invoke('system:basic')
+}
+
+const storageApi = {
+  fs: () => ipcRenderer.invoke('storage:fs')
+}
+
+const displayApi = {
+  info: () => ipcRenderer.invoke('display:info')
+}
+
+const powerApi = {
+  snapshot: () => ipcRenderer.invoke('power:snapshot')
+}
+
+const processApi = {
+  list: () => ipcRenderer.invoke('process:list'),
+  load: () => ipcRenderer.invoke('process:load')
+}
+
+const printerApi = {
+  list: () => ipcRenderer.invoke('printer:list')
+}
+
+const mediaApi = {
+  devices: () => ipcRenderer.invoke('media:devices')
+}
+
+const eventsApi = {
+  onHotplug: (callback: (event: { type: string; message: string; ts: number }) => void) => {
+    const listener = (_event: any, payload: any) => callback(payload)
+    ipcRenderer.on('events:hotplug', listener)
+    return () => ipcRenderer.removeListener('events:hotplug', listener)
+  }
+}
+
 // Custom APIs for renderer
 const api = {
   serial: serialApi,
   usb: usbApi,
-  bluetooth: bluetoothApi
+  bluetooth: bluetoothApi,
+  network: networkApi,
+  hid: hidApi,
+  gpio: gpioApi,
+  i2c: i2cApi,
+  spi: spiApi,
+  onewire: onewireApi,
+  system: systemApi,
+  storage: storageApi,
+  display: displayApi,
+  power: powerApi,
+  process: processApi,
+  printer: printerApi,
+  media: mediaApi,
+  events: eventsApi
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
