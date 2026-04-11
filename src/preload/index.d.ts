@@ -234,6 +234,31 @@ interface FileTransferApi {
   onExpired: (callback: (code: string) => void) => void
 }
 
+interface MqttApi {
+  connect: (options: {
+    url: string
+    port?: number
+    username?: string
+    password?: string
+    clientId?: string
+    clean?: boolean
+    keepalive?: number
+  }) => Promise<{ success: boolean; error?: string }>
+  disconnect: () => Promise<{ success: boolean }>
+  subscribe: (topic: string, qos?: 0 | 1 | 2) => Promise<{ success: boolean; error?: string }>
+  unsubscribe: (topic: string) => Promise<{ success: boolean }>
+  publish: (
+    topic: string,
+    message: string,
+    qos?: 0 | 1 | 2,
+    retain?: boolean
+  ) => Promise<{ success: boolean; error?: string }>
+  onMessage: (callback: (topic: string, message: string) => void) => void
+  onConnect: (callback: () => void) => void
+  onDisconnect: (callback: () => void) => void
+  onError: (callback: (error: string) => void) => void
+}
+
 interface Api {
   serial: SerialApi
   usb: UsbApi
@@ -256,6 +281,7 @@ interface Api {
   dns: DnsApi
   meta: MetaApi
   fileTransfer: FileTransferApi
+  mqtt: MqttApi
 }
 
 declare global {
@@ -265,4 +291,4 @@ declare global {
   }
 }
 
-export type { SerialApi, UsbApi, BluetoothApi, NetworkApi, HidApi, Api }
+export type { SerialApi, UsbApi, BluetoothApi, NetworkApi, HidApi, Api, MqttApi }

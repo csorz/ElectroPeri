@@ -77,6 +77,7 @@ app.whenReady().then(async () => {
   const { setupDnsHandlers } = await import('./handlers/dns')
   const { setupMetaHandlers } = await import('./handlers/meta')
   const { setupFileTransferHandlers } = await import('./handlers/fileTransfer')
+  const { setupMqttHandlers } = await import('./handlers/mqtt')
 
   setupSerialHandlers()
   setupUsbHandlers()
@@ -99,6 +100,7 @@ app.whenReady().then(async () => {
   setupDnsHandlers()
   setupMetaHandlers()
   setupFileTransferHandlers()
+  setupMqttHandlers()
 
   createWindow()
 

@@ -206,6 +206,36 @@ const fileTransferApi = {
   }
 }
 
+// MQTT API
+const mqttApi = {
+  connect: (options: {
+    url: string
+    port?: number
+    username?: string
+    password?: string
+    clientId?: string
+    clean?: boolean
+    keepalive?: number
+  }) => ipcRenderer.invoke('mqtt:connect', options),
+  disconnect: () => ipcRenderer.invoke('mqtt:disconnect'),
+  subscribe: (topic: string, qos?: 0 | 1 | 2) => ipcRenderer.invoke('mqtt:subscribe', topic, qos),
+  unsubscribe: (topic: string) => ipcRenderer.invoke('mqtt:unsubscribe', topic),
+  publish: (topic: string, message: string, qos?: 0 | 1 | 2, retain?: boolean) =>
+    ipcRenderer.invoke('mqtt:publish', topic, message, qos, retain),
+  onMessage: (callback: (topic: string, message: string) => void) => {
+    ipcRenderer.on('mqtt:message', (_event, topic, message) => callback(topic, message))
+  },
+  onConnect: (callback: () => void) => {
+    ipcRenderer.on('mqtt:connect', () => callback())
+  },
+  onDisconnect: (callback: () => void) => {
+    ipcRenderer.on('mqtt:disconnect', () => callback())
+  },
+  onError: (callback: (error: string) => void) => {
+    ipcRenderer.on('mqtt:error', (_event, error) => callback(error))
+  }
+}
+
 // Custom APIs for renderer
 const api = {
   serial: serialApi,
@@ -228,7 +258,8 @@ const api = {
   codeRunner: codeRunnerApi,
   dns: dnsApi,
   meta: metaApi,
-  fileTransfer: fileTransferApi
+  fileTransfer: fileTransferApi,
+  mqtt: mqttApi
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
