@@ -1,0 +1,37 @@
+import { Link } from 'react-router-dom'
+import '../toolbox.css'
+
+const tools = [
+  { to: '/frontend-toolbox/time/stamp', icon: '⏱️', title: '时间戳转换', desc: 'Unix 时间戳与日期互转' },
+  { to: '/frontend-toolbox/time/now', icon: '🕐', title: '当前时间', desc: '显示当前时间戳和日期' },
+  { to: '/frontend-toolbox/time/timezone', icon: '🌍', title: '时区转换', desc: '不同时区时间转换' }
+]
+
+export default function TimeCategoryPage() {
+  return (
+    <div className="toolbox-page">
+      <Link to="/home" className="toolbox-back">
+        ← 返回首页
+      </Link>
+      <div className="page-header">
+        <div className="page-header-title">
+          <span className="page-icon">🕐</span>
+          <h1>时间与时间戳</h1>
+        </div>
+        <p className="page-sub">时间戳转换、当前时间、时区转换</p>
+      </div>
+
+      <div className="toolbox-category-grid">
+        {tools.map((tool) => (
+          <Link key={tool.to} to={tool.to} className="toolbox-tool-card">
+            <span className="tool-icon">{tool.icon}</span>
+            <div className="tool-info">
+              <div className="tool-title">{tool.title}</div>
+              <div className="tool-desc">{tool.desc}</div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
+}
