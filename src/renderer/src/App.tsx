@@ -47,6 +47,7 @@ import TimezoneToolPage from './pages/toolbox/tools/TimezoneToolPage'
 import HttpRequestToolPage from './pages/toolbox/tools/HttpRequestToolPage'
 import WebSocketToolPage from './pages/toolbox/tools/WebSocketToolPage'
 import HttpStatusToolPage from './pages/toolbox/tools/HttpStatusToolPage'
+import MqttToolPage from './pages/toolbox/tools/MqttToolPage'
 
 // Text tools
 import RegexToolPage from './pages/toolbox/tools/RegexToolPage'
@@ -196,6 +197,7 @@ function App(): React.JSX.Element {
           <Route path="frontend-toolbox/http" element={<HttpCategoryPage />} />
           <Route path="frontend-toolbox/http/request" element={<HttpRequestToolPage />} />
           <Route path="frontend-toolbox/http/websocket" element={<WebSocketToolPage />} />
+          <Route path="frontend-toolbox/http/mqtt" element={<MqttToolPage />} />
           <Route path="frontend-toolbox/http/status" element={<HttpStatusToolPage />} />
 
           {/* Text Category & Tools */}

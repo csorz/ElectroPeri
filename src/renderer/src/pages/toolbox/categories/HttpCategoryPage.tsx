@@ -4,6 +4,7 @@ import '../toolbox.css'
 const tools = [
   { to: '/frontend-toolbox/http/request', icon: '📤', title: 'HTTP 请求', desc: '发送 HTTP/HTTPS 请求' },
   { to: '/frontend-toolbox/http/websocket', icon: '🔌', title: 'WebSocket', desc: 'WebSocket 连接测试' },
+  { to: '/frontend-toolbox/http/mqtt', icon: '📡', title: 'MQTT', desc: 'MQTT 连接测试' },
   { to: '/frontend-toolbox/http/status', icon: '📊', title: '状态码查询', desc: 'HTTP 状态码对照表' }
 ]
 

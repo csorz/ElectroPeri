@@ -232,7 +232,7 @@ export default function MqttToolPage() {
 
   return (
     <div className="toolbox-page">
-      <Link to="/frontend-toolbox/utils" className="toolbox-back">
+      <Link to="/frontend-toolbox/http" className="toolbox-back">
         Return to Utilities
       </Link>
       <div className="page-header">
