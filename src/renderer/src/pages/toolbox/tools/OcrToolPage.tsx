@@ -1,5 +1,6 @@
 import { useCallback, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import Tesseract from 'tesseract.js'
 import { copyToClipboard } from '../clipboard'
 import '../toolbox.css'
 
@@ -8,6 +9,7 @@ export default function OcrToolPage() {
   const [recognizedText, setRecognizedText] = useState('')
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [status, setStatus] = useState('')
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -39,17 +41,22 @@ export default function OcrToolPage() {
     setError(null)
 
     try {
-      setProgress(10)
-      // 动态加载 Tesseract.js (需要安装依赖: npm install tesseract.js)
-      // 使用 Function 构造器来避免静态分析
-      // eslint-disable-next-line @typescript-eslint/no-implied-eval
-      const loadTesseract = new Function('return import("tesseract.js")')
-      const Tesseract = await loadTesseract()
-
-      setProgress(30)
       const result = await Tesseract.recognize(imageUrl, 'chi_sim+eng', {
-        logger: (m: { status: string; progress: number }) => {
-          if (m.status === 'recognizing text') {
+        logger: (m) => {
+          if (m.status === 'loading tesseract core') {
+            setStatus('加载 Tesseract 核心...')
+            setProgress(5)
+          } else if (m.status === 'initializing tesseract') {
+            setStatus('初始化 Tesseract...')
+            setProgress(10)
+          } else if (m.status === 'loading language traineddata') {
+            setStatus('加载语言包...')
+            setProgress(20)
+          } else if (m.status === 'initializing api') {
+            setStatus('初始化 API...')
+            setProgress(30)
+          } else if (m.status === 'recognizing text') {
+            setStatus('识别文字中...')
             setProgress(30 + Math.round(m.progress * 70))
           }
         }
@@ -57,18 +64,10 @@ export default function OcrToolPage() {
 
       setProgress(100)
       setRecognizedText(result.data.text)
+      setStatus('识别完成')
     } catch (e) {
       console.error(e)
-      setError('OCR 识别需要安装 tesseract.js 依赖')
-      setRecognizedText(`OCR 识别需要 tesseract.js 库支持。
-
-安装方法：
-npm install tesseract.js
-
-推荐在线 OCR 工具：
-- 百度 OCR: https://cloud.baidu.com/product/ocr
-- 腾讯云 OCR: https://cloud.tencent.com/product/ocr
-- 谷歌云 Vision: https://cloud.google.com/vision`)
+      setError(e instanceof Error ? e.message : 'OCR 识别失败')
     } finally {
       setLoading(false)
     }
@@ -78,6 +77,8 @@ npm install tesseract.js
     setImageUrl(null)
     setRecognizedText('')
     setError(null)
+    setProgress(0)
+    setStatus('')
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -93,7 +94,7 @@ npm install tesseract.js
           <span className="page-icon">📝</span>
           <h1>文字识别</h1>
         </div>
-        <p className="page-sub">OCR 图片文字识别（需要安装 tesseract.js）</p>
+        <p className="page-sub">OCR 图片文字识别，支持中英文</p>
       </div>
 
       <section className="tool-card">
@@ -132,7 +133,7 @@ npm install tesseract.js
             onClick={handleRecognize}
             disabled={!imageUrl || loading}
           >
-            {loading ? `识别中... ${progress}%` : '开始识别'}
+            {loading ? `${status} ${progress}%` : '开始识别'}
           </button>
           {recognizedText && (
             <>
@@ -146,6 +147,28 @@ npm install tesseract.js
           )}
         </div>
 
+        {loading && (
+          <div style={{ marginTop: 12 }}>
+            <div
+              style={{
+                height: 6,
+                background: '#e0e0e0',
+                borderRadius: 3,
+                overflow: 'hidden'
+              }}
+            >
+              <div
+                style={{
+                  height: '100%',
+                  width: `${progress}%`,
+                  background: '#4fc3f7',
+                  transition: 'width 0.3s'
+                }}
+              />
+            </div>
+          </div>
+        )}
+
         {recognizedText && (
           <div className="tool-block">
             <div className="tool-block-title">识别结果</div>
@@ -158,7 +181,7 @@ npm install tesseract.js
 
       <div className="tool-notice">
         <p>💡 提示：此工具使用 Tesseract.js 进行本地 OCR 识别，无需上传图片到服务器。</p>
-        <p>如需使用，请先安装依赖：<code>npm install tesseract.js</code></p>
+        <p>首次使用需要下载语言包，请耐心等待。</p>
       </div>
     </div>
   )

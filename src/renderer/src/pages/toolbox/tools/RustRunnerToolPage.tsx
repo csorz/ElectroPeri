@@ -3,54 +3,73 @@ import { Link } from 'react-router-dom'
 import { copyToClipboard } from '../clipboard'
 import '../toolbox.css'
 
-const DEFAULT_CODE = `// Rust 在线运行工具
-// 注意：此工具需要后端支持才能实际运行 Rust 代码
+const DEFAULT_CODE = `// Rust 运行工具
+// 需要系统安装 Rust
 
 fn main() {
     println!("Hello, World!");
 
     // 向量操作示例
     let numbers = vec![1, 2, 3, 4, 5];
-    let doubled: Vec<i32> = numbers.iter().map(|n| n * 2).collect();
-    println!("Doubled: {:?}", doubled);
+    for n in &numbers {
+        println!("{}", n * 2);
+    }
 }
 `
+
+interface RunResult {
+  success: boolean
+  output: string
+  error: string
+  time: number
+}
 
 export default function RustRunnerToolPage() {
   const [code, setCode] = useState(DEFAULT_CODE)
   const [output, setOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [running, setRunning] = useState(false)
+  const [time, setTime] = useState<number | null>(null)
 
   const onCopy = useCallback((t: string) => void copyToClipboard(t), [])
 
-  const runCode = () => {
+  const runCode = async () => {
+    setRunning(true)
     setError(null)
     setOutput('')
+    setTime(null)
 
-    // 由于浏览器无法直接运行 Rust，显示提示信息
-    setError('Rust 代码需要后端服务支持才能运行。当前为演示模式。')
-    setOutput(`提示：
-1. 在浏览器中无法直接运行 Rust 代码
-2. 需要部署后端服务（如使用 Rust 编译器）
-3. 可考虑以下方案：
-   - 后端 API: 将代码发送到服务器编译执行
-   - 在线编译服务: 使用 Judge0、Rust Playground API 等
-   - WebAssembly: 将 Rust 编译为 WASM 在浏览器运行
+    try {
+      const result: RunResult = await window.api.codeRunner.runRust(code, 30000)
+      setTime(result.time)
 
-您的代码：
-${code}`)
+      if (result.success) {
+        setOutput(result.output)
+      } else {
+        setError(result.error || '执行失败')
+        if (result.output) {
+          setOutput(result.output)
+        }
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '执行失败')
+    } finally {
+      setRunning(false)
+    }
   }
 
   const clearCode = () => {
     setCode('')
     setOutput('')
     setError(null)
+    setTime(null)
   }
 
   const loadExample = () => {
     setCode(DEFAULT_CODE)
     setOutput('')
     setError(null)
+    setTime(null)
   }
 
   return (
@@ -61,16 +80,12 @@ ${code}`)
       <div className="page-header">
         <div className="page-header-title">
           <span className="page-icon">🦀</span>
-          <h1>Rust 在线运行</h1>
+          <h1>Rust 运行</h1>
         </div>
-        <p className="page-sub">Rust 代码在线编译运行（需要后端支持）</p>
+        <p className="page-sub">使用系统 Rust 编译执行代码</p>
       </div>
 
       <section className="tool-card">
-        <div className="tool-desc" style={{ background: '#fff3cd', padding: '12px', borderRadius: '4px', marginBottom: '16px' }}>
-          <strong>提示：</strong>Rust 代码需要后端服务支持才能实际运行。当前为演示模式。
-        </div>
-
         {error && (
           <div className="error-message">
             <span>❌ {error}</span>
@@ -93,9 +108,9 @@ ${code}`)
             type="button"
             className="btn btn-primary"
             onClick={runCode}
-            disabled={!code.trim()}
+            disabled={!code.trim() || running}
           >
-            运行代码
+            {running ? '编译运行中...' : '运行代码'}
           </button>
           <button type="button" className="btn btn-secondary" onClick={clearCode}>
             清空
@@ -105,9 +120,12 @@ ${code}`)
           </button>
         </div>
 
-        {output && (
+        {(output || time !== null) && (
           <div className="tool-block">
-            <div className="tool-block-title">输出结果</div>
+            <div className="tool-block-title">
+              输出结果
+              {time !== null && <span style={{ float: 'right', color: '#888', fontSize: 12 }}>耗时: {time}ms</span>}
+            </div>
             <pre className="tool-result mono" style={{ whiteSpace: 'pre-wrap' }}>
               {output}
             </pre>
@@ -119,6 +137,10 @@ ${code}`)
           </div>
         )}
       </section>
+
+      <div className="tool-notice">
+        <p>💡 提示：需要系统安装 Rust 并添加到 PATH 环境变量。首次编译可能较慢。</p>
+      </div>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
+import CryptoJS from 'crypto-js'
 import { copyToClipboard } from '../clipboard'
 import '../toolbox.css'
 
@@ -20,6 +21,7 @@ export default function JwtToolPage() {
   const [header, setHeader] = useState<JwtHeader | null>(null)
   const [payload, setPayload] = useState<JwtPayload | null>(null)
   const [signature, setSignature] = useState('')
+  const [signatureValid, setSignatureValid] = useState<boolean | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   // 编码相关状态
@@ -49,11 +51,21 @@ export default function JwtToolPage() {
     }
   }
 
+  const createSignature = (headerB64: string, payloadB64: string, secret: string): string => {
+    const message = `${headerB64}.${payloadB64}`
+    const signature = CryptoJS.HmacSHA256(message, secret)
+    return CryptoJS.enc.Base64.stringify(signature)
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '')
+  }
+
   const decodeJwt = () => {
     setError(null)
     setHeader(null)
     setPayload(null)
     setSignature('')
+    setSignatureValid(null)
 
     const token = jwtInput.trim()
     if (!token) {
@@ -79,9 +91,30 @@ export default function JwtToolPage() {
     }
   }
 
+  const verifySignature = () => {
+    if (!jwtInput.trim() || !encodeSecret.trim()) {
+      setError('请输入 JWT Token 和密钥')
+      return
+    }
+
+    const parts = jwtInput.trim().split('.')
+    if (parts.length !== 3) {
+      setError('无效的 JWT 格式')
+      return
+    }
+
+    const expectedSignature = createSignature(parts[0], parts[1], encodeSecret)
+    setSignatureValid(expectedSignature === parts[2])
+  }
+
   const encodeJwt = () => {
     setError(null)
     setEncodedJwt('')
+
+    if (!encodeSecret.trim()) {
+      setError('请输入 Secret 密钥')
+      return
+    }
 
     try {
       const headerObj = JSON.parse(encodeHeader)
@@ -89,16 +122,9 @@ export default function JwtToolPage() {
 
       const headerB64 = base64UrlEncode(JSON.stringify(headerObj))
       const payloadB64 = base64UrlEncode(JSON.stringify(payloadObj))
+      const signatureB64 = createSignature(headerB64, payloadB64, encodeSecret)
 
-      // 注意：这里只是简单编码，不进行签名验证
-      // 实际签名需要使用 HMAC 等算法
-      const fakeSignature = base64UrlEncode('fake_signature_for_demo')
-
-      setEncodedJwt(`${headerB64}.${payloadB64}.${fakeSignature}`)
-
-      if (encodeSecret) {
-        setError('提示：当前为演示模式，未实际进行签名。完整签名需要后端支持或引入加密库。')
-      }
+      setEncodedJwt(`${headerB64}.${payloadB64}.${signatureB64}`)
     } catch {
       setError('JSON 格式错误，请检查 Header 和 Payload 格式')
     }
@@ -114,7 +140,7 @@ export default function JwtToolPage() {
           <span className="page-icon">🎫</span>
           <h1>JWT 编解码</h1>
         </div>
-        <p className="page-sub">JWT Token 编码与解码</p>
+        <p className="page-sub">JWT Token 编码、解码与签名验证</p>
       </div>
 
       <section className="tool-card">
@@ -147,18 +173,40 @@ export default function JwtToolPage() {
               />
             </div>
 
+            <div className="tool-block">
+              <div className="tool-block-title">验证签名（可选）</div>
+              <input
+                type="text"
+                className="tool-input"
+                value={encodeSecret}
+                onChange={(e) => setEncodeSecret(e.target.value)}
+                placeholder="输入 Secret 密钥验证签名..."
+              />
+            </div>
+
             <div className="tool-actions">
               <button type="button" className="btn btn-primary" onClick={decodeJwt}>
                 解码
               </button>
+              {jwtInput && encodeSecret && (
+                <button type="button" className="btn btn-secondary" onClick={verifySignature}>
+                  验证签名
+                </button>
+              )}
             </div>
+
+            {signatureValid !== null && (
+              <div className={signatureValid ? 'success-message' : 'error-message'} style={{ marginTop: 12 }}>
+                <span>{signatureValid ? '✅ 签名验证通过' : '❌ 签名验证失败'}</span>
+              </div>
+            )}
 
             {header && (
               <div className="tool-block">
                 <div className="tool-block-title">Header</div>
                 <pre className="tool-result mono">{JSON.stringify(header, null, 2)}</pre>
                 <div className="tool-actions">
-                  <button type="button" className="btn btn-secondary" onClick={() => onCopy(JSON.stringify(header, null, 2))}>
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => onCopy(JSON.stringify(header, null, 2))}>
                     复制
                   </button>
                 </div>
@@ -170,7 +218,7 @@ export default function JwtToolPage() {
                 <div className="tool-block-title">Payload</div>
                 <pre className="tool-result mono">{JSON.stringify(payload, null, 2)}</pre>
                 <div className="tool-actions">
-                  <button type="button" className="btn btn-secondary" onClick={() => onCopy(JSON.stringify(payload, null, 2))}>
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => onCopy(JSON.stringify(payload, null, 2))}>
                     复制
                   </button>
                 </div>
@@ -180,9 +228,9 @@ export default function JwtToolPage() {
             {signature && (
               <div className="tool-block">
                 <div className="tool-block-title">Signature</div>
-                <pre className="tool-result mono">{signature}</pre>
+                <pre className="tool-result mono" style={{ wordBreak: 'break-all' }}>{signature}</pre>
                 <div className="tool-actions">
-                  <button type="button" className="btn btn-secondary" onClick={() => onCopy(signature)}>
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => onCopy(signature)}>
                     复制
                   </button>
                 </div>
@@ -211,21 +259,20 @@ export default function JwtToolPage() {
               />
             </div>
 
-            <div className="tool-row">
-              <label className="tool-label">
-                Secret（演示模式不实际签名）
-                <input
-                  type="text"
-                  value={encodeSecret}
-                  onChange={(e) => setEncodeSecret(e.target.value)}
-                  placeholder="输入密钥..."
-                />
-              </label>
+            <div className="tool-block">
+              <div className="tool-block-title">Secret 密钥</div>
+              <input
+                type="text"
+                className="tool-input"
+                value={encodeSecret}
+                onChange={(e) => setEncodeSecret(e.target.value)}
+                placeholder="输入密钥（用于签名）..."
+              />
             </div>
 
             <div className="tool-actions">
               <button type="button" className="btn btn-primary" onClick={encodeJwt}>
-                编码
+                编码并签名
               </button>
             </div>
 
@@ -248,6 +295,10 @@ export default function JwtToolPage() {
           </>
         )}
       </section>
+
+      <div className="tool-notice">
+        <p>💡 提示：使用 HMAC-SHA256 算法进行签名。请妥善保管您的 Secret 密钥。</p>
+      </div>
     </div>
   )
 }

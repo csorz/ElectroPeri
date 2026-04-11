@@ -73,6 +73,10 @@ app.whenReady().then(async () => {
   const { setupPrinterHandlers } = await import('./handlers/printer')
   const { setupMediaHandlers } = await import('./handlers/media')
   const { setupHotplugWatcher } = await import('./handlers/hotplug')
+  const { setupCodeRunnerHandlers } = await import('./handlers/codeRunner')
+  const { setupDnsHandlers } = await import('./handlers/dns')
+  const { setupMetaHandlers } = await import('./handlers/meta')
+  const { setupFileTransferHandlers } = await import('./handlers/fileTransfer')
 
   setupSerialHandlers()
   setupUsbHandlers()
@@ -91,6 +95,10 @@ app.whenReady().then(async () => {
   setupPrinterHandlers()
   setupMediaHandlers()
   setupHotplugWatcher()
+  setupCodeRunnerHandlers()
+  setupDnsHandlers()
+  setupMetaHandlers()
+  setupFileTransferHandlers()
 
   createWindow()
 

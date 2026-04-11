@@ -2,28 +2,26 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import '../toolbox.css'
 
-interface DnsRecord {
+interface DnsResult {
   type: string
-  name: string
-  value: string
-  ttl: string
+  records: string[]
+  error?: string
+}
+
+interface DnsFullResult {
+  domain: string
+  results: DnsResult[]
 }
 
 export default function DnsQueryToolPage() {
   const [domain, setDomain] = useState('')
   const [recordType, setRecordType] = useState('A')
-  const [records, setRecords] = useState<DnsRecord[]>([])
+  const [results, setResults] = useState<DnsFullResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [dnsServers, setDnsServers] = useState<string[]>([])
 
-  const dnsServices = [
-    { name: 'DNS Checker', url: 'https://dnschecker.org/' },
-    { name: '站长工具 DNS', url: 'https://tool.chinaz.com/dns/' },
-    { name: 'Google DNS', url: 'https://dns.google/' },
-    { name: 'Cloudflare DNS', url: 'https://1.1.1.1/dns/' }
-  ]
-
-  const handleQuery = () => {
+  const handleQuery = async () => {
     if (!domain.trim()) {
       setError('请输入域名')
       return
@@ -31,33 +29,47 @@ export default function DnsQueryToolPage() {
 
     setLoading(true)
     setError(null)
+    setResults(null)
 
-    // 由于浏览器无法直接进行 DNS 查询，这里显示说明信息
-    setTimeout(() => {
-      setRecords([
-        {
-          type: '说明',
-          name: 'DNS 查询',
-          value: '由于浏览器安全限制，无法直接进行 DNS 查询。请使用下方在线工具进行查询。',
-          ttl: '-'
-        }
-      ])
+    try {
+      const result = await window.api.dns.query(domain.trim(), recordType)
+      setResults({
+        domain: domain.trim(),
+        results: [result]
+      })
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '查询失败')
+    } finally {
       setLoading(false)
-    }, 500)
+    }
   }
 
-  const handleServiceClick = (service: typeof dnsServices[0]) => {
-    if (domain.trim()) {
-      const encodedDomain = encodeURIComponent(domain.trim())
-      if (service.url.includes('dnschecker.org')) {
-        window.open(`${service.url}#A/${encodedDomain}`, '_blank')
-      } else if (service.url.includes('chinaz.com')) {
-        window.open(`${service.url}?type=1&host=${encodedDomain}`, '_blank')
-      } else {
-        window.open(service.url, '_blank')
-      }
-    } else {
-      window.open(service.url, '_blank')
+  const handleQueryAll = async () => {
+    if (!domain.trim()) {
+      setError('请输入域名')
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+    setResults(null)
+
+    try {
+      const result = await window.api.dns.queryAll(domain.trim())
+      setResults(result)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '查询失败')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGetServers = async () => {
+    try {
+      const servers = await window.api.dns.getServers()
+      setDnsServers(servers)
+    } catch (e) {
+      console.error(e)
     }
   }
 
@@ -97,12 +109,17 @@ export default function DnsQueryToolPage() {
               <option value="MX">MX</option>
               <option value="TXT">TXT</option>
               <option value="NS">NS</option>
-              <option value="SOA">SOA</option>
             </select>
           </div>
           <div className="tool-actions">
             <button type="button" className="btn btn-primary" onClick={handleQuery} disabled={loading}>
-              {loading ? '查询中...' : '查询'}
+              {loading ? '查询中...' : '查询单项'}
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={handleQueryAll} disabled={loading}>
+              查询全部
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={handleGetServers}>
+              查看 DNS 服务器
             </button>
           </div>
         </div>
@@ -113,32 +130,38 @@ export default function DnsQueryToolPage() {
           </div>
         )}
 
-        {records.length > 0 && (
+        {dnsServers.length > 0 && (
           <div className="tool-block">
-            <div className="tool-block-title">查询结果</div>
+            <div className="tool-block-title">当前 DNS 服务器</div>
             <div className="tool-result">
-              {records.map((record, index) => (
-                <p key={index}>{record.value}</p>
+              {dnsServers.map((server, i) => (
+                <div key={i} style={{ fontFamily: 'monospace' }}>{server}</div>
               ))}
             </div>
           </div>
         )}
 
-        <div className="tool-block">
-          <div className="tool-block-title">在线 DNS 查询工具</div>
-          <div className="tool-actions" style={{ flexWrap: 'wrap', gap: '8px' }}>
-            {dnsServices.map((service) => (
-              <button
-                key={service.name}
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => handleServiceClick(service)}
-              >
-                {service.name}
-              </button>
+        {results && results.results.length > 0 && (
+          <div className="tool-block">
+            <div className="tool-block-title">查询结果 - {results.domain}</div>
+            {results.results.map((result, i) => (
+              <div key={i} style={{ marginBottom: 16 }}>
+                <div style={{ fontWeight: 600, marginBottom: 4 }}>{result.type} 记录</div>
+                {result.error ? (
+                  <div style={{ color: '#888' }}>{result.error}</div>
+                ) : result.records.length > 0 ? (
+                  <div className="tool-result">
+                    {result.records.map((record, j) => (
+                      <div key={j} style={{ fontFamily: 'monospace', padding: '4px 0' }}>{record}</div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ color: '#888' }}>无记录</div>
+                )}
+              </div>
             ))}
           </div>
-        </div>
+        )}
 
         <div className="tool-block">
           <div className="tool-block-title">DNS 记录类型说明</div>
@@ -151,30 +174,12 @@ export default function DnsQueryToolPage() {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>A</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>将域名指向 IPv4 地址</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>AAAA</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>将域名指向 IPv6 地址</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>CNAME</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>将域名指向另一个域名</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>MX</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>邮件交换记录</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>TXT</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>文本记录，常用于域名验证</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>NS</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>域名服务器记录</td>
-                </tr>
+                <tr><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>A</td><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>将域名指向 IPv4 地址</td></tr>
+                <tr><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>AAAA</td><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>将域名指向 IPv6 地址</td></tr>
+                <tr><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>CNAME</td><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>将域名指向另一个域名</td></tr>
+                <tr><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>MX</td><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>邮件交换记录</td></tr>
+                <tr><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>TXT</td><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>文本记录，常用于域名验证</td></tr>
+                <tr><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>NS</td><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>域名服务器记录</td></tr>
               </tbody>
             </table>
           </div>

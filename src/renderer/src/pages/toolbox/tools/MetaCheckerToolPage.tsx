@@ -10,15 +10,36 @@ interface MetaInfo {
   ogTitle: string
   ogDescription: string
   ogImage: string
+  ogType: string
+  twitterCard: string
+  twitterTitle?: string
+  twitterDescription?: string
+  twitterImage?: string
   canonical: string
   robots: string
+  viewport: string
+  charset: string
+  language: string
+  favicon: string
+  h1: string[]
+  h2: string[]
+  images: { alt: string; src: string }[]
+  links: { text: string; href: string }[]
+}
+
+interface CheckResult {
+  success: boolean
+  url?: string
+  meta?: MetaInfo
+  statusCode?: number
+  error?: string
 }
 
 export default function MetaCheckerToolPage() {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [metaInfo, setMetaInfo] = useState<MetaInfo | null>(null)
+  const [result, setResult] = useState<CheckResult | null>(null)
 
   const handleCheck = async () => {
     if (!url.trim()) {
@@ -28,37 +49,21 @@ export default function MetaCheckerToolPage() {
 
     setLoading(true)
     setError(null)
-    setMetaInfo(null)
+    setResult(null)
 
     try {
-      // 由于跨域限制，这里提供模拟检测功能
-      // 实际项目中需要通过后端代理或使用 CORS 代理
-      const targetUrl = url.trim()
-
-      // 模拟检测结果
-      setMetaInfo({
-        title: '检测功能说明',
-        description: '由于浏览器跨域限制，Meta 检测需要后端服务支持。请使用以下在线工具进行检测：',
-        keywords: '',
-        author: '',
-        ogTitle: '',
-        ogDescription: '',
-        ogImage: '',
-        canonical: targetUrl,
-        robots: ''
-      })
+      const res = await window.api.meta.check(url.trim())
+      if (res.success) {
+        setResult(res)
+      } else {
+        setError(res.error || '检测失败')
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : '检测失败')
     } finally {
       setLoading(false)
     }
   }
-
-  const onlineTools = [
-    { name: 'SEO Site Checkup', url: 'https://seositecheckup.com/' },
-    { name: 'Meta Tag Analyzer', url: 'https://www.seoptimer.com/meta-tag-checker' },
-    { name: 'Google Rich Results', url: 'https://search.google.com/test/rich-results' }
-  ]
 
   return (
     <div className="toolbox-page">
@@ -96,26 +101,86 @@ export default function MetaCheckerToolPage() {
           </div>
         )}
 
-        {metaInfo && (
-          <div className="tool-block">
-            <div className="tool-block-title">检测结果</div>
-            <div className="tool-result">
-              <p style={{ marginBottom: '12px' }}>{metaInfo.description}</p>
-              <div className="tool-actions" style={{ flexWrap: 'wrap', gap: '8px' }}>
-                {onlineTools.map((tool) => (
-                  <a
-                    key={tool.name}
-                    href={tool.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-secondary"
-                  >
-                    {tool.name}
-                  </a>
-                ))}
+        {result && result.meta && (
+          <>
+            <div className="tool-block">
+              <div className="tool-block-title">基本信息</div>
+              <div className="tool-result">
+                <div><strong>URL:</strong> {result.url}</div>
+                <div><strong>状态码:</strong> {result.statusCode}</div>
+                <div><strong>语言:</strong> {result.meta.language || '未设置'}</div>
+                <div><strong>字符集:</strong> {result.meta.charset || '未检测'}</div>
               </div>
             </div>
-          </div>
+
+            <div className="tool-block">
+              <div className="tool-block-title">页面标题</div>
+              <div className="tool-result">
+                <div style={{ fontSize: 18, fontWeight: 600 }}>{result.meta.title || '未设置'}</div>
+                {result.meta.title && (
+                  <div style={{ color: result.meta.title.length > 60 ? '#f44336' : '#4caf50', marginTop: 4 }}>
+                    {result.meta.title.length} 字符 {result.meta.title.length > 60 && '(建议不超过60字符)'}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="tool-block">
+              <div className="tool-block-title">Meta 描述</div>
+              <div className="tool-result">
+                <div>{result.meta.description || '未设置'}</div>
+                {result.meta.description && (
+                  <div style={{ color: result.meta.description.length > 160 ? '#f44336' : '#4caf50', marginTop: 4 }}>
+                    {result.meta.description.length} 字符 {result.meta.description.length > 160 && '(建议不超过160字符)'}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {result.meta.keywords && (
+              <div className="tool-block">
+                <div className="tool-block-title">关键词</div>
+                <div className="tool-result">{result.meta.keywords}</div>
+              </div>
+            )}
+
+            {(result.meta.ogTitle || result.meta.ogDescription || result.meta.ogImage) && (
+              <div className="tool-block">
+                <div className="tool-block-title">Open Graph</div>
+                <div className="tool-result">
+                  {result.meta.ogTitle && <div><strong>og:title:</strong> {result.meta.ogTitle}</div>}
+                  {result.meta.ogDescription && <div><strong>og:description:</strong> {result.meta.ogDescription}</div>}
+                  {result.meta.ogImage && <div><strong>og:image:</strong> {result.meta.ogImage}</div>}
+                  {result.meta.ogType && <div><strong>og:type:</strong> {result.meta.ogType}</div>}
+                </div>
+              </div>
+            )}
+
+            {result.meta.h1 && result.meta.h1.length > 0 && (
+              <div className="tool-block">
+                <div className="tool-block-title">H1 标题 ({result.meta.h1.length})</div>
+                <div className="tool-result">
+                  {result.meta.h1.map((h, i) => (
+                    <div key={i}>{h}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {result.meta.images && result.meta.images.length > 0 && (
+              <div className="tool-block">
+                <div className="tool-block-title">图片 ({result.meta.images.length})</div>
+                <div className="tool-result">
+                  {result.meta.images.slice(0, 10).map((img, i) => (
+                    <div key={i} style={{ marginBottom: 4 }}>
+                      {img.alt ? `✅ ${img.alt}` : '⚠️ 缺少 alt'}: {img.src.substring(0, 50)}...
+                    </div>
+                  ))}
+                  {result.meta.images.length > 10 && <div>...还有 {result.meta.images.length - 10} 张图片</div>}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         <div className="tool-block">
@@ -129,26 +194,10 @@ export default function MetaCheckerToolPage() {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>title</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>页面标题，显示在浏览器标签和搜索结果中</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>description</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>页面描述，显示在搜索结果摘要中</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>keywords</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>页面关键词（现代 SEO 作用较小）</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>og:* 系列</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>Open Graph 标签，用于社交媒体分享展示</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>robots</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>控制搜索引擎爬虫行为</td>
-                </tr>
+                <tr><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>title</td><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>页面标题，显示在浏览器标签和搜索结果中</td></tr>
+                <tr><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>description</td><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>页面描述，显示在搜索结果摘要中</td></tr>
+                <tr><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>og:* 系列</td><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>Open Graph 标签，用于社交媒体分享展示</td></tr>
+                <tr><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>robots</td><td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>控制搜索引擎爬虫行为</td></tr>
               </tbody>
             </table>
           </div>

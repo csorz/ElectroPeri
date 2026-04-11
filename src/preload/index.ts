@@ -173,6 +173,39 @@ const eventsApi = {
   }
 }
 
+// Code Runner API
+const codeRunnerApi = {
+  runJs: (code: string, timeout?: number) => ipcRenderer.invoke('code:runJs', code, timeout),
+  runPython: (code: string, timeout?: number) => ipcRenderer.invoke('code:runPython', code, timeout),
+  runGo: (code: string, timeout?: number) => ipcRenderer.invoke('code:runGo', code, timeout),
+  runJava: (code: string, timeout?: number) => ipcRenderer.invoke('code:runJava', code, timeout),
+  runRust: (code: string, timeout?: number) => ipcRenderer.invoke('code:runRust', code, timeout)
+}
+
+// DNS API
+const dnsApi = {
+  query: (domain: string, type: string) => ipcRenderer.invoke('dns:query', domain, type),
+  queryAll: (domain: string) => ipcRenderer.invoke('dns:queryAll', domain),
+  reverse: (ip: string) => ipcRenderer.invoke('dns:reverse', ip),
+  getServers: () => ipcRenderer.invoke('dns:getServers')
+}
+
+// Meta Checker API
+const metaApi = {
+  check: (url: string) => ipcRenderer.invoke('meta:check', url)
+}
+
+// File Transfer API
+const fileTransferApi = {
+  create: (files: string[]) => ipcRenderer.invoke('transfer:create', files),
+  status: (code: string) => ipcRenderer.invoke('transfer:status', code),
+  close: (code: string) => ipcRenderer.invoke('transfer:close', code),
+  getLocalIp: () => ipcRenderer.invoke('transfer:getLocalIp'),
+  onExpired: (callback: (code: string) => void) => {
+    ipcRenderer.on('transfer:expired', (_event, code) => callback(code))
+  }
+}
+
 // Custom APIs for renderer
 const api = {
   serial: serialApi,
@@ -191,7 +224,11 @@ const api = {
   process: processApi,
   printer: printerApi,
   media: mediaApi,
-  events: eventsApi
+  events: eventsApi,
+  codeRunner: codeRunnerApi,
+  dns: dnsApi,
+  meta: metaApi,
+  fileTransfer: fileTransferApi
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

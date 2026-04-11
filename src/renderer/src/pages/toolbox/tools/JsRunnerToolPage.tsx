@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { copyToClipboard } from '../clipboard'
 import '../toolbox.css'
 
-const DEFAULT_CODE = `// JavaScript 在线运行工具
-// 可以在此处编写和运行 JavaScript 代码
+const DEFAULT_CODE = `// JavaScript 运行工具
+// 使用 Node.js VM 模块安全执行
 
 function greet(name) {
   return \`Hello, \${name}!\`;
@@ -17,65 +17,45 @@ const numbers = [1, 2, 3, 4, 5];
 const doubled = numbers.map(n => n * 2);
 console.log('Doubled:', doubled);
 
-// 使用 console.log 输出结果
+// 数学运算
+console.log('PI:', Math.PI);
+console.log('Random:', Math.random().toFixed(4));
 `
+
+interface RunResult {
+  success: boolean
+  output: string
+  error: string
+  time: number
+}
 
 export default function JsRunnerToolPage() {
   const [code, setCode] = useState(DEFAULT_CODE)
   const [output, setOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [running, setRunning] = useState(false)
+  const [time, setTime] = useState<number | null>(null)
 
   const onCopy = useCallback((t: string) => void copyToClipboard(t), [])
 
-  const runCode = () => {
+  const runCode = async () => {
     setRunning(true)
     setError(null)
     setOutput('')
+    setTime(null)
 
     try {
-      // 创建安全的执行环境
-      const logs: string[] = []
-      const mockConsole = {
-        log: (...args: unknown[]) => {
-          logs.push(args.map(arg => {
-            if (typeof arg === 'object') {
-              return JSON.stringify(arg, null, 2)
-            }
-            return String(arg)
-          }).join(' '))
-        },
-        error: (...args: unknown[]) => {
-          logs.push('[ERROR] ' + args.map(arg => {
-            if (typeof arg === 'object') {
-              return JSON.stringify(arg, null, 2)
-            }
-            return String(arg)
-          }).join(' '))
-        },
-        warn: (...args: unknown[]) => {
-          logs.push('[WARN] ' + args.map(arg => {
-            if (typeof arg === 'object') {
-              return JSON.stringify(arg, null, 2)
-            }
-            return String(arg)
-          }).join(' '))
-        },
-        info: (...args: unknown[]) => {
-          logs.push('[INFO] ' + args.map(arg => {
-            if (typeof arg === 'object') {
-              return JSON.stringify(arg, null, 2)
-            }
-            return String(arg)
-          }).join(' '))
+      const result: RunResult = await window.api.codeRunner.runJs(code, 5000)
+      setTime(result.time)
+
+      if (result.success) {
+        setOutput(result.output)
+      } else {
+        setError(result.error || '执行失败')
+        if (result.output) {
+          setOutput(result.output)
         }
       }
-
-      // 使用 Function 构造函数执行代码
-      const fn = new Function('console', code)
-      fn(mockConsole)
-
-      setOutput(logs.join('\n'))
     } catch (e) {
       setError(e instanceof Error ? e.message : '执行失败')
     } finally {
@@ -87,12 +67,14 @@ export default function JsRunnerToolPage() {
     setCode('')
     setOutput('')
     setError(null)
+    setTime(null)
   }
 
   const loadExample = () => {
     setCode(DEFAULT_CODE)
     setOutput('')
     setError(null)
+    setTime(null)
   }
 
   return (
@@ -103,9 +85,9 @@ export default function JsRunnerToolPage() {
       <div className="page-header">
         <div className="page-header-title">
           <span className="page-icon">🟨</span>
-          <h1>JavaScript 在线运行</h1>
+          <h1>JavaScript 运行</h1>
         </div>
-        <p className="page-sub">在浏览器中运行 JavaScript 代码</p>
+        <p className="page-sub">使用 Node.js VM 模块安全执行 JavaScript 代码</p>
       </div>
 
       <section className="tool-card">
@@ -143,9 +125,12 @@ export default function JsRunnerToolPage() {
           </button>
         </div>
 
-        {output && (
+        {(output || time !== null) && (
           <div className="tool-block">
-            <div className="tool-block-title">输出结果</div>
+            <div className="tool-block-title">
+              输出结果
+              {time !== null && <span style={{ float: 'right', color: '#888', fontSize: 12 }}>耗时: {time}ms</span>}
+            </div>
             <pre className="tool-result mono" style={{ whiteSpace: 'pre-wrap' }}>
               {output}
             </pre>
@@ -157,6 +142,10 @@ export default function JsRunnerToolPage() {
           </div>
         )}
       </section>
+
+      <div className="tool-notice">
+        <p>💡 提示：代码在隔离的 VM 沙箱中执行，无法访问文件系统和网络。</p>
+      </div>
     </div>
   )
 }

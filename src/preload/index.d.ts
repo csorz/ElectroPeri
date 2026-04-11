@@ -174,6 +174,66 @@ interface EventsApi {
   ) => () => void
 }
 
+interface CodeRunnerApi {
+  runJs: (code: string, timeout?: number) => Promise<{ success: boolean; output: string; error: string; time: number }>
+  runPython: (code: string, timeout?: number) => Promise<{ success: boolean; output: string; error: string; time: number }>
+  runGo: (code: string, timeout?: number) => Promise<{ success: boolean; output: string; error: string; time: number }>
+  runJava: (code: string, timeout?: number) => Promise<{ success: boolean; output: string; error: string; time: number }>
+  runRust: (code: string, timeout?: number) => Promise<{ success: boolean; output: string; error: string; time: number }>
+}
+
+interface DnsApi {
+  query: (domain: string, type: string) => Promise<{ type: string; records: string[]; error?: string }>
+  queryAll: (domain: string) => Promise<{ domain: string; results: Array<{ type: string; records: string[]; error?: string }> }>
+  reverse: (ip: string) => Promise<{ success: boolean; hostnames: string[]; error?: string }>
+  getServers: () => Promise<string[]>
+}
+
+interface MetaApi {
+  check: (url: string) => Promise<{
+    success: boolean
+    url?: string
+    meta?: {
+      title: string
+      description: string
+      keywords: string
+      author: string
+      ogTitle: string
+      ogDescription: string
+      ogImage: string
+      ogType: string
+      twitterCard: string
+      canonical: string
+      robots: string
+      viewport: string
+      charset: string
+      language: string
+      favicon: string
+      h1: string[]
+      h2: string[]
+      images: Array<{ alt: string; src: string }>
+      links: Array<{ text: string; href: string }>
+    }
+    statusCode?: number
+    error?: string
+  }>
+}
+
+interface FileTransferApi {
+  create: (files: string[]) => Promise<{
+    success: boolean
+    code?: string
+    port?: number
+    files?: Array<{ id: string; name: string; size: number; sizeText: string }>
+    expiresIn?: number
+    error?: string
+  }>
+  status: (code: string) => Promise<{ success: boolean; code?: string; port?: number; files?: any[]; error?: string }>
+  close: (code: string) => Promise<{ success: boolean; error?: string }>
+  getLocalIp: () => Promise<string[]>
+  onExpired: (callback: (code: string) => void) => void
+}
+
 interface Api {
   serial: SerialApi
   usb: UsbApi
@@ -192,6 +252,10 @@ interface Api {
   printer: PrinterApi
   media: MediaApi
   events: EventsApi
+  codeRunner: CodeRunnerApi
+  dns: DnsApi
+  meta: MetaApi
+  fileTransfer: FileTransferApi
 }
 
 declare global {

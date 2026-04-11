@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { copyToClipboard } from '../clipboard'
 import '../toolbox.css'
 
-const DEFAULT_CODE = `# Python 在线运行工具
-# 注意：此工具需要后端支持才能实际运行 Python 代码
+const DEFAULT_CODE = `# Python 运行工具
+# 需要系统安装 Python 3
 
 def greet(name):
     return f"Hello, {name}!"
@@ -16,44 +16,65 @@ numbers = [1, 2, 3, 4, 5]
 doubled = [n * 2 for n in numbers]
 print("Doubled:", doubled)
 
-# 使用 print() 输出结果
+# 数学运算
+import math
+print("PI:", math.pi)
+print("Sqrt(2):", math.sqrt(2))
 `
+
+interface RunResult {
+  success: boolean
+  output: string
+  error: string
+  time: number
+}
 
 export default function PythonRunnerToolPage() {
   const [code, setCode] = useState(DEFAULT_CODE)
   const [output, setOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [running, setRunning] = useState(false)
+  const [time, setTime] = useState<number | null>(null)
 
   const onCopy = useCallback((t: string) => void copyToClipboard(t), [])
 
-  const runCode = () => {
+  const runCode = async () => {
+    setRunning(true)
     setError(null)
     setOutput('')
+    setTime(null)
 
-    // 由于浏览器无法直接运行 Python，显示提示信息
-    setError('Python 代码需要后端服务支持才能运行。当前为演示模式。')
-    setOutput(`提示：
-1. 在浏览器中无法直接运行 Python 代码
-2. 需要部署后端服务（如使用 Python subprocess 或 Pyodide）
-3. 可考虑以下方案：
-   - Pyodide: 浏览器端 Python 运行时
-   - 后端 API: 将代码发送到服务器执行
-   - WebAssembly: 编译 Python 到 WASM
+    try {
+      const result: RunResult = await window.api.codeRunner.runPython(code, 10000)
+      setTime(result.time)
 
-您的代码：
-${code}`)
+      if (result.success) {
+        setOutput(result.output)
+      } else {
+        setError(result.error || '执行失败')
+        if (result.output) {
+          setOutput(result.output)
+        }
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '执行失败')
+    } finally {
+      setRunning(false)
+    }
   }
 
   const clearCode = () => {
     setCode('')
     setOutput('')
     setError(null)
+    setTime(null)
   }
 
   const loadExample = () => {
     setCode(DEFAULT_CODE)
     setOutput('')
     setError(null)
+    setTime(null)
   }
 
   return (
@@ -64,16 +85,12 @@ ${code}`)
       <div className="page-header">
         <div className="page-header-title">
           <span className="page-icon">🐍</span>
-          <h1>Python 在线运行</h1>
+          <h1>Python 运行</h1>
         </div>
-        <p className="page-sub">Python 代码在线编译运行（需要后端支持）</p>
+        <p className="page-sub">使用系统 Python 3 执行代码</p>
       </div>
 
       <section className="tool-card">
-        <div className="tool-desc" style={{ background: '#fff3cd', padding: '12px', borderRadius: '4px', marginBottom: '16px' }}>
-          <strong>提示：</strong>Python 代码需要后端服务支持才能实际运行。当前为演示模式。
-        </div>
-
         {error && (
           <div className="error-message">
             <span>❌ {error}</span>
@@ -96,9 +113,9 @@ ${code}`)
             type="button"
             className="btn btn-primary"
             onClick={runCode}
-            disabled={!code.trim()}
+            disabled={!code.trim() || running}
           >
-            运行代码
+            {running ? '运行中...' : '运行代码'}
           </button>
           <button type="button" className="btn btn-secondary" onClick={clearCode}>
             清空
@@ -108,9 +125,12 @@ ${code}`)
           </button>
         </div>
 
-        {output && (
+        {(output || time !== null) && (
           <div className="tool-block">
-            <div className="tool-block-title">输出结果</div>
+            <div className="tool-block-title">
+              输出结果
+              {time !== null && <span style={{ float: 'right', color: '#888', fontSize: 12 }}>耗时: {time}ms</span>}
+            </div>
             <pre className="tool-result mono" style={{ whiteSpace: 'pre-wrap' }}>
               {output}
             </pre>
@@ -122,6 +142,10 @@ ${code}`)
           </div>
         )}
       </section>
+
+      <div className="tool-notice">
+        <p>💡 提示：需要系统安装 Python 3 并添加到 PATH 环境变量。</p>
+      </div>
     </div>
   )
 }
