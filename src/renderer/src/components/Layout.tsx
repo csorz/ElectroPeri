@@ -7,42 +7,7 @@ type NavItem = { to: string; icon: string; label: string; end?: boolean; childre
 const navGroups: { key: string; title: string; items: NavItem[] }[] = [
   {
     key: 'p0',
-    title: 'P0 工业核心接口',
-    items: [
-      { to: '/serial', icon: '🔌', label: '串口采集' },
-      { to: '/web-serial', icon: '🧪', label: 'Web 串口' },
-      { to: '/usb', icon: '📱', label: 'USB采集' },
-      { to: '/bluetooth', icon: '📶', label: '蓝牙采集' },
-      { to: '/hid', icon: '⌨️', label: 'HID采集' },
-      { to: '/network', icon: '🌐', label: '网络采集' }
-    ]
-  },
-  {
-    key: 'p1',
-    title: 'P1 嵌入式扩展接口',
-    items: [
-      { to: '/gpio', icon: '🟩', label: 'GPIO' },
-      { to: '/i2c', icon: '🧩', label: 'I2C' },
-      { to: '/spi', icon: '🧵', label: 'SPI' },
-      { to: '/onewire', icon: '🌡️', label: '1-Wire' }
-    ]
-  },
-  {
-    key: 'p2',
-    title: 'P2 系统与终端能力',
-    items: [
-      { to: '/system', icon: '🖥️', label: '系统信息' },
-      { to: '/storage', icon: '💾', label: '存储设备' },
-      { to: '/display', icon: '🖵', label: '显示/GPU' },
-      { to: '/power', icon: '🔋', label: '电源' },
-      { to: '/process', icon: '🧠', label: '进程/负载' },
-      { to: '/printer', icon: '🖨️', label: '打印机' },
-      { to: '/media', icon: '🎙️', label: '音视频/外设' }
-    ]
-  },
-  {
-    key: 'p3',
-    title: 'P3 前端工具箱',
+    title: 'P0 全栈工具箱',
     items: [
       {
         to: '/frontend-toolbox/encoding',
@@ -220,6 +185,41 @@ const navGroups: { key: string; title: string; items: NavItem[] }[] = [
         ]
       }
     ]
+  },
+  {
+    key: 'p1',
+    title: 'P1 工业核心接口',
+    items: [
+      { to: '/serial', icon: '🔌', label: '串口采集' },
+      { to: '/web-serial', icon: '🧪', label: 'Web 串口' },
+      { to: '/usb', icon: '📱', label: 'USB采集' },
+      { to: '/bluetooth', icon: '📶', label: '蓝牙采集' },
+      { to: '/hid', icon: '⌨️', label: 'HID采集' },
+      { to: '/network', icon: '🌐', label: '网络采集' }
+    ]
+  },
+  {
+    key: 'p2',
+    title: 'P2 系统与终端能力',
+    items: [
+      { to: '/system', icon: '🖥️', label: '系统信息' },
+      { to: '/storage', icon: '💾', label: '存储设备' },
+      { to: '/display', icon: '🖵', label: '显示/GPU' },
+      { to: '/power', icon: '🔋', label: '电源' },
+      { to: '/process', icon: '🧠', label: '进程/负载' },
+      { to: '/printer', icon: '🖨️', label: '打印机' },
+      { to: '/media', icon: '🎙️', label: '音视频/外设' }
+    ]
+  },
+  {
+    key: 'p4',
+    title: 'P4 嵌入式扩展接口',
+    items: [
+      { to: '/gpio', icon: '🟩', label: 'GPIO' },
+      { to: '/i2c', icon: '🧩', label: 'I2C' },
+      { to: '/spi', icon: '🧵', label: 'SPI' },
+      { to: '/onewire', icon: '🌡️', label: '1-Wire' }
+    ]
   }
 ]
 
@@ -272,7 +272,7 @@ export default function Layout() {
           </NavLink>
           {navGroups.map((group) => {
             const hasActiveItem =
-              group.key === 'p3'
+              group.key === 'p0'
                 ? currentPath.startsWith('/frontend-toolbox')
                 : group.items.some((item) => isItemActive(item, currentPath))
             const isExpanded = hasActiveItem || Boolean(manualExpanded[group.key])

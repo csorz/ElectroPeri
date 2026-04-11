@@ -3,7 +3,18 @@ import './HomePage.css'
 
 const groups = [
   {
-    title: 'P0 工业核心接口',
+    title: 'P0 全栈工具箱',
+    items: [
+      { to: '/frontend-toolbox/encoding', label: '编码与加解密', desc: 'Hash、Base64、加密解密' },
+      { to: '/frontend-toolbox/json', label: 'JSON 处理', desc: '格式化、压缩、校验' },
+      { to: '/frontend-toolbox/url', label: 'URL 与参数', desc: 'URL/Base64/Query 解析' },
+      { to: '/frontend-toolbox/time', label: '时间与时间戳', desc: '时间戳与日期互转' },
+      { to: '/frontend-toolbox/http', label: '请求调试', desc: 'HTTP fetch、WebSocket' },
+      { to: '/frontend-toolbox/text', label: '文本与数据转换', desc: '正则、Diff、CSV、YAML↔JSON' }
+    ]
+  },
+  {
+    title: 'P1 工业核心接口',
     items: [
       { to: '/serial', label: '串口采集', desc: 'SerialPort 扫描、连接、收发' },
       { to: '/web-serial', label: 'Web 串口', desc: '基于 Web Serial API 的串口通信' },
@@ -11,15 +22,6 @@ const groups = [
       { to: '/hid', label: 'HID 采集', desc: 'HID 设备扫描、连接、收发' },
       { to: '/bluetooth', label: '蓝牙采集', desc: 'BLE 扫描、连接与简单通信' },
       { to: '/network', label: '网络采集', desc: '网卡扫描、TCP 通信与回环测试' }
-    ]
-  },
-  {
-    title: 'P1 嵌入式扩展接口',
-    items: [
-      { to: '/gpio', label: 'GPIO', desc: '引脚读写与输入监听' },
-      { to: '/i2c', label: 'I2C', desc: '总线扫描、地址读写' },
-      { to: '/spi', label: 'SPI', desc: '总线打开与 transfer 传输' },
-      { to: '/onewire', label: '1-Wire', desc: 'DS18B20 扫描与温度读取' }
     ]
   },
   {
@@ -35,15 +37,12 @@ const groups = [
     ]
   },
   {
-    title: 'P3 前端工具箱',
+    title: 'P4 嵌入式扩展接口',
     items: [
-      { to: '/frontend-toolbox', label: '工具箱概览', desc: '文档 1～6 节入口' },
-      { to: '/frontend-toolbox/encoding', label: '1. 编码与加解密', desc: 'Hash（字符串/文件）' },
-      { to: '/frontend-toolbox/json', label: '2. JSON 处理', desc: '格式化、压缩、校验' },
-      { to: '/frontend-toolbox/url', label: '3. URL 与参数', desc: 'URL/Base64/Query 解析' },
-      { to: '/frontend-toolbox/time', label: '4. 时间与时间戳', desc: '时间戳与日期互转' },
-      { to: '/frontend-toolbox/http', label: '5. 请求调试', desc: 'HTTP fetch、WebSocket' },
-      { to: '/frontend-toolbox/text', label: '6. 文本与数据转换', desc: '正则、Diff、CSV、YAML↔JSON' }
+      { to: '/gpio', label: 'GPIO', desc: '引脚读写与输入监听' },
+      { to: '/i2c', label: 'I2C', desc: '总线扫描、地址读写' },
+      { to: '/spi', label: 'SPI', desc: '总线打开与 transfer 传输' },
+      { to: '/onewire', label: '1-Wire', desc: 'DS18B20 扫描与温度读取' }
     ]
   }
 ]

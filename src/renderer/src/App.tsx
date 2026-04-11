@@ -2,19 +2,125 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import HomePage from './pages/HomePage'
 
-// P0 - 工业核心接口
-import SerialPage from './pages/p0/SerialPage'
-import WebSerialPage from './pages/p0/WebSerialPage'
-import UsbPage from './pages/p0/UsbPage'
-import BluetoothPage from './pages/p0/BluetoothPage'
-import HidPage from './pages/p0/HidPage'
-import NetworkPage from './pages/p0/NetworkPage'
+// P0 - 全栈工具箱 - Category pages
+import EncodingCategoryPage from './pages/p0/categories/EncodingCategoryPage'
+import JsonCategoryPage from './pages/p0/categories/JsonCategoryPage'
+import UrlCategoryPage from './pages/p0/categories/UrlCategoryPage'
+import TimeCategoryPage from './pages/p0/categories/TimeCategoryPage'
+import HttpCategoryPage from './pages/p0/categories/HttpCategoryPage'
+import TextCategoryPage from './pages/p0/categories/TextCategoryPage'
+import ColorCategoryPage from './pages/p0/categories/ColorCategoryPage'
+import CssCategoryPage from './pages/p0/categories/CssCategoryPage'
+import ImageCategoryPage from './pages/p0/categories/ImageCategoryPage'
+import MarkdownCategoryPage from './pages/p0/categories/MarkdownCategoryPage'
+import CodeCategoryPage from './pages/p0/categories/CodeCategoryPage'
+import DevCategoryPage from './pages/p0/categories/DevCategoryPage'
+import SeoCategoryPage from './pages/p0/categories/SeoCategoryPage'
+import OcrCategoryPage from './pages/p0/categories/OcrCategoryPage'
+import UtilsCategoryPage from './pages/p0/categories/UtilsCategoryPage'
+import FunCategoryPage from './pages/p0/categories/FunCategoryPage'
 
-// P1 - 嵌入式扩展接口
-import GpioPage from './pages/p1/GpioPage'
-import I2cPage from './pages/p1/I2cPage'
-import SpiPage from './pages/p1/SpiPage'
-import OnewirePage from './pages/p1/OnewirePage'
+// Encoding tools
+import HashToolPage from './pages/p0/tools/HashToolPage'
+import Base64ToolPage from './pages/p0/tools/Base64ToolPage'
+import UrlEncodeToolPage from './pages/p0/tools/UrlEncodeToolPage'
+import EncryptToolPage from './pages/p0/tools/EncryptToolPage'
+import UnicodeToolPage from './pages/p0/tools/UnicodeToolPage'
+
+// JSON tools
+import JsonFormatToolPage from './pages/p0/tools/JsonFormatToolPage'
+import JsonMinifyToolPage from './pages/p0/tools/JsonMinifyToolPage'
+import JsonValidateToolPage from './pages/p0/tools/JsonValidateToolPage'
+import JsonToYamlToolPage from './pages/p0/tools/JsonToYamlToolPage'
+import JsonToCsvToolPage from './pages/p0/tools/JsonToCsvToolPage'
+
+// URL tools
+import ShortUrlToolPage from './pages/p0/tools/ShortUrlToolPage'
+import QueryParserToolPage from './pages/p0/tools/QueryParserToolPage'
+
+// Time tools
+import TimestampToolPage from './pages/p0/tools/TimestampToolPage'
+import CurrentTimeToolPage from './pages/p0/tools/CurrentTimeToolPage'
+import TimezoneToolPage from './pages/p0/tools/TimezoneToolPage'
+
+// HTTP tools
+import HttpRequestToolPage from './pages/p0/tools/HttpRequestToolPage'
+import WebSocketToolPage from './pages/p0/tools/WebSocketToolPage'
+import HttpStatusToolPage from './pages/p0/tools/HttpStatusToolPage'
+
+// Text tools
+import RegexToolPage from './pages/p0/tools/RegexToolPage'
+import TextDiffToolPage from './pages/p0/tools/TextDiffToolPage'
+import CsvJsonToolPage from './pages/p0/tools/CsvJsonToolPage'
+import YamlJsonToolPage from './pages/p0/tools/YamlJsonToolPage'
+import WordCountToolPage from './pages/p0/tools/WordCountToolPage'
+
+// Color tools
+import ColorConvertToolPage from './pages/p0/tools/ColorConvertToolPage'
+import ColorPaletteToolPage from './pages/p0/tools/ColorPaletteToolPage'
+import GradientGeneratorToolPage from './pages/p0/tools/GradientGeneratorToolPage'
+import ContrastToolPage from './pages/p0/tools/ContrastToolPage'
+import ColorPickerToolPage from './pages/p0/tools/ColorPickerToolPage'
+
+// CSS tools
+import ShadowGeneratorToolPage from './pages/p0/tools/ShadowGeneratorToolPage'
+import ButtonDesignerToolPage from './pages/p0/tools/ButtonDesignerToolPage'
+import GridGeneratorToolPage from './pages/p0/tools/GridGeneratorToolPage'
+import BackgroundGeneratorToolPage from './pages/p0/tools/BackgroundGeneratorToolPage'
+import CssFormatToolPage from './pages/p0/tools/CssFormatToolPage'
+
+// Image tools
+import ImageCompressToolPage from './pages/p0/tools/ImageCompressToolPage'
+import ImageConvertToolPage from './pages/p0/tools/ImageConvertToolPage'
+import ImageBase64ToolPage from './pages/p0/tools/ImageBase64ToolPage'
+import WatermarkToolPage from './pages/p0/tools/WatermarkToolPage'
+import QrCodeToolPage from './pages/p0/tools/QrCodeToolPage'
+
+// Markdown tools
+import MarkdownEditorToolPage from './pages/p0/tools/MarkdownEditorToolPage'
+import MarkdownTableToolPage from './pages/p0/tools/MarkdownTableToolPage'
+import HtmlMdToolPage from './pages/p0/tools/HtmlMdToolPage'
+
+// Code tools
+import JsRunnerToolPage from './pages/p0/tools/JsRunnerToolPage'
+import PythonRunnerToolPage from './pages/p0/tools/PythonRunnerToolPage'
+import JavaRunnerToolPage from './pages/p0/tools/JavaRunnerToolPage'
+import GoRunnerToolPage from './pages/p0/tools/GoRunnerToolPage'
+import RustRunnerToolPage from './pages/p0/tools/RustRunnerToolPage'
+
+// Dev tools
+import UuidGeneratorToolPage from './pages/p0/tools/UuidGeneratorToolPage'
+import JwtToolPage from './pages/p0/tools/JwtToolPage'
+import CronGeneratorToolPage from './pages/p0/tools/CronGeneratorToolPage'
+import RandomPasswordToolPage from './pages/p0/tools/RandomPasswordToolPage'
+
+// SEO tools
+import IpQueryToolPage from './pages/p0/tools/IpQueryToolPage'
+import WhoisToolPage from './pages/p0/tools/WhoisToolPage'
+import MetaCheckerToolPage from './pages/p0/tools/MetaCheckerToolPage'
+import DnsQueryToolPage from './pages/p0/tools/DnsQueryToolPage'
+
+// OCR tools
+import OcrToolPage from './pages/p0/tools/OcrToolPage'
+import SvgEditorToolPage from './pages/p0/tools/SvgEditorToolPage'
+
+// Utils tools
+import VideoParserToolPage from './pages/p0/tools/VideoParserToolPage'
+import FileTransferToolPage from './pages/p0/tools/FileTransferToolPage'
+import PhoneLookupToolPage from './pages/p0/tools/PhoneLookupToolPage'
+
+// Fun tools
+import PianoToolPage from './pages/p0/tools/PianoToolPage'
+import VoiceSynthesisToolPage from './pages/p0/tools/VoiceSynthesisToolPage'
+import AvatarGeneratorToolPage from './pages/p0/tools/AvatarGeneratorToolPage'
+
+// P1 - 工业核心接口
+import SerialPage from './pages/p1/SerialPage'
+import WebSerialPage from './pages/p1/WebSerialPage'
+import UsbPage from './pages/p1/UsbPage'
+import BluetoothPage from './pages/p1/BluetoothPage'
+import HidPage from './pages/p1/HidPage'
+import NetworkPage from './pages/p1/NetworkPage'
 
 // P2 - 系统与终端能力
 import SystemPage from './pages/p2/SystemPage'
@@ -25,117 +131,11 @@ import ProcessPage from './pages/p2/ProcessPage'
 import PrinterPage from './pages/p2/PrinterPage'
 import MediaPage from './pages/p2/MediaPage'
 
-// P3 - 前端工具箱 - Category pages
-import EncodingCategoryPage from './pages/p3/categories/EncodingCategoryPage'
-import JsonCategoryPage from './pages/p3/categories/JsonCategoryPage'
-import UrlCategoryPage from './pages/p3/categories/UrlCategoryPage'
-import TimeCategoryPage from './pages/p3/categories/TimeCategoryPage'
-import HttpCategoryPage from './pages/p3/categories/HttpCategoryPage'
-import TextCategoryPage from './pages/p3/categories/TextCategoryPage'
-import ColorCategoryPage from './pages/p3/categories/ColorCategoryPage'
-import CssCategoryPage from './pages/p3/categories/CssCategoryPage'
-import ImageCategoryPage from './pages/p3/categories/ImageCategoryPage'
-import MarkdownCategoryPage from './pages/p3/categories/MarkdownCategoryPage'
-import CodeCategoryPage from './pages/p3/categories/CodeCategoryPage'
-import DevCategoryPage from './pages/p3/categories/DevCategoryPage'
-import SeoCategoryPage from './pages/p3/categories/SeoCategoryPage'
-import OcrCategoryPage from './pages/p3/categories/OcrCategoryPage'
-import UtilsCategoryPage from './pages/p3/categories/UtilsCategoryPage'
-import FunCategoryPage from './pages/p3/categories/FunCategoryPage'
-
-// Encoding tools
-import HashToolPage from './pages/p3/tools/HashToolPage'
-import Base64ToolPage from './pages/p3/tools/Base64ToolPage'
-import UrlEncodeToolPage from './pages/p3/tools/UrlEncodeToolPage'
-import EncryptToolPage from './pages/p3/tools/EncryptToolPage'
-import UnicodeToolPage from './pages/p3/tools/UnicodeToolPage'
-
-// JSON tools
-import JsonFormatToolPage from './pages/p3/tools/JsonFormatToolPage'
-import JsonMinifyToolPage from './pages/p3/tools/JsonMinifyToolPage'
-import JsonValidateToolPage from './pages/p3/tools/JsonValidateToolPage'
-import JsonToYamlToolPage from './pages/p3/tools/JsonToYamlToolPage'
-import JsonToCsvToolPage from './pages/p3/tools/JsonToCsvToolPage'
-
-// URL tools
-import ShortUrlToolPage from './pages/p3/tools/ShortUrlToolPage'
-import QueryParserToolPage from './pages/p3/tools/QueryParserToolPage'
-
-// Time tools
-import TimestampToolPage from './pages/p3/tools/TimestampToolPage'
-import CurrentTimeToolPage from './pages/p3/tools/CurrentTimeToolPage'
-import TimezoneToolPage from './pages/p3/tools/TimezoneToolPage'
-
-// HTTP tools
-import HttpRequestToolPage from './pages/p3/tools/HttpRequestToolPage'
-import WebSocketToolPage from './pages/p3/tools/WebSocketToolPage'
-import HttpStatusToolPage from './pages/p3/tools/HttpStatusToolPage'
-
-// Text tools
-import RegexToolPage from './pages/p3/tools/RegexToolPage'
-import TextDiffToolPage from './pages/p3/tools/TextDiffToolPage'
-import CsvJsonToolPage from './pages/p3/tools/CsvJsonToolPage'
-import YamlJsonToolPage from './pages/p3/tools/YamlJsonToolPage'
-import WordCountToolPage from './pages/p3/tools/WordCountToolPage'
-
-// Color tools
-import ColorConvertToolPage from './pages/p3/tools/ColorConvertToolPage'
-import ColorPaletteToolPage from './pages/p3/tools/ColorPaletteToolPage'
-import GradientGeneratorToolPage from './pages/p3/tools/GradientGeneratorToolPage'
-import ContrastToolPage from './pages/p3/tools/ContrastToolPage'
-import ColorPickerToolPage from './pages/p3/tools/ColorPickerToolPage'
-
-// CSS tools
-import ShadowGeneratorToolPage from './pages/p3/tools/ShadowGeneratorToolPage'
-import ButtonDesignerToolPage from './pages/p3/tools/ButtonDesignerToolPage'
-import GridGeneratorToolPage from './pages/p3/tools/GridGeneratorToolPage'
-import BackgroundGeneratorToolPage from './pages/p3/tools/BackgroundGeneratorToolPage'
-import CssFormatToolPage from './pages/p3/tools/CssFormatToolPage'
-
-// Image tools
-import ImageCompressToolPage from './pages/p3/tools/ImageCompressToolPage'
-import ImageConvertToolPage from './pages/p3/tools/ImageConvertToolPage'
-import ImageBase64ToolPage from './pages/p3/tools/ImageBase64ToolPage'
-import WatermarkToolPage from './pages/p3/tools/WatermarkToolPage'
-import QrCodeToolPage from './pages/p3/tools/QrCodeToolPage'
-
-// Markdown tools
-import MarkdownEditorToolPage from './pages/p3/tools/MarkdownEditorToolPage'
-import MarkdownTableToolPage from './pages/p3/tools/MarkdownTableToolPage'
-import HtmlMdToolPage from './pages/p3/tools/HtmlMdToolPage'
-
-// Code tools
-import JsRunnerToolPage from './pages/p3/tools/JsRunnerToolPage'
-import PythonRunnerToolPage from './pages/p3/tools/PythonRunnerToolPage'
-import JavaRunnerToolPage from './pages/p3/tools/JavaRunnerToolPage'
-import GoRunnerToolPage from './pages/p3/tools/GoRunnerToolPage'
-import RustRunnerToolPage from './pages/p3/tools/RustRunnerToolPage'
-
-// Dev tools
-import UuidGeneratorToolPage from './pages/p3/tools/UuidGeneratorToolPage'
-import JwtToolPage from './pages/p3/tools/JwtToolPage'
-import CronGeneratorToolPage from './pages/p3/tools/CronGeneratorToolPage'
-import RandomPasswordToolPage from './pages/p3/tools/RandomPasswordToolPage'
-
-// SEO tools
-import IpQueryToolPage from './pages/p3/tools/IpQueryToolPage'
-import WhoisToolPage from './pages/p3/tools/WhoisToolPage'
-import MetaCheckerToolPage from './pages/p3/tools/MetaCheckerToolPage'
-import DnsQueryToolPage from './pages/p3/tools/DnsQueryToolPage'
-
-// OCR tools
-import OcrToolPage from './pages/p3/tools/OcrToolPage'
-import SvgEditorToolPage from './pages/p3/tools/SvgEditorToolPage'
-
-// Utils tools
-import VideoParserToolPage from './pages/p3/tools/VideoParserToolPage'
-import FileTransferToolPage from './pages/p3/tools/FileTransferToolPage'
-import PhoneLookupToolPage from './pages/p3/tools/PhoneLookupToolPage'
-
-// Fun tools
-import PianoToolPage from './pages/p3/tools/PianoToolPage'
-import VoiceSynthesisToolPage from './pages/p3/tools/VoiceSynthesisToolPage'
-import AvatarGeneratorToolPage from './pages/p3/tools/AvatarGeneratorToolPage'
+// P4 - 嵌入式扩展接口
+import GpioPage from './pages/p4/GpioPage'
+import I2cPage from './pages/p4/I2cPage'
+import SpiPage from './pages/p4/SpiPage'
+import OnewirePage from './pages/p4/OnewirePage'
 
 import './assets/main.css'
 
