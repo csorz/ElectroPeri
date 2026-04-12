@@ -3,31 +3,19 @@ import { Link } from 'react-router-dom'
 import { copyToClipboard } from '../clipboard'
 import '../toolbox.css'
 
+type LogType = 'send' | 'receive' | 'system' | 'error'
+
 interface LogEntry {
   id: number
   timestamp: string
-  type: 'sent' | 'received' | 'system' | 'error'
+  type: LogType
   message: string
   isBinary?: boolean
-  rawMessage?: string | ArrayBuffer | Blob
-}
-
-interface ConnectionStats {
-  sentCount: number
-  receivedCount: number
-  connectedAt: Date | null
 }
 
 export default function WebSocketToolPage() {
-  // Basic state
+  // Connection config
   const [url, setUrl] = useState('')
-  const [message, setMessage] = useState('')
-  const [logs, setLogs] = useState<LogEntry[]>([])
-  const [connected, setConnected] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  // Advanced options state
-  const [showAdvanced, setShowAdvanced] = useState(false)
   const [protocols, setProtocols] = useState('')
   const [autoReconnect, setAutoReconnect] = useState(false)
   const [reconnectInterval, setReconnectInterval] = useState(3000)
@@ -35,17 +23,28 @@ export default function WebSocketToolPage() {
   const [heartbeatInterval, setHeartbeatInterval] = useState(30000)
   const [heartbeatMessage, setHeartbeatMessage] = useState('ping')
 
+  // Connection state
+  const [connected, setConnected] = useState(false)
+  const [connecting, setConnecting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Message
+  const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState<'text' | 'json'>('text')
+
+  // Logs
+  const [logs, setLogs] = useState<LogEntry[]>([])
+  const [logFilter, setLogFilter] = useState('')
+  const logIdRef = useRef(0)
+  const logContainerRef = useRef<HTMLDivElement>(null)
+
   // Statistics
-  const [stats, setStats] = useState<ConnectionStats>({
-    sentCount: 0,
-    receivedCount: 0,
-    connectedAt: null
-  })
+  const [sentCount, setSentCount] = useState(0)
+  const [receivedCount, setReceivedCount] = useState(0)
   const [duration, setDuration] = useState(0)
 
   // Refs
   const wsRef = useRef<WebSocket | null>(null)
-  const logIdRef = useRef(0)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const durationIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -53,16 +52,18 @@ export default function WebSocketToolPage() {
 
   const onCopy = useCallback((t: string) => void copyToClipboard(t), [])
 
-  const addLog = useCallback((
-    type: LogEntry['type'],
-    message: string,
-    isBinary: boolean = false,
-    rawMessage?: string | ArrayBuffer | Blob
-  ) => {
+  const addLog = useCallback((type: LogType, message: string, isBinary: boolean = false) => {
     const timestamp = new Date().toLocaleTimeString()
-    const id = ++logIdRef.current
-    setLogs((prev) => [...prev, { id, timestamp, type, message, isBinary, rawMessage }])
+    logIdRef.current += 1
+    setLogs((prev) => [...prev, { id: logIdRef.current, timestamp, type, message, isBinary }])
   }, [])
+
+  // Auto-scroll to latest log
+  useEffect(() => {
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight
+    }
+  }, [logs])
 
   const formatJson = (str: string): { formatted: string; isJson: boolean } => {
     try {
@@ -94,8 +95,8 @@ export default function WebSocketToolPage() {
     heartbeatIntervalRef.current = setInterval(() => {
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
         wsRef.current.send(heartbeatMessage)
-        addLog('sent', `[Heartbeat] ${heartbeatMessage}`)
-        setStats((prev) => ({ ...prev, sentCount: prev.sentCount + 1 }))
+        addLog('send', `[心跳] ${heartbeatMessage}`)
+        setSentCount((prev) => prev + 1)
       }
     }, heartbeatInterval)
   }, [heartbeat, heartbeatInterval, heartbeatMessage, addLog])
@@ -106,7 +107,7 @@ export default function WebSocketToolPage() {
     }, 1000)
   }, [])
 
-  const handleConnect = useCallback(() => {
+  const handleConnect = async () => {
     setError(null)
     intentionalCloseRef.current = false
 
@@ -120,8 +121,10 @@ export default function WebSocketToolPage() {
       return
     }
 
+    setConnecting(true)
+    addLog('system', `正在连接 ${url}...`)
+
     try {
-      // Parse protocols
       const protocolList = protocols
         .split(',')
         .map((p) => p.trim())
@@ -132,7 +135,9 @@ export default function WebSocketToolPage() {
 
       ws.onopen = () => {
         setConnected(true)
-        setStats({ sentCount: 0, receivedCount: 0, connectedAt: new Date() })
+        setConnecting(false)
+        setSentCount(0)
+        setReceivedCount(0)
         setDuration(0)
         addLog('system', '连接成功')
         startHeartbeat()
@@ -143,25 +148,21 @@ export default function WebSocketToolPage() {
         const isBinary = event.data instanceof ArrayBuffer || event.data instanceof Blob
 
         if (isBinary) {
-          addLog('received', '[Binary Data]', true, event.data)
+          addLog('receive', '[二进制数据]', true)
         } else {
           const { formatted, isJson } = formatJson(event.data)
-          if (isJson) {
-            addLog('received', formatted, false, event.data)
-          } else {
-            addLog('received', event.data, false, event.data)
-          }
+          addLog('receive', isJson ? formatted : event.data)
         }
-        setStats((prev) => ({ ...prev, receivedCount: prev.receivedCount + 1 }))
+        setReceivedCount((prev) => prev + 1)
       }
 
       ws.onclose = (event) => {
         setConnected(false)
-        addLog('system', `连接关闭 (code: ${event.code}, reason: ${event.reason || 'N/A'})`)
+        setConnecting(false)
+        addLog('system', `连接关闭 (code: ${event.code}${event.reason ? `, ${event.reason}` : ''})`)
         wsRef.current = null
         clearTimers()
 
-        // Auto reconnect if enabled and not intentional close
         if (autoReconnect && !intentionalCloseRef.current && reconnectInterval > 0) {
           addLog('system', `将在 ${reconnectInterval / 1000} 秒后自动重连...`)
           reconnectTimeoutRef.current = setTimeout(() => {
@@ -173,13 +174,17 @@ export default function WebSocketToolPage() {
       ws.onerror = () => {
         addLog('error', '连接错误')
         setConnected(false)
+        setConnecting(false)
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : '连接失败')
+      const errMsg = e instanceof Error ? e.message : '连接失败'
+      setError(errMsg)
+      addLog('error', errMsg)
+      setConnecting(false)
     }
-  }, [url, protocols, autoReconnect, reconnectInterval, addLog, clearTimers, startHeartbeat, startDurationTimer])
+  }
 
-  const handleDisconnect = useCallback(() => {
+  const handleDisconnect = async () => {
     intentionalCloseRef.current = true
     clearTimers()
 
@@ -188,10 +193,10 @@ export default function WebSocketToolPage() {
       wsRef.current = null
     }
     setConnected(false)
-    addLog('system', '主动断开连接')
-  }, [addLog, clearTimers])
+    addLog('system', '已断开连接')
+  }
 
-  const handleSend = useCallback(() => {
+  const handleSend = async () => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
       setError('WebSocket 未连接')
       return
@@ -202,16 +207,29 @@ export default function WebSocketToolPage() {
       return
     }
 
-    wsRef.current.send(message)
-    const { formatted, isJson } = formatJson(message)
-    addLog('sent', isJson ? formatted : message, false, message)
-    setStats((prev) => ({ ...prev, sentCount: prev.sentCount + 1 }))
-    setMessage('')
-  }, [message, addLog])
+    try {
+      wsRef.current.send(message)
+      const { formatted, isJson } = formatJson(message)
+      addLog('send', isJson ? formatted : message)
+      setSentCount((prev) => prev + 1)
+      setMessage('')
+    } catch (e) {
+      const errMsg = e instanceof Error ? e.message : '发送失败'
+      setError(errMsg)
+      addLog('error', `发送失败: ${errMsg}`)
+    }
+  }
 
-  const handleClear = useCallback(() => {
+  const handleClearLogs = () => {
     setLogs([])
-  }, [])
+  }
+
+  const handleCopyLogs = () => {
+    const text = logs
+      .map((log) => `[${log.timestamp}] [${log.type.toUpperCase()}] ${log.message}`)
+      .join('\n')
+    onCopy(text)
+  }
 
   const formatDuration = (seconds: number): string => {
     const h = Math.floor(seconds / 3600)
@@ -223,29 +241,37 @@ export default function WebSocketToolPage() {
     return `${m}:${s.toString().padStart(2, '0')}`
   }
 
-  const getLogTypeIcon = (type: LogEntry['type']): string => {
+  const filteredLogs = logFilter.trim()
+    ? logs.filter((log) => log.message.includes(logFilter))
+    : logs
+
+  const getLogTypeColor = (type: LogType): string => {
     switch (type) {
-      case 'sent':
-        return '📤'
-      case 'received':
-        return '📨'
+      case 'send':
+        return '#81c784'
+      case 'receive':
+        return '#ffb74d'
       case 'system':
-        return 'ℹ️'
+        return '#4fc3f7'
       case 'error':
-        return '❌'
+        return '#e57373'
+      default:
+        return '#fff'
     }
   }
 
-  const getLogTypeClass = (type: LogEntry['type']): string => {
+  const getLogTypeBg = (type: LogType): string => {
     switch (type) {
-      case 'sent':
-        return 'log-sent'
-      case 'received':
-        return 'log-received'
+      case 'send':
+        return '#e8f5e9'
+      case 'receive':
+        return '#fff8e1'
       case 'system':
-        return 'log-system'
+        return '#e3f2fd'
       case 'error':
-        return 'log-error'
+        return '#ffebee'
+      default:
+        return '#fff'
     }
   }
 
@@ -262,7 +288,7 @@ export default function WebSocketToolPage() {
   return (
     <div className="toolbox-page">
       <Link to="/frontend-toolbox/http" className="toolbox-back">
-        ← 返回请求调试
+        返回请求调试
       </Link>
       <div className="page-header">
         <div className="page-header-title">
@@ -280,7 +306,7 @@ export default function WebSocketToolPage() {
             alignItems: 'center',
             gap: '12px',
             padding: '12px 16px',
-            background: connected ? '#e8f5e9' : '#ffebee',
+            background: connected ? '#e8f5e9' : connecting ? '#fff8e1' : '#ffebee',
             borderRadius: '8px',
             marginBottom: '16px',
           }}
@@ -290,273 +316,301 @@ export default function WebSocketToolPage() {
               width: '12px',
               height: '12px',
               borderRadius: '50%',
-              background: connected ? '#4caf50' : '#f44336',
+              background: connected ? '#4caf50' : connecting ? '#ff9800' : '#f44336',
               boxShadow: connected ? '0 0 8px #4caf50' : 'none',
             }}
           />
-          <span style={{ fontWeight: 500, color: connected ? '#2e7d32' : '#c62828' }}>
-            {connected ? '已连接' : '未连接'}
+          <span style={{ fontWeight: 500, color: connected ? '#2e7d32' : connecting ? '#f57c00' : '#c62828' }}>
+            {connected ? '已连接' : connecting ? '连接中...' : '未连接'}
           </span>
           {connected && (
             <span style={{ marginLeft: 'auto', fontSize: '13px', color: '#666' }}>
-              已发送: {stats.sentCount} | 已接收: {stats.receivedCount} | 持续时间: {formatDuration(duration)}
+              发送: {sentCount} | 接收: {receivedCount} | 持续: {formatDuration(duration)}
             </span>
           )}
         </div>
 
-        {/* URL Input */}
+        {/* Connection Config Section */}
         <div className="tool-block" style={{ borderTop: 'none', paddingTop: 0 }}>
-          <div className="tool-block-title">WebSocket URL</div>
-          <input
-            type="text"
-            className="tool-textarea"
-            style={{ height: 'auto', padding: '12px' }}
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="输入 WebSocket URL，如：wss://echo.websocket.org"
-            disabled={connected}
-          />
-        </div>
+          <div className="tool-block-title">连接配置</div>
 
-        {/* Advanced Options Toggle */}
-        <div style={{ marginBottom: '16px' }}>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            style={{ fontSize: '13px', padding: '6px 12px' }}
-            onClick={() => setShowAdvanced(!showAdvanced)}
-          >
-            {showAdvanced ? '▼ 隐藏高级选项' : '▶ 显示高级选项'}
-          </button>
-        </div>
-
-        {/* Advanced Options */}
-        {showAdvanced && (
-          <div
-            style={{
-              background: '#f5f5f5',
-              borderRadius: '8px',
-              padding: '16px',
-              marginBottom: '16px',
-            }}
-          >
-            {/* Protocols */}
-            <div className="tool-row" style={{ marginBottom: '12px' }}>
-              <label className="tool-label" style={{ minWidth: '120px' }}>
-                子协议
-              </label>
+          <div className="tool-row">
+            <label className="tool-label">
+              WebSocket URL
               <input
                 type="text"
                 className="tool-input"
-                style={{ flex: 1 }}
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="例如: wss://echo.websocket.org"
+                disabled={connected || connecting}
+              />
+            </label>
+          </div>
+
+          <div className="tool-inline">
+            <label className="tool-label">
+              子协议 (可选)
+              <input
+                type="text"
+                className="tool-input"
                 value={protocols}
                 onChange={(e) => setProtocols(e.target.value)}
-                placeholder="逗号分隔的子协议，如：chat, superchat"
-                disabled={connected}
+                placeholder="逗号分隔，如: chat, superchat"
+                disabled={connected || connecting}
               />
-            </div>
+            </label>
+          </div>
 
-            {/* Auto Reconnect */}
-            <div className="tool-row" style={{ marginBottom: '12px', alignItems: 'center' }}>
-              <label className="tool-label" style={{ minWidth: '120px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <input
-                  type="checkbox"
-                  checked={autoReconnect}
-                  onChange={(e) => setAutoReconnect(e.target.checked)}
-                  disabled={connected}
-                />
-                自动重连
-              </label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-                <span style={{ fontSize: '13px', color: '#666' }}>间隔:</span>
+          <div className="tool-inline">
+            <label className="tool-label" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <input
+                type="checkbox"
+                checked={autoReconnect}
+                onChange={(e) => setAutoReconnect(e.target.checked)}
+                disabled={connected || connecting}
+              />
+              自动重连
+            </label>
+
+            {autoReconnect && (
+              <label className="tool-label" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                重连间隔
                 <input
                   type="number"
                   className="tool-input"
-                  style={{ width: '100px' }}
+                  style={{ width: 80 }}
                   value={reconnectInterval}
-                  onChange={(e) => setReconnectInterval(Number(e.target.value) || 3000)}
+                  onChange={(e) => setReconnectInterval(parseInt(e.target.value) || 3000)}
                   min={1000}
                   step={1000}
-                  disabled={connected}
+                  disabled={connected || connecting}
                 />
-                <span style={{ fontSize: '13px', color: '#666' }}>ms</span>
-              </div>
-            </div>
-
-            {/* Heartbeat */}
-            <div className="tool-row" style={{ alignItems: 'flex-start' }}>
-              <label className="tool-label" style={{ minWidth: '120px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <input
-                  type="checkbox"
-                  checked={heartbeat}
-                  onChange={(e) => setHeartbeat(e.target.checked)}
-                  disabled={connected}
-                />
-                心跳检测
+                ms
               </label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '13px', color: '#666' }}>间隔:</span>
+            )}
+          </div>
+
+          <div className="tool-inline">
+            <label className="tool-label" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <input
+                type="checkbox"
+                checked={heartbeat}
+                onChange={(e) => setHeartbeat(e.target.checked)}
+                disabled={connected || connecting}
+              />
+              心跳检测
+            </label>
+
+            {heartbeat && (
+              <>
+                <label className="tool-label" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  间隔
                   <input
                     type="number"
                     className="tool-input"
-                    style={{ width: '100px' }}
+                    style={{ width: 80 }}
                     value={heartbeatInterval}
-                    onChange={(e) => setHeartbeatInterval(Number(e.target.value) || 30000)}
+                    onChange={(e) => setHeartbeatInterval(parseInt(e.target.value) || 30000)}
                     min={1000}
                     step={1000}
-                    disabled={connected}
+                    disabled={connected || connecting}
                   />
-                  <span style={{ fontSize: '13px', color: '#666' }}>ms</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '13px', color: '#666' }}>消息:</span>
+                  ms
+                </label>
+                <label className="tool-label" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  消息
                   <input
                     type="text"
                     className="tool-input"
-                    style={{ flex: 1 }}
+                    style={{ width: 120 }}
                     value={heartbeatMessage}
                     onChange={(e) => setHeartbeatMessage(e.target.value)}
-                    placeholder="心跳消息，如：ping"
-                    disabled={connected}
+                    placeholder="ping"
+                    disabled={connected || connecting}
                   />
-                </div>
-              </div>
+                </label>
+              </>
+            )}
+          </div>
+
+          {error && (
+            <div className="error-message">
+              <span>{error}</span>
             </div>
-          </div>
-        )}
-
-        {error && (
-          <div className="error-message">
-            <span>❌ {error}</span>
-          </div>
-        )}
-
-        <div className="tool-actions">
-          {!connected ? (
-            <button type="button" className="btn btn-primary" onClick={handleConnect}>
-              连接
-            </button>
-          ) : (
-            <button type="button" className="btn btn-secondary" onClick={handleDisconnect}>
-              断开连接
-            </button>
           )}
-        </div>
 
-        {connected && (
-          <>
-            <div className="tool-block">
-              <div className="tool-block-title">发送消息</div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <input
-                  type="text"
-                  className="tool-textarea"
-                  style={{ flex: 1, height: 'auto', padding: '12px' }}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="输入要发送的消息... (支持 JSON 格式)"
-                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                />
-                <button type="button" className="btn btn-primary" onClick={handleSend}>
-                  发送
-                </button>
-              </div>
-            </div>
-          </>
-        )}
-
-        <div className="tool-block">
-          <div className="tool-block-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>日志</span>
-            <span style={{ display: 'flex', gap: '8px' }}>
+          <div className="tool-actions">
+            {!connected ? (
               <button
                 type="button"
-                className="btn btn-secondary"
-                style={{ fontSize: '12px', padding: '4px 8px' }}
-                onClick={() => onCopy(logs.map(l => `[${l.timestamp}] ${l.message}`).join('\n'))}
+                className="btn btn-primary"
+                onClick={handleConnect}
+                disabled={connecting}
               >
-                复制日志
+                {connecting ? '连接中...' : '连接'}
+              </button>
+            ) : (
+              <button type="button" className="btn btn-secondary" onClick={handleDisconnect}>
+                断开连接
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Send Message Section (visible when connected) */}
+        {connected && (
+          <div className="tool-block">
+            <div className="tool-block-title">发送消息</div>
+
+            <div className="tool-inline" style={{ marginBottom: 8 }}>
+              <label className="tool-label" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                消息类型
+                <select
+                  className="tool-input"
+                  style={{ width: 100 }}
+                  value={messageType}
+                  onChange={(e) => setMessageType(e.target.value as 'text' | 'json')}
+                >
+                  <option value="text">文本</option>
+                  <option value="json">JSON</option>
+                </select>
+              </label>
+            </div>
+
+            <div className="tool-row">
+              <textarea
+                className="tool-textarea"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder={messageType === 'json' ? '输入 JSON 格式消息...' : '输入要发送的消息...'}
+                rows={4}
+                style={{ fontFamily: messageType === 'json' ? 'monospace' : 'inherit' }}
+              />
+            </div>
+
+            <div className="tool-actions">
+              <button type="button" className="btn btn-primary" onClick={handleSend}>
+                发送
+              </button>
+              {messageType === 'json' && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    try {
+                      const formatted = JSON.stringify(JSON.parse(message), null, 2)
+                      setMessage(formatted)
+                    } catch {
+                      setError('JSON 格式错误')
+                    }
+                  }}
+                >
+                  格式化 JSON
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Message Log Section */}
+        <div className="tool-block">
+          <div
+            className="tool-block-title"
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          >
+            <span>消息日志</span>
+            <span style={{ display: 'flex', gap: 8 }}>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={handleCopyLogs}
+              >
+                复制
               </button>
               <button
                 type="button"
-                className="btn btn-secondary"
-                style={{ fontSize: '12px', padding: '4px 8px' }}
-                onClick={handleClear}
+                className="btn btn-secondary btn-sm"
+                onClick={handleClearLogs}
               >
                 清空
               </button>
             </span>
           </div>
+
+          <div className="tool-row">
+            <input
+              type="text"
+              className="tool-input"
+              value={logFilter}
+              onChange={(e) => setLogFilter(e.target.value)}
+              placeholder="按消息内容过滤..."
+            />
+          </div>
+
           <div
+            ref={logContainerRef}
             className="tool-result mono"
             style={{
-              minHeight: '150px',
+              minHeight: '200px',
               maxHeight: '400px',
               overflow: 'auto',
-              fontSize: '13px',
+              fontSize: '12px',
+              lineHeight: 1.6
             }}
           >
-            {logs.length === 0 ? (
+            {filteredLogs.length === 0 ? (
               <span style={{ color: '#888' }}>暂无日志</span>
             ) : (
-              logs.map((log) => (
+              filteredLogs.map((log) => (
                 <div
                   key={log.id}
-                  className={getLogTypeClass(log.type)}
                   style={{
                     padding: '8px 12px',
                     borderBottom: '1px solid #eee',
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '8px',
+                    background: getLogTypeBg(log.type),
                   }}
                 >
-                  <span style={{ flexShrink: 0 }}>{getLogTypeIcon(log.type)}</span>
-                  <div style={{ flex: 1 }}>
-                    <span style={{ color: '#888', fontSize: '12px' }}>[{log.timestamp}]</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ color: '#888', fontSize: '11px' }}>[{log.timestamp}]</span>
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        padding: '1px 6px',
+                        borderRadius: '3px',
+                        background: getLogTypeColor(log.type),
+                        color: '#fff',
+                        textTransform: 'uppercase'
+                      }}
+                    >
+                      {log.type === 'send' ? '发送' : log.type === 'receive' ? '接收' : log.type === 'system' ? '系统' : '错误'}
+                    </span>
                     {log.isBinary && (
                       <span
                         style={{
-                          marginLeft: '8px',
-                          fontSize: '11px',
+                          fontSize: '10px',
                           background: '#9c27b0',
-                          color: 'white',
+                          color: '#fff',
                           padding: '1px 6px',
-                          borderRadius: '4px',
+                          borderRadius: '3px',
                         }}
                       >
-                        Binary
+                        二进制
                       </span>
                     )}
-                    <pre
-                      style={{
-                        margin: '4px 0 0',
-                        whiteSpace: 'pre-wrap',
-                        wordBreak: 'break-word',
-                        fontFamily: 'inherit',
-                        color: log.type === 'sent' ? '#1565c0' : log.type === 'error' ? '#c62828' : 'inherit',
-                      }}
-                    >
-                      {log.message}
-                    </pre>
                   </div>
-                  {log.rawMessage && !log.isBinary && typeof log.rawMessage === 'string' && (
-                    <button
-                      type="button"
-                      onClick={() => onCopy(log.rawMessage as string)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        opacity: 0.5,
-                        fontSize: '12px',
-                      }}
-                      title="复制原始消息"
-                    >
-                      📋
-                    </button>
-                  )}
+                  <pre
+                    style={{
+                      margin: 0,
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word',
+                      fontFamily: 'inherit',
+                      color: log.type === 'error' ? '#c62828' : '#333',
+                    }}
+                  >
+                    {log.message}
+                  </pre>
                 </div>
               ))
             )}
@@ -564,21 +618,10 @@ export default function WebSocketToolPage() {
         </div>
       </section>
 
-      {/* Inline styles for log types */}
-      <style>{`
-        .log-sent {
-          background: #e3f2fd;
-        }
-        .log-received {
-          background: #f1f8e9;
-        }
-        .log-system {
-          background: #fff8e1;
-        }
-        .log-error {
-          background: #ffebee;
-        }
-      `}</style>
+      {/* Quick Tips */}
+      <div className="tool-notice">
+        <p>💡 提示：可以使用 wss://echo.websocket.org 测试 WebSocket 连接，该服务会原样返回发送的消息。</p>
+      </div>
     </div>
   )
 }

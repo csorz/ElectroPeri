@@ -1,0 +1,172 @@
+<h2>Creative QR Code Styles</h2>
+<p class="subtitle">Which artistic styles do you want? (Select all that apply)</p>
+
+<div class="cards">
+  <div class="card" data-choice="rounded" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;height:120px;">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <rect x="5" y="5" width="15" height="15" rx="4" fill="#333"/>
+        <rect x="25" y="5" width="10" height="10" rx="3" fill="#333"/>
+        <rect x="40" y="5" width="10" height="10" rx="3" fill="#333"/>
+        <rect x="55" y="5" width="15" height="15" rx="4" fill="#333"/>
+        <rect x="5" y="25" width="10" height="10" rx="3" fill="#333"/>
+        <rect x="25" y="25" width="10" height="10" rx="3" fill="#333"/>
+        <rect x="5" y="55" width="15" height="15" rx="4" fill="#333"/>
+        <rect x="25" y="55" width="10" height="10" rx="3" fill="#333"/>
+        <rect x="55" y="55" width="15" height="15" rx="4" fill="#333"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>Rounded</h3>
+      <p>Smooth rounded corners on all modules</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="dots" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;height:120px;">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <circle cx="12" cy="12" r="7" fill="#333"/>
+        <circle cx="30" cy="10" r="5" fill="#333"/>
+        <circle cx="45" cy="10" r="5" fill="#333"/>
+        <circle cx="62" cy="12" r="7" fill="#333"/>
+        <circle cx="10" cy="30" r="5" fill="#333"/>
+        <circle cx="30" cy="30" r="5" fill="#333"/>
+        <circle cx="12" cy="62" r="7" fill="#333"/>
+        <circle cx="30" cy="60" r="5" fill="#333"/>
+        <circle cx="62" cy="62" r="7" fill="#333"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>Dots</h3>
+      <p>Circular dots instead of squares</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="gradient" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;height:120px;">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <defs>
+          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#667eea"/>
+            <stop offset="100%" style="stop-color:#764ba2"/>
+          </linearGradient>
+        </defs>
+        <rect x="5" y="5" width="15" height="15" fill="url(#grad1)"/>
+        <rect x="25" y="5" width="10" height="10" fill="url(#grad1)"/>
+        <rect x="40" y="5" width="10" height="10" fill="url(#grad1)"/>
+        <rect x="55" y="5" width="15" height="15" fill="url(#grad1)"/>
+        <rect x="5" y="25" width="10" height="10" fill="url(#grad1)"/>
+        <rect x="25" y="25" width="10" height="10" fill="url(#grad1)"/>
+        <rect x="5" y="55" width="15" height="15" fill="url(#grad1)"/>
+        <rect x="25" y="55" width="10" height="10" fill="url(#grad1)"/>
+        <rect x="55" y="55" width="15" height="15" fill="url(#grad1)"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>Gradient</h3>
+      <p>Gradient color from one color to another</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="logo" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;height:120px;">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <rect x="5" y="5" width="15" height="15" fill="#333"/>
+        <rect x="25" y="5" width="10" height="10" fill="#333"/>
+        <rect x="40" y="5" width="10" height="10" fill="#333"/>
+        <rect x="55" y="5" width="15" height="15" fill="#333"/>
+        <rect x="5" y="25" width="10" height="10" fill="#333"/>
+        <rect x="55" y="25" width="10" height="10" fill="#333"/>
+        <rect x="5" y="40" width="10" height="10" fill="#333"/>
+        <rect x="55" y="40" width="10" height="10" fill="#333"/>
+        <rect x="5" y="55" width="15" height="15" fill="#333"/>
+        <rect x="55" y="55" width="15" height="15" fill="#333"/>
+        <rect x="25" y="25" width="25" height="25" rx="4" fill="#fff" stroke="#333" stroke-width="2"/>
+        <text x="37.5" y="42" text-anchor="middle" font-size="12" fill="#333">LOGO</text>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>Logo Center</h3>
+      <p>Place a logo/image in the center</p>
+    </div>
+  </div>
+</div>
+
+<div class="cards" style="margin-top: 16px;">
+  <div class="card" data-choice="liquid" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;height:120px;">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <path d="M5,5 Q12.5,5 20,12.5 Q20,20 12.5,20 Q5,20 5,12.5 Z" fill="#333"/>
+        <path d="M25,5 Q30,8 35,5 Q40,8 35,15 Q30,15 25,15 Q22,10 25,5 Z" fill="#333"/>
+        <path d="M55,5 Q62.5,5 70,12.5 Q70,20 62.5,20 Q55,20 55,12.5 Z" fill="#333"/>
+        <path d="M5,55 Q12.5,55 20,62.5 Q20,70 12.5,70 Q5,70 5,62.5 Z" fill="#333"/>
+        <path d="M55,55 Q62.5,55 70,62.5 Q70,70 62.5,70 Q55,70 55,62.5 Z" fill="#333"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>Liquid</h3>
+      <p>Fluid, organic blob-like modules</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="mini" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;height:120px;">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <rect x="5" y="5" width="15" height="15" fill="#333"/>
+        <rect x="7" y="7" width="5" height="5" fill="#fff"/>
+        <rect x="13" y="13" width="5" height="5" fill="#fff"/>
+        <rect x="55" y="5" width="15" height="15" fill="#333"/>
+        <rect x="57" y="7" width="5" height="5" fill="#fff"/>
+        <rect x="63" y="13" width="5" height="5" fill="#fff"/>
+        <rect x="5" y="55" width="15" height="15" fill="#333"/>
+        <rect x="7" y="57" width="5" height="5" fill="#fff"/>
+        <rect x="13" y="63" width="5" height="5" fill="#fff"/>
+        <rect x="25" y="25" width="25" height="25" fill="#333"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>Mini Squares</h3>
+      <p>Inner mini squares in each module</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="random" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;height:120px;">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <rect x="5" y="5" width="15" height="15" fill="#333"/>
+        <circle cx="30" cy="10" r="5" fill="#333"/>
+        <rect x="40" y="5" width="10" height="10" fill="#333"/>
+        <rect x="55" y="5" width="15" height="15" fill="#333"/>
+        <circle cx="10" cy="30" r="5" fill="#333"/>
+        <rect x="25" y="25" width="10" height="10" fill="#333"/>
+        <rect x="5" y="55" width="15" height="15" fill="#333"/>
+        <circle cx="30" cy="60" r="5" fill="#333"/>
+        <rect x="55" y="55" width="15" height="15" fill="#333"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>Random Mix</h3>
+      <p>Mix of squares and circles randomly</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="frame" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;height:120px;">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <rect x="2" y="2" width="76" height="76" rx="8" fill="none" stroke="#333" stroke-width="3"/>
+        <rect x="10" y="10" width="12" height="12" fill="#333"/>
+        <rect x="28" y="10" width="8" height="8" fill="#333"/>
+        <rect x="42" y="10" width="8" height="8" fill="#333"/>
+        <rect x="58" y="10" width="12" height="12" fill="#333"/>
+        <rect x="10" y="28" width="8" height="8" fill="#333"/>
+        <rect x="10" y="58" width="12" height="12" fill="#333"/>
+        <rect x="28" y="58" width="8" height="8" fill="#333"/>
+        <rect x="58" y="58" width="12" height="12" fill="#333"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>Frame</h3>
+      <p>Decorative border/frame around QR</p>
+    </div>
+  </div>
+</div>

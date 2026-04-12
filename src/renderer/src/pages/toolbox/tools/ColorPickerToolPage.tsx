@@ -125,7 +125,7 @@ export default function ColorPickerToolPage() {
         {/* 颜色选择器 */}
         <div className="tool-block" style={{ borderTop: 'none', paddingTop: 0 }}>
           <div className="tool-block-title">选择颜色</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px' }}>
             <input
               type="color"
               value={color}
@@ -135,7 +135,8 @@ export default function ColorPickerToolPage() {
                 height: '60px',
                 border: '2px solid var(--border-color)',
                 borderRadius: '8px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                flexShrink: 0
               }}
             />
             <input
@@ -144,7 +145,7 @@ export default function ColorPickerToolPage() {
               value={color}
               onChange={(e) => setColor(e.target.value)}
               placeholder="#000000"
-              style={{ flex: 1, fontSize: '16px', fontFamily: 'monospace' }}
+              style={{ flex: '1 1 150px', minWidth: '120px', fontSize: '16px', fontFamily: 'monospace' }}
             />
             <button type="button" className="btn btn-primary" onClick={addToHistory}>
               收藏
@@ -184,21 +185,23 @@ export default function ColorPickerToolPage() {
                 key={format.label}
                 style={{
                   display: 'flex',
+                  flexWrap: 'wrap',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '12px',
                   background: 'var(--bg-secondary)',
-                  borderRadius: '4px'
+                  borderRadius: '4px',
+                  gap: '8px'
                 }}
               >
-                <div>
+                <div style={{ flex: '1 1 auto', minWidth: '100px' }}>
                   <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{format.label}</div>
-                  <code className="mono" style={{ fontSize: '14px' }}>{format.value}</code>
+                  <code className="mono" style={{ fontSize: '14px', wordBreak: 'break-all' }}>{format.value}</code>
                 </div>
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  style={{ padding: '4px 12px', fontSize: '12px' }}
+                  style={{ padding: '4px 12px', fontSize: '12px', flexShrink: 0 }}
                   onClick={() => onCopy(format.value)}
                 >
                   复制

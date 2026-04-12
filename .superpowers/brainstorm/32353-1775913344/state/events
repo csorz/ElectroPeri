@@ -1,0 +1,4 @@
+{"type":"click","text":"A\n    \n      Tabs Layout\n      Three tabs: Generate | Decode | Batch. Each tab has its own form and options. Clean separation of features.","choice":"tabs","id":null,"timestamp":1775914035952}
+{"type":"click","text":"B\n    \n      Unified Form\n      Single form with mode toggle at top. Style options always visible. Decode section collapsible at bottom. More compact.","choice":"unified","id":null,"timestamp":1775914038762}
+{"type":"click","text":"C\n    \n      双列布局\n      左侧：输入表单+选项。右边：预览+下载。样式选择器作为视觉选择器。解码为下方独立部分。","choice":"sidebar","id":null,"timestamp":1775914048126}
+{"type":"click","text":"A\n    \n      标签布局\n      三个标签页：生成 |解码 |批次。每个标签页都有自己的形式和选项。特征分工清晰。","choice":"tabs","id":null,"timestamp":1775914050661}

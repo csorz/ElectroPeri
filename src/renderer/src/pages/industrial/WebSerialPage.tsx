@@ -185,6 +185,22 @@ export default function WebSerialPage() {
         </div>
       </div>
 
+      {/* Browser Support Info */}
+      <div className="browser-support-info" style={{
+        background: '#e3f2fd',
+        padding: '12px 16px',
+        borderRadius: 4,
+        marginBottom: 16,
+        fontSize: 13
+      }}>
+        <div style={{ marginBottom: 4 }}>
+          <strong>📋 浏览器支持:</strong> Chrome 89+ | Edge 89+ | Opera 75+
+        </div>
+        <div style={{ color: '#666' }}>
+          <strong>⚠️ 需要:</strong> HTTPS 或 localhost 安全上下文
+        </div>
+      </div>
+
       {!supported && (
         <div className="error-message">
           <span>❌ 当前环境不支持 Web Serial API，请确认 Chromium 内核与安全上下文配置。</span>

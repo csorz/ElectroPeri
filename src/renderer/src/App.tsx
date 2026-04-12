@@ -20,6 +20,63 @@ import OcrCategoryPage from './pages/toolbox/categories/OcrCategoryPage'
 import UtilsCategoryPage from './pages/toolbox/categories/UtilsCategoryPage'
 import FunCategoryPage from './pages/toolbox/categories/FunCategoryPage'
 
+// Network Category
+import NetworkCategoryPage from './pages/toolbox/categories/NetworkCategoryPage'
+import TcpToolPage from './pages/toolbox/tools/TcpToolPage'
+import UdpToolPage from './pages/toolbox/tools/UdpToolPage'
+import KcpToolPage from './pages/toolbox/tools/KcpToolPage'
+
+// Database Category
+import DatabaseCategoryPage from './pages/toolbox/categories/DatabaseCategoryPage'
+import MysqlToolPage from './pages/toolbox/tools/MysqlToolPage'
+import PostgresqlToolPage from './pages/toolbox/tools/PostgresqlToolPage'
+import MongodbToolPage from './pages/toolbox/tools/MongodbToolPage'
+import ShardingToolPage from './pages/toolbox/tools/ShardingToolPage'
+import IndexToolPage from './pages/toolbox/tools/IndexToolPage'
+import ReplicationToolPage from './pages/toolbox/tools/ReplicationToolPage'
+
+// Pool Category
+import PoolCategoryPage from './pages/toolbox/categories/PoolCategoryPage'
+import ConnectionPoolToolPage from './pages/toolbox/tools/ConnectionPoolToolPage'
+import ThreadPoolToolPage from './pages/toolbox/tools/ThreadPoolToolPage'
+import ObjectPoolToolPage from './pages/toolbox/tools/ObjectPoolToolPage'
+
+// Redis Category
+import RedisCategoryPage from './pages/toolbox/categories/RedisCategoryPage'
+import RedisCacheToolPage from './pages/toolbox/tools/RedisCacheToolPage'
+import RedisProblemsToolPage from './pages/toolbox/tools/RedisProblemsToolPage'
+import RedisResilienceToolPage from './pages/toolbox/tools/RedisResilienceToolPage'
+
+// Deploy Category
+import DeployCategoryPage from './pages/toolbox/categories/DeployCategoryPage'
+import DeployArchitectureToolPage from './pages/toolbox/tools/DeployArchitectureToolPage'
+import LinuxToolPage from './pages/toolbox/tools/LinuxToolPage'
+import DockerToolPage from './pages/toolbox/tools/DockerToolPage'
+import KubernetesToolPage from './pages/toolbox/tools/KubernetesToolPage'
+import SecurityToolPage from './pages/toolbox/tools/SecurityToolPage'
+
+// Monitor Category
+import MonitorCategoryPage from './pages/toolbox/categories/MonitorCategoryPage'
+import GrafanaToolPage from './pages/toolbox/tools/GrafanaToolPage'
+
+// Release Category
+import ReleaseCategoryPage from './pages/toolbox/categories/ReleaseCategoryPage'
+import CanaryToolPage from './pages/toolbox/tools/CanaryToolPage'
+import BlueGreenToolPage from './pages/toolbox/tools/BlueGreenToolPage'
+import RollingToolPage from './pages/toolbox/tools/RollingToolPage'
+
+// Scaling Category
+import ScalingCategoryPage from './pages/toolbox/categories/ScalingCategoryPage'
+import MultiActiveToolPage from './pages/toolbox/tools/MultiActiveToolPage'
+import BackupToolPage from './pages/toolbox/tools/BackupToolPage'
+
+// HA Category
+import HaCategoryPage from './pages/toolbox/categories/HaCategoryPage'
+import LoadbalancerToolPage from './pages/toolbox/tools/LoadbalancerToolPage'
+import DnsToolPage from './pages/toolbox/tools/DnsToolPage'
+import ProxyToolPage from './pages/toolbox/tools/ProxyToolPage'
+import CdnToolPage from './pages/toolbox/tools/CdnToolPage'
+
 // Encoding tools
 import HashToolPage from './pages/toolbox/tools/HashToolPage'
 import Base64ToolPage from './pages/toolbox/tools/Base64ToolPage'
@@ -118,6 +175,9 @@ import AvatarGeneratorToolPage from './pages/toolbox/tools/AvatarGeneratorToolPa
 // P1 - 工业核心接口
 import SerialPage from './pages/industrial/SerialPage'
 import WebSerialPage from './pages/industrial/WebSerialPage'
+import WebHidPage from './pages/industrial/WebHidPage'
+import WebUsbPage from './pages/industrial/WebUsbPage'
+import WebBluetoothPage from './pages/industrial/WebBluetoothPage'
 import UsbPage from './pages/industrial/UsbPage'
 import BluetoothPage from './pages/industrial/BluetoothPage'
 import HidPage from './pages/industrial/HidPage'
@@ -164,6 +224,9 @@ function App(): React.JSX.Element {
           <Route path="printer" element={<PrinterPage />} />
           <Route path="media" element={<MediaPage />} />
           <Route path="web-serial" element={<WebSerialPage />} />
+          <Route path="web-hid" element={<WebHidPage />} />
+          <Route path="web-usb" element={<WebUsbPage />} />
+          <Route path="web-bluetooth" element={<WebBluetoothPage />} />
 
           {/* Encoding Category & Tools */}
           <Route path="frontend-toolbox/encoding" element={<EncodingCategoryPage />} />
@@ -276,6 +339,63 @@ function App(): React.JSX.Element {
           <Route path="frontend-toolbox/fun/piano" element={<PianoToolPage />} />
           <Route path="frontend-toolbox/fun/voice" element={<VoiceSynthesisToolPage />} />
           <Route path="frontend-toolbox/fun/avatar" element={<AvatarGeneratorToolPage />} />
+
+          {/* Network Category & Tools */}
+          <Route path="frontend-toolbox/network" element={<NetworkCategoryPage />} />
+          <Route path="frontend-toolbox/network/tcp" element={<TcpToolPage />} />
+          <Route path="frontend-toolbox/network/udp" element={<UdpToolPage />} />
+          <Route path="frontend-toolbox/network/kcp" element={<KcpToolPage />} />
+
+          {/* Database Category & Tools */}
+          <Route path="frontend-toolbox/database" element={<DatabaseCategoryPage />} />
+          <Route path="frontend-toolbox/database/mysql" element={<MysqlToolPage />} />
+          <Route path="frontend-toolbox/database/postgresql" element={<PostgresqlToolPage />} />
+          <Route path="frontend-toolbox/database/mongodb" element={<MongodbToolPage />} />
+          <Route path="frontend-toolbox/database/sharding" element={<ShardingToolPage />} />
+          <Route path="frontend-toolbox/database/index" element={<IndexToolPage />} />
+          <Route path="frontend-toolbox/database/replication" element={<ReplicationToolPage />} />
+
+          {/* Pool Category & Tools */}
+          <Route path="frontend-toolbox/pool" element={<PoolCategoryPage />} />
+          <Route path="frontend-toolbox/pool/connection" element={<ConnectionPoolToolPage />} />
+          <Route path="frontend-toolbox/pool/thread" element={<ThreadPoolToolPage />} />
+          <Route path="frontend-toolbox/pool/object" element={<ObjectPoolToolPage />} />
+
+          {/* Redis Category & Tools */}
+          <Route path="frontend-toolbox/redis" element={<RedisCategoryPage />} />
+          <Route path="frontend-toolbox/redis/cache" element={<RedisCacheToolPage />} />
+          <Route path="frontend-toolbox/redis/problems" element={<RedisProblemsToolPage />} />
+          <Route path="frontend-toolbox/redis/resilience" element={<RedisResilienceToolPage />} />
+
+          {/* Deploy Category & Tools */}
+          <Route path="frontend-toolbox/deploy" element={<DeployCategoryPage />} />
+          <Route path="frontend-toolbox/deploy/architecture" element={<DeployArchitectureToolPage />} />
+          <Route path="frontend-toolbox/deploy/linux" element={<LinuxToolPage />} />
+          <Route path="frontend-toolbox/deploy/docker" element={<DockerToolPage />} />
+          <Route path="frontend-toolbox/deploy/kubernetes" element={<KubernetesToolPage />} />
+          <Route path="frontend-toolbox/deploy/security" element={<SecurityToolPage />} />
+
+          {/* Monitor Category & Tools */}
+          <Route path="frontend-toolbox/monitor" element={<MonitorCategoryPage />} />
+          <Route path="frontend-toolbox/monitor/grafana" element={<GrafanaToolPage />} />
+
+          {/* Release Category & Tools */}
+          <Route path="frontend-toolbox/release" element={<ReleaseCategoryPage />} />
+          <Route path="frontend-toolbox/release/canary" element={<CanaryToolPage />} />
+          <Route path="frontend-toolbox/release/blue-green" element={<BlueGreenToolPage />} />
+          <Route path="frontend-toolbox/release/rolling" element={<RollingToolPage />} />
+
+          {/* Scaling Category & Tools */}
+          <Route path="frontend-toolbox/scaling" element={<ScalingCategoryPage />} />
+          <Route path="frontend-toolbox/scaling/multi-active" element={<MultiActiveToolPage />} />
+          <Route path="frontend-toolbox/scaling/backup" element={<BackupToolPage />} />
+
+          {/* HA Category & Tools */}
+          <Route path="frontend-toolbox/ha" element={<HaCategoryPage />} />
+          <Route path="frontend-toolbox/ha/loadbalancer" element={<LoadbalancerToolPage />} />
+          <Route path="frontend-toolbox/ha/dns" element={<DnsToolPage />} />
+          <Route path="frontend-toolbox/ha/proxy" element={<ProxyToolPage />} />
+          <Route path="frontend-toolbox/ha/cdn" element={<CdnToolPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

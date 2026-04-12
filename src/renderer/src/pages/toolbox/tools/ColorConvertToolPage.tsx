@@ -160,7 +160,7 @@ export default function ColorConvertToolPage() {
               type="color"
               value={hex}
               onChange={(e) => updateFromHex(e.target.value)}
-              style={{ width: '50px', height: '40px', border: 'none', cursor: 'pointer' }}
+              style={{ width: '50px', height: '40px', border: 'none', cursor: 'pointer', flexShrink: 0 }}
             />
             <input
               type="text"
@@ -168,7 +168,7 @@ export default function ColorConvertToolPage() {
               value={hex}
               onChange={(e) => updateFromHex(e.target.value)}
               placeholder="#000000"
-              style={{ flex: 1 }}
+              style={{ flex: 1, minWidth: '80px' }}
             />
           </div>
         </div>
@@ -176,7 +176,7 @@ export default function ColorConvertToolPage() {
         {/* RGB 输入 */}
         <div className="tool-block">
           <div className="tool-block-title">RGB</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '12px' }}>
             <label className="tool-label">
               R
               <input
@@ -216,7 +216,7 @@ export default function ColorConvertToolPage() {
         {/* HSL 输入 */}
         <div className="tool-block">
           <div className="tool-block-title">HSL</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '12px' }}>
             <label className="tool-label">
               H (色相)
               <input
@@ -262,18 +262,20 @@ export default function ColorConvertToolPage() {
                 key={key}
                 style={{
                   display: 'flex',
+                  flexWrap: 'wrap',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '8px 12px',
                   background: 'var(--bg-secondary)',
-                  borderRadius: '4px'
+                  borderRadius: '4px',
+                  gap: '8px'
                 }}
               >
-                <code className="mono" style={{ color: 'var(--text-secondary)' }}>{value}</code>
+                <code className="mono" style={{ color: 'var(--text-secondary)', wordBreak: 'break-all', flex: '1 1 auto', minWidth: '80px' }}>{value}</code>
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                  style={{ padding: '4px 8px', fontSize: '12px', flexShrink: 0 }}
                   onClick={() => onCopy(value)}
                 >
                   复制

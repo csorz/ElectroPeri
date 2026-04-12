@@ -1,5 +1,5 @@
 .display-page {
-  padding: 24px;
+  padding: clamp(12px, 2vw, 24px);
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -8,24 +8,26 @@
 
 .display-page .page-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
 .display-page .page-header h1 {
-  font-size: 24px;
+  font-size: clamp(18px, 3vw, 24px);
   font-weight: 700;
   color: #333;
 }
 
 .display-page .card {
   flex: 1;
-  min-height: 0;
+  min-height: clamp(150px, 30vw, 300px);
   background: #0b1020;
   color: #d6e1ff;
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(10px, 1.5vw, 12px);
   overflow: auto;
   border: 1px solid #eee;
 }
@@ -34,16 +36,17 @@
   white-space: pre-wrap;
   word-break: break-word;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-  font-size: 12px;
+  font-size: clamp(11px, 1.3vw, 12px);
 }
 
 .display-page .status-bar {
   margin-top: 12px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   color: #555;
-  font-size: 13px;
+  font-size: clamp(12px, 1.5vw, 13px);
 }
 
 .display-page .status-indicator {
@@ -63,11 +66,11 @@
 
 .display-page .card-list {
   flex: 1;
-  min-height: 0;
+  min-height: clamp(150px, 30vw, 300px);
   background: #fff;
   border: 1px solid #e8ecf1;
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(10px, 1.5vw, 12px);
   overflow: auto;
 }
 
@@ -78,24 +81,50 @@
 .display-page .section h3 {
   color: #333;
   margin-bottom: 8px;
+  font-size: clamp(13px, 1.8vw, 15px);
 }
 
 .display-page table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: clamp(11px, 1.3vw, 13px);
+  display: block;
+  overflow-x: auto;
 }
 
 .display-page th,
 .display-page td {
   border-bottom: 1px solid #edf0f4;
-  padding: 8px;
+  padding: clamp(6px, 1vw, 8px);
   text-align: left;
   color: #333;
+  white-space: nowrap;
 }
 
 .display-page ul {
   padding-left: 16px;
   color: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .display-page {
+    padding: 12px;
+  }
+
+  .display-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .display-page {
+    padding: 8px;
+  }
+
+  .display-page .card-list {
+    padding: 10px;
+  }
 }
 

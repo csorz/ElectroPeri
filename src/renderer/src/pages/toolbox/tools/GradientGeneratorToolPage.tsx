@@ -162,21 +162,21 @@ export default function GradientGeneratorToolPage() {
           </div>
           <div style={{ display: 'grid', gap: '12px' }}>
             {stops.map((stop, index) => (
-              <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div key={index} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px' }}>
                 <input
                   type="color"
                   value={stop.color}
                   onChange={(e) => updateStop(index, { color: e.target.value })}
-                  style={{ width: '50px', height: '40px', border: 'none', cursor: 'pointer' }}
+                  style={{ width: '50px', height: '40px', border: 'none', cursor: 'pointer', flexShrink: 0 }}
                 />
                 <input
                   type="text"
                   className="tool-input"
                   value={stop.color}
                   onChange={(e) => updateStop(index, { color: e.target.value })}
-                  style={{ width: '120px' }}
+                  style={{ width: '120px', flexShrink: 0 }}
                 />
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ flex: '1 1 150px', display: 'flex', alignItems: 'center', gap: '8px', minWidth: '150px' }}>
                   <input
                     type="range"
                     min="0"
@@ -185,13 +185,13 @@ export default function GradientGeneratorToolPage() {
                     onChange={(e) => updateStop(index, { position: parseInt(e.target.value) })}
                     style={{ flex: 1 }}
                   />
-                  <span style={{ width: '40px', textAlign: 'right' }}>{stop.position}%</span>
+                  <span style={{ width: '40px', textAlign: 'right', flexShrink: 0 }}>{stop.position}%</span>
                 </div>
                 {stops.length > 2 && (
                   <button
                     type="button"
                     className="btn btn-secondary"
-                    style={{ padding: '4px 8px' }}
+                    style={{ padding: '4px 8px', flexShrink: 0 }}
                     onClick={() => removeStop(index)}
                   >
                     删除

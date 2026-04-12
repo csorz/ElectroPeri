@@ -1,5 +1,5 @@
 .power-page {
-  padding: 24px;
+  padding: clamp(12px, 2vw, 24px);
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -8,26 +8,29 @@
 
 .power-page .page-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
 .power-page .page-header h1 {
-  font-size: 24px;
+  font-size: clamp(18px, 3vw, 24px);
   font-weight: 700;
   color: #333;
 }
 
 .power-page .card {
   background: white;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(12px, 2vw, 16px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .power-page .kv {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 12px;
   align-items: center;
@@ -35,21 +38,23 @@
 
 .power-page .k {
   color: #555;
-  font-size: 13px;
+  font-size: clamp(12px, 1.5vw, 13px);
 }
 
 .power-page .v {
   color: #222;
   font-weight: 700;
+  font-size: clamp(13px, 1.5vw, 15px);
 }
 
 .power-page .status-bar {
   margin-top: 12px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   color: #555;
-  font-size: 13px;
+  font-size: clamp(12px, 1.5vw, 13px);
 }
 
 .power-page .status-indicator {
@@ -65,5 +70,32 @@
 
 .power-page .status-indicator.error {
   background: #f44336;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .power-page {
+    padding: 12px;
+  }
+
+  .power-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .power-page .card {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .power-page {
+    padding: 8px;
+  }
+
+  .power-page .card {
+    padding: 10px;
+    border-radius: 8px;
+  }
 }
 

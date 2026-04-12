@@ -1,5 +1,5 @@
 .hid-page {
-  padding: 24px;
+  padding: clamp(12px, 2vw, 24px);
   min-height: 100%;
   overflow: auto;
   display: flex;
@@ -8,13 +8,15 @@
 
 .hid-page .page-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
 .hid-page .page-header h1 {
-  font-size: 24px;
+  font-size: clamp(18px, 3vw, 24px);
   font-weight: 700;
   color: #333;
 }
@@ -22,7 +24,7 @@
 .hid-page .content-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: clamp(12px, 2vw, 16px);
   flex: 1;
   min-height: 0;
 }
@@ -30,8 +32,8 @@
 .hid-page .device-list,
 .hid-page .data-panel {
   background: white;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(12px, 2vw, 16px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
@@ -42,7 +44,7 @@
 .hid-page .data-panel h3 {
   margin-bottom: 12px;
   color: #333;
-  font-size: 16px;
+  font-size: clamp(14px, 2vw, 16px);
 }
 
 .hid-page .device-list-items {
@@ -52,13 +54,15 @@
 }
 
 .hid-page .device-item {
-  padding: 10px 12px;
+  padding: clamp(8px, 1.5vw, 10px) clamp(10px, 1.5vw, 12px);
   border: 1px solid #eee;
-  border-radius: 10px;
+  border-radius: clamp(6px, 1.5vw, 10px);
   margin-bottom: 10px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
 
 .hid-page .device-item.selected {
@@ -69,20 +73,23 @@
 .hid-page .device-name {
   font-weight: 700;
   color: #222;
+  font-size: clamp(12px, 1.5vw, 14px);
 }
 
 .hid-page .device-ids {
   display: block;
   margin-top: 4px;
-  font-size: 12px;
+  font-size: clamp(11px, 1.3vw, 12px);
   color: #555;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
 }
 
 .hid-page .data-panel .panel-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   margin-bottom: 8px;
 }
 
@@ -94,27 +101,27 @@
   display: inline-flex;
   gap: 6px;
   align-items: center;
-  font-size: 13px;
+  font-size: clamp(12px, 1.5vw, 13px);
   color: #444;
 }
 
 .hid-page input[type='number'],
 .hid-page input[type='text'] {
-  padding: 8px 10px;
-  border-radius: 8px;
+  padding: clamp(6px, 1vw, 8px) clamp(8px, 1.5vw, 10px);
+  border-radius: clamp(4px, 1vw, 8px);
   border: 1px solid #ddd;
   outline: none;
-  min-width: 80px;
+  min-width: clamp(60px, 10vw, 80px);
 }
 
 .hid-page .data-display {
   flex: 1;
-  min-height: 0;
+  min-height: clamp(100px, 20vw, 200px);
   border: 1px solid #eee;
-  border-radius: 10px;
+  border-radius: clamp(6px, 1.5vw, 10px);
   background: #0b1020;
   color: #d6e1ff;
-  padding: 10px;
+  padding: clamp(8px, 1.5vw, 10px);
   overflow: auto;
   margin-bottom: 8px;
 }
@@ -123,25 +130,28 @@
   white-space: pre-wrap;
   word-break: break-word;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-  font-size: 12px;
+  font-size: clamp(11px, 1.3vw, 12px);
 }
 
 .hid-page .send-panel {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
 .hid-page .send-panel input {
   flex: 1;
+  min-width: 150px;
 }
 
 .hid-page .status-bar {
   margin-top: 12px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   color: #555;
-  font-size: 13px;
+  font-size: clamp(12px, 1.5vw, 13px);
 }
 
 .hid-page .status-indicator {
@@ -161,5 +171,59 @@
 
 .hid-page .status-indicator.error {
   background: #f44336;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .hid-page .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hid-page {
+    padding: 12px;
+  }
+
+  .hid-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hid-page .device-list,
+  .hid-page .data-panel {
+    padding: 12px;
+  }
+
+  .hid-page .device-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hid-page .send-panel {
+    flex-direction: column;
+  }
+
+  .hid-page .send-panel input,
+  .hid-page .send-panel .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hid-page {
+    padding: 8px;
+  }
+
+  .hid-page .device-list,
+  .hid-page .data-panel {
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  .hid-page .data-display {
+    min-height: 80px;
+    padding: 8px;
+  }
 }
 

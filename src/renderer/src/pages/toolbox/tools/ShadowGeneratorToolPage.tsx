@@ -194,13 +194,14 @@ export default function ShadowGeneratorToolPage() {
                 type="color"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
-                style={{ width: '40px', height: '32px', border: 'none' }}
+                style={{ width: '40px', height: '32px', border: 'none', flexShrink: 0 }}
               />
               <input
                 type="text"
                 className="tool-input"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
+                style={{ minWidth: '80px' }}
               />
             </div>
           </label>
@@ -240,20 +241,22 @@ export default function ShadowGeneratorToolPage() {
                   key={index}
                   style={{
                     display: 'flex',
+                    flexWrap: 'wrap',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     padding: '8px 12px',
                     background: 'var(--bg-secondary)',
-                    borderRadius: '4px'
+                    borderRadius: '4px',
+                    gap: '8px'
                   }}
                 >
-                  <span className="mono" style={{ fontSize: '12px' }}>
+                  <span className="mono" style={{ fontSize: '12px', wordBreak: 'break-all', flex: '1 1 auto', minWidth: '100px' }}>
                     {layer.inset ? 'inset ' : ''}{layer.h}px {layer.v}px {layer.blur}px {layer.spread}px
                   </span>
                   <button
                     type="button"
                     className="btn btn-secondary"
-                    style={{ padding: '2px 8px', fontSize: '12px' }}
+                    style={{ padding: '2px 8px', fontSize: '12px', flexShrink: 0 }}
                     onClick={() => removeLayer(index)}
                   >
                     删除

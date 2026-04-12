@@ -1,5 +1,5 @@
 .system-page {
-  padding: 24px;
+  padding: clamp(12px, 2vw, 24px);
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -8,13 +8,15 @@
 
 .system-page .page-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
 .system-page .page-header h1 {
-  font-size: 24px;
+  font-size: clamp(18px, 3vw, 24px);
   font-weight: 700;
   color: #333;
 }
@@ -41,11 +43,11 @@
 
 .system-page .card {
   flex: 1;
-  min-height: 0;
+  min-height: clamp(150px, 30vw, 300px);
   background: #0b1020;
   color: #d6e1ff;
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(10px, 1.5vw, 12px);
   overflow: auto;
   border: 1px solid #eee;
 }
@@ -54,7 +56,7 @@
   white-space: pre-wrap;
   word-break: break-word;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-  font-size: 12px;
+  font-size: clamp(11px, 1.3vw, 12px);
 }
 
 .system-page .status-bar {
@@ -83,37 +85,73 @@
 
 .system-page .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: clamp(10px, 1.5vw, 12px);
 }
 
 .system-page .info-card {
   background: #fff;
   border: 1px solid #e8ecf1;
-  border-radius: 12px;
-  padding: 14px;
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(12px, 1.5vw, 14px);
 }
 
 .system-page .title {
   color: #666;
-  font-size: 12px;
+  font-size: clamp(11px, 1.3vw, 12px);
 }
 
 .system-page .value {
   margin-top: 6px;
   color: #222;
   font-weight: 700;
+  font-size: clamp(13px, 1.5vw, 15px);
 }
 
 .system-page .sub {
   margin-top: 4px;
   color: #777;
-  font-size: 12px;
+  font-size: clamp(11px, 1.3vw, 12px);
 }
 
 .system-page .updated-time {
   margin-top: 10px;
   color: #777;
-  font-size: 12px;
+  font-size: clamp(11px, 1.3vw, 12px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .system-page {
+    padding: 12px;
+  }
+
+  .system-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .system-page .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .system-page .card {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .system-page {
+    padding: 8px;
+  }
+
+  .system-page .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .system-page .info-card {
+    padding: 10px;
+  }
 }
 

@@ -94,13 +94,14 @@ export default function HashToolPage() {
                   <div className="tool-label" style={{ marginBottom: 4 }}>
                     {algo}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <pre className="tool-result mono" style={{ flex: 1, margin: 0 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+                    <pre className="tool-result mono" style={{ flex: '1 1 200px', margin: 0, minWidth: '150px', wordBreak: 'break-all' }}>
                       {hashTextResults[algo]}
                     </pre>
                     <button
                       type="button"
                       className="btn btn-secondary btn-sm"
+                      style={{ flexShrink: 0 }}
                       onClick={() => onCopy(hashTextResults[algo])}
                     >
                       复制
@@ -123,13 +124,14 @@ export default function HashToolPage() {
                   <div className="tool-label" style={{ marginBottom: 4 }}>
                     {algo}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <pre className="tool-result mono" style={{ flex: 1, margin: 0 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+                    <pre className="tool-result mono" style={{ flex: '1 1 200px', margin: 0, minWidth: '150px', wordBreak: 'break-all' }}>
                       {hashFileResults[algo]}
                     </pre>
                     <button
                       type="button"
                       className="btn btn-secondary btn-sm"
+                      style={{ flexShrink: 0 }}
                       onClick={() => onCopy(hashFileResults[algo])}
                     >
                       复制

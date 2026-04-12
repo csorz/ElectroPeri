@@ -6,19 +6,22 @@
 
 .page-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 20px;
 }
 
 .page-header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: clamp(20px, 4vw, 24px);
   color: #333;
 }
 
 .header-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -27,6 +30,7 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   background: #fff;
+  font-size: 13px;
 }
 
 .error-message {
@@ -36,6 +40,7 @@
   border-radius: 4px;
   margin-bottom: 20px;
   color: #c00;
+  font-size: 13px;
 }
 
 .content-grid {
@@ -52,11 +57,12 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
+  min-height: 300px;
 }
 
 .device-list h3 {
   margin: 0 0 12px 0;
-  font-size: 16px;
+  font-size: clamp(14px, 2vw, 16px);
   color: #333;
 }
 
@@ -66,6 +72,9 @@
   align-items: center;
   justify-content: center;
   color: #999;
+  font-size: 13px;
+  text-align: center;
+  padding: 20px;
 }
 
 .port-list {
@@ -78,8 +87,10 @@
 
 .port-item {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   padding: 12px;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
@@ -101,11 +112,14 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1;
+  min-width: 0;
 }
 
 .port-path {
   font-weight: 600;
   color: #333;
+  font-size: 13px;
 }
 
 .port-manufacturer,
@@ -114,24 +128,31 @@
   color: #666;
 }
 
+.port-actions {
+  flex-shrink: 0;
+}
+
 .data-panel {
   background: #fff;
   border-radius: 8px;
   padding: 16px;
   display: flex;
   flex-direction: column;
+  min-height: 300px;
 }
 
 .panel-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
 .panel-header h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: clamp(14px, 2vw, 16px);
   color: #333;
 }
 
@@ -141,26 +162,28 @@
   border-radius: 6px;
   padding: 12px;
   overflow-y: auto;
-  min-height: 200px;
+  min-height: 150px;
 }
 
 .data-display pre {
   margin: 0;
   color: #4fc3f7;
   font-family: 'Consolas', 'Monaco', monospace;
-  font-size: 13px;
+  font-size: clamp(11px, 1.5vw, 13px);
   white-space: pre-wrap;
   word-break: break-all;
 }
 
 .send-panel {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 12px;
 }
 
 .send-panel input {
   flex: 1;
+  min-width: 150px;
   padding: 10px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -174,13 +197,14 @@
 
 .status-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   margin-top: 16px;
   padding: 10px 16px;
   background: #fff;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: clamp(12px, 2vw, 14px);
   color: #666;
 }
 
@@ -188,6 +212,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .status-indicator.idle {
@@ -225,6 +250,7 @@
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .btn:disabled {
@@ -266,4 +292,92 @@
 
 .btn-danger:hover:not(:disabled) {
   background: #e53935;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .device-list,
+  .data-panel {
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .device-list,
+  .data-panel {
+    padding: 14px;
+    min-height: 200px;
+  }
+
+  .port-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .port-actions {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .port-actions .btn {
+    width: 100%;
+  }
+
+  .send-panel {
+    flex-direction: column;
+  }
+
+  .send-panel input,
+  .send-panel .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .serial-page {
+    padding: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  .device-list,
+  .data-panel {
+    padding: 12px;
+    min-height: 180px;
+  }
+
+  .data-display {
+    min-height: 120px;
+    padding: 10px;
+  }
+
+  .data-display pre {
+    font-size: 11px;
+  }
+
+  .btn {
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+
+  .status-bar {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
 }

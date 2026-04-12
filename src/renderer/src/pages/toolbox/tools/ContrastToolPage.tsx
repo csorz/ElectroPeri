@@ -112,7 +112,7 @@ export default function ContrastToolPage() {
         </div>
 
         {/* 颜色选择 */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
           <div className="tool-block" style={{ borderTop: 'none', paddingTop: 0 }}>
             <div className="tool-block-title">前景色（文字）</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -120,14 +120,14 @@ export default function ContrastToolPage() {
                 type="color"
                 value={foregroundColor}
                 onChange={(e) => setForegroundColor(e.target.value)}
-                style={{ width: '50px', height: '40px', border: 'none', cursor: 'pointer' }}
+                style={{ width: '50px', height: '40px', border: 'none', cursor: 'pointer', flexShrink: 0 }}
               />
               <input
                 type="text"
                 className="tool-input"
                 value={foregroundColor}
                 onChange={(e) => setForegroundColor(e.target.value)}
-                style={{ flex: 1 }}
+                style={{ flex: 1, minWidth: '80px' }}
               />
             </div>
           </div>
@@ -138,14 +138,14 @@ export default function ContrastToolPage() {
                 type="color"
                 value={backgroundColor}
                 onChange={(e) => setBackgroundColor(e.target.value)}
-                style={{ width: '50px', height: '40px', border: 'none', cursor: 'pointer' }}
+                style={{ width: '50px', height: '40px', border: 'none', cursor: 'pointer', flexShrink: 0 }}
               />
               <input
                 type="text"
                 className="tool-input"
                 value={backgroundColor}
                 onChange={(e) => setBackgroundColor(e.target.value)}
-                style={{ flex: 1 }}
+                style={{ flex: 1, minWidth: '80px' }}
               />
             </div>
           </div>
@@ -154,17 +154,19 @@ export default function ContrastToolPage() {
         {/* WCAG 标准 */}
         <div className="tool-block">
           <div className="tool-block-title">WCAG 合规性</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             <div>
               <h4 style={{ marginBottom: '8px' }}>普通文本 (14px+)</h4>
               <div style={{ display: 'grid', gap: '8px' }}>
                 <div style={{
                   display: 'flex',
+                  flexWrap: 'wrap',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '8px 12px',
                   background: 'var(--bg-secondary)',
-                  borderRadius: '4px'
+                  borderRadius: '4px',
+                  gap: '8px'
                 }}>
                   <span>AA (≥ 4.5:1)</span>
                   <span style={{ color: wcagResults.normal.aa ? '#00c853' : '#ff5252' }}>
@@ -173,11 +175,13 @@ export default function ContrastToolPage() {
                 </div>
                 <div style={{
                   display: 'flex',
+                  flexWrap: 'wrap',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '8px 12px',
                   background: 'var(--bg-secondary)',
-                  borderRadius: '4px'
+                  borderRadius: '4px',
+                  gap: '8px'
                 }}>
                   <span>AAA (≥ 7:1)</span>
                   <span style={{ color: wcagResults.normal.aaa ? '#00c853' : '#ff5252' }}>
@@ -191,11 +195,13 @@ export default function ContrastToolPage() {
               <div style={{ display: 'grid', gap: '8px' }}>
                 <div style={{
                   display: 'flex',
+                  flexWrap: 'wrap',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '8px 12px',
                   background: 'var(--bg-secondary)',
-                  borderRadius: '4px'
+                  borderRadius: '4px',
+                  gap: '8px'
                 }}>
                   <span>AA (≥ 3:1)</span>
                   <span style={{ color: wcagResults.large.aa ? '#00c853' : '#ff5252' }}>
@@ -204,11 +210,13 @@ export default function ContrastToolPage() {
                 </div>
                 <div style={{
                   display: 'flex',
+                  flexWrap: 'wrap',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '8px 12px',
                   background: 'var(--bg-secondary)',
-                  borderRadius: '4px'
+                  borderRadius: '4px',
+                  gap: '8px'
                 }}>
                   <span>AAA (≥ 4.5:1)</span>
                   <span style={{ color: wcagResults.large.aaa ? '#00c853' : '#ff5252' }}>

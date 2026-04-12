@@ -1,0 +1,35 @@
+<h2>QR Code Style Options</h2>
+<p class="subtitle">Which creative styles do you want for QR code generation?</p>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="instant" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Instant Generation</h3>
+      <p>Auto-generate QR code as you type - no button click needed</p>
+    </div>
+  </div>
+  <div class="option" data-choice="decode" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>QR Code Decoder</h3>
+      <p>Upload image to decode/scan QR codes - extract text from QR images</p>
+    </div>
+  </div>
+  <div class="option" data-choice="styles" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Creative Styles</h3>
+      <p>Rounded corners, dots, gradient colors, logo center, artistic patterns</p>
+    </div>
+  </div>
+  <div class="option" data-choice="batch" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>Batch Generation</h3>
+      <p>Generate multiple QR codes at once from a list of texts</p>
+    </div>
+  </div>
+</div>
+
+<p style="margin-top: 20px; color: #666;">Click to select multiple options. Current tool already has: basic generation, size/color controls, error correction levels.</p>

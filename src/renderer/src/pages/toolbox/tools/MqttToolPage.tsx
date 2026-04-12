@@ -79,7 +79,7 @@ export default function MqttToolPage() {
       setConnected(false)
       setConnecting(false)
       setSubscriptions([])
-      addLog('system', 'Disconnected from broker')
+      addLog('system', '已断开连接')
     }
 
     const handleError = (err: string) => {
@@ -101,7 +101,7 @@ export default function MqttToolPage() {
     setError(null)
 
     if (!brokerUrl.trim()) {
-      setError('Please enter broker URL')
+      setError('请输入服务器地址')
       return
     }
 
@@ -121,13 +121,13 @@ export default function MqttToolPage() {
 
       if (result.success) {
         setConnected(true)
-        addLog('system', 'Connected successfully')
+        addLog('system', '连接成功')
       } else {
-        setError(result.error || 'Connection failed')
-        addLog('error', result.error || 'Connection failed')
+        setError(result.error || '连接失败')
+        addLog('error', result.error || '连接失败')
       }
     } catch (e) {
-      const errMsg = e instanceof Error ? e.message : 'Connection failed'
+      const errMsg = e instanceof Error ? e.message : '连接失败'
       setError(errMsg)
       addLog('error', errMsg)
     } finally {
@@ -136,16 +136,16 @@ export default function MqttToolPage() {
   }
 
   const handleDisconnect = async () => {
-    addLog('system', 'Disconnecting...')
+    addLog('system', '正在断开连接...')
     await window.api.mqtt.disconnect()
     setConnected(false)
     setSubscriptions([])
-    addLog('system', 'Disconnected')
+    addLog('system', '已断开')
   }
 
   const handleSubscribe = async () => {
     if (!subTopic.trim()) {
-      setError('Please enter topic to subscribe')
+      setError('请输入订阅主题')
       return
     }
 
@@ -161,8 +161,8 @@ export default function MqttToolPage() {
       })
       setSubTopic('')
     } else {
-      setError(result.error || 'Subscribe failed')
-      addLog('error', `Subscribe failed: ${result.error}`)
+      setError(result.error || '订阅失败')
+      addLog('error', `订阅失败: ${result.error}`)
     }
   }
 
@@ -172,18 +172,18 @@ export default function MqttToolPage() {
       addLog('system', `Unsubscribed from ${topic}`)
       setSubscriptions((prev) => prev.filter((s) => s.topic !== topic))
     } else {
-      addLog('error', `Unsubscribe failed for ${topic}`)
+      addLog('error', `取消订阅失败: ${topic}`)
     }
   }
 
   const handlePublish = async () => {
     if (!pubTopic.trim()) {
-      setError('Please enter topic to publish')
+      setError('请输入发布主题')
       return
     }
 
     if (!pubMessage.trim()) {
-      setError('Please enter message to publish')
+      setError('请输入发布消息')
       return
     }
 
@@ -192,8 +192,8 @@ export default function MqttToolPage() {
       addLog('send', pubMessage, pubTopic)
       setPubMessage('')
     } else {
-      setError(result.error || 'Publish failed')
-      addLog('error', `Publish failed: ${result.error}`)
+      setError(result.error || '发布失败')
+      addLog('error', `发布失败: ${result.error}`)
     }
   }
 
@@ -246,17 +246,17 @@ export default function MqttToolPage() {
       <section className="tool-card">
         {/* Connection Config Section */}
         <div className="tool-block" style={{ borderTop: 'none', paddingTop: 0 }}>
-          <div className="tool-block-title">Connection Config</div>
+          <div className="tool-block-title">连接配置</div>
 
           <div className="tool-row">
             <label className="tool-label">
-              Broker URL
+              服务器地址
               <input
                 type="text"
                 className="tool-input"
                 value={brokerUrl}
                 onChange={(e) => setBrokerUrl(e.target.value)}
-                placeholder="e.g. mqtt://broker.example.com"
+                placeholder="例如: mqtt://broker.example.com"
                 disabled={connected}
               />
             </label>
@@ -264,7 +264,7 @@ export default function MqttToolPage() {
 
           <div className="tool-inline">
             <label className="tool-label">
-              Port
+              端口
               <input
                 type="number"
                 className="tool-input"
@@ -276,7 +276,7 @@ export default function MqttToolPage() {
             </label>
 
             <label className="tool-label">
-              Keep Alive
+              心跳间隔
               <input
                 type="number"
                 className="tool-input"
@@ -294,31 +294,31 @@ export default function MqttToolPage() {
                 onChange={(e) => setCleanSession(e.target.checked)}
                 disabled={connected}
               />
-              Clean Session
+              清除会话
             </label>
           </div>
 
           <div className="tool-inline">
             <label className="tool-label">
-              Username (optional)
+              用户名 (可选)
               <input
                 type="text"
                 className="tool-input"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
+                placeholder="用户名"
                 disabled={connected}
               />
             </label>
 
             <label className="tool-label">
-              Password (optional)
+              密码 (可选)
               <input
                 type="password"
                 className="tool-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
+                placeholder="密码"
                 disabled={connected}
               />
             </label>
@@ -326,13 +326,13 @@ export default function MqttToolPage() {
 
           <div className="tool-row">
             <label className="tool-label">
-              Client ID (optional, auto-generated if empty)
+              客户端 ID (可选，留空自动生成)
               <input
                 type="text"
                 className="tool-input"
                 value={clientId}
                 onChange={(e) => setClientId(e.target.value)}
-                placeholder="Auto-generated"
+                placeholder="自动生成"
                 disabled={connected}
               />
             </label>
@@ -352,11 +352,11 @@ export default function MqttToolPage() {
                 onClick={handleConnect}
                 disabled={connecting}
               >
-                {connecting ? 'Connecting...' : 'Connect'}
+                {connecting ? '连接中...' : '连接'}
               </button>
             ) : (
               <button type="button" className="btn btn-secondary" onClick={handleDisconnect}>
-                Disconnect
+                断开连接
               </button>
             )}
           </div>
@@ -365,7 +365,7 @@ export default function MqttToolPage() {
         {/* Subscribe Section (visible when connected) */}
         {connected && (
           <div className="tool-block">
-            <div className="tool-block-title">Subscribe</div>
+            <div className="tool-block-title">订阅主题</div>
 
             <div className="tool-inline">
               <input
@@ -374,7 +374,7 @@ export default function MqttToolPage() {
                 style={{ flex: 1 }}
                 value={subTopic}
                 onChange={(e) => setSubTopic(e.target.value)}
-                placeholder="Topic, e.g. sensor/temperature"
+                placeholder="主题，例如: sensor/temperature"
                 onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
               />
               <select
@@ -388,13 +388,13 @@ export default function MqttToolPage() {
                 <option value={2}>QoS 2</option>
               </select>
               <button type="button" className="btn btn-primary" onClick={handleSubscribe}>
-                Subscribe
+                订阅
               </button>
             </div>
 
             {subscriptions.length > 0 && (
               <div className="tool-result" style={{ background: '#f5f5f5', color: '#333' }}>
-                <div style={{ marginBottom: 8, fontWeight: 600 }}>Subscribed Topics:</div>
+                <div style={{ marginBottom: 8, fontWeight: 600 }}>已订阅主题:</div>
                 {subscriptions.map((sub) => (
                   <div
                     key={sub.topic}
@@ -414,7 +414,7 @@ export default function MqttToolPage() {
                       className="btn btn-secondary btn-sm"
                       onClick={() => handleUnsubscribe(sub.topic)}
                     >
-                      Unsubscribe
+                      取消订阅
                     </button>
                   </div>
                 ))}
@@ -426,7 +426,7 @@ export default function MqttToolPage() {
         {/* Publish Section (visible when connected) */}
         {connected && (
           <div className="tool-block">
-            <div className="tool-block-title">Publish</div>
+            <div className="tool-block-title">发布消息</div>
 
             <div className="tool-row">
               <input
@@ -434,7 +434,7 @@ export default function MqttToolPage() {
                 className="tool-input"
                 value={pubTopic}
                 onChange={(e) => setPubTopic(e.target.value)}
-                placeholder="Topic, e.g. sensor/temperature"
+                placeholder="主题，例如: sensor/temperature"
               />
             </div>
 
@@ -443,7 +443,7 @@ export default function MqttToolPage() {
                 className="tool-textarea"
                 value={pubMessage}
                 onChange={(e) => setPubMessage(e.target.value)}
-                placeholder="Message content..."
+                placeholder="消息内容..."
                 rows={3}
               />
             </div>
@@ -466,11 +466,11 @@ export default function MqttToolPage() {
                   checked={pubRetain}
                   onChange={(e) => setPubRetain(e.target.checked)}
                 />
-                Retain
+                保留消息
               </label>
 
               <button type="button" className="btn btn-primary" onClick={handlePublish}>
-                Publish
+                发布
               </button>
             </div>
           </div>
@@ -482,21 +482,21 @@ export default function MqttToolPage() {
             className="tool-block-title"
             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
           >
-            <span>Message Log</span>
+            <span>消息日志</span>
             <span style={{ display: 'flex', gap: 8 }}>
               <button
                 type="button"
                 className="btn btn-secondary btn-sm"
                 onClick={handleCopyLogs}
               >
-                Copy
+                复制
               </button>
               <button
                 type="button"
                 className="btn btn-secondary btn-sm"
                 onClick={handleClearLogs}
               >
-                Clear
+                清空
               </button>
             </span>
           </div>
@@ -507,7 +507,7 @@ export default function MqttToolPage() {
               className="tool-input"
               value={logFilter}
               onChange={(e) => setLogFilter(e.target.value)}
-              placeholder="Filter by topic or message..."
+              placeholder="按主题或消息过滤..."
             />
           </div>
 
@@ -523,7 +523,7 @@ export default function MqttToolPage() {
             }}
           >
             {filteredLogs.length === 0 ? (
-              <span style={{ color: '#888' }}>No logs yet</span>
+              <span style={{ color: '#888' }}>暂无日志</span>
             ) : (
               filteredLogs.map((log) => (
                 <div key={log.id} style={{ color: getLogTypeColor(log.type) }}>

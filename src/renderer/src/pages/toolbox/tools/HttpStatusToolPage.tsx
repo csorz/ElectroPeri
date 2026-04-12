@@ -108,9 +108,9 @@ export default function HttpStatusToolPage() {
 
         {selectedItem && (
           <div className="tool-block" style={{ background: '#f0f7ff', borderColor: '#007bff' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+              <div style={{ flex: '1 1 auto', minWidth: '200px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                   <span
                     className="mono"
                     style={{
@@ -141,7 +141,7 @@ export default function HttpStatusToolPage() {
               <button
                 type="button"
                 className="btn btn-secondary"
-                style={{ fontSize: '12px' }}
+                style={{ fontSize: '12px', flexShrink: 0 }}
                 onClick={() =>
                   onCopy(`${selectedItem.code} ${selectedItem.name}: ${selectedItem.description}`)
                 }

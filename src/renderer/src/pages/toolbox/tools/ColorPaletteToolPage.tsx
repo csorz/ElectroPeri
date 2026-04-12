@@ -192,14 +192,14 @@ export default function ColorPaletteToolPage() {
                 type="color"
                 value={baseColor}
                 onChange={(e) => setBaseColor(e.target.value)}
-                style={{ width: '50px', height: '40px', border: 'none', cursor: 'pointer' }}
+                style={{ width: '50px', height: '40px', border: 'none', cursor: 'pointer', flexShrink: 0 }}
               />
               <input
                 type="text"
                 className="tool-input"
                 value={baseColor}
                 onChange={(e) => setBaseColor(e.target.value)}
-                style={{ flex: 1 }}
+                style={{ flex: 1, minWidth: '80px' }}
               />
             </div>
           </label>

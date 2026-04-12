@@ -1,0 +1,814 @@
+.tool-page {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tool-header {
+  margin-bottom: 20px;
+}
+
+.tool-header h1 {
+  margin: 0 0 4px 0;
+  font-size: clamp(20px, 4vw, 24px);
+  color: #333;
+}
+
+.tool-header p {
+  margin: 0;
+  font-size: clamp(13px, 2vw, 14px);
+  color: #888;
+}
+
+.tool-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 12px;
+}
+
+.tool-tabs button {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tool-tabs button:hover {
+  color: #333;
+  background: #f5f5f5;
+}
+
+.tool-tabs button.active {
+  color: #4fc3f7;
+  background: #e3f8ff;
+  font-weight: 500;
+}
+
+.tool-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: clamp(12px, 3vw, 20px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* Concept Section */
+.concept-section h2 {
+  margin: 24px 0 12px 0;
+  font-size: clamp(16px, 3vw, 18px);
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #4fc3f7;
+}
+
+.concept-section h2:first-child {
+  margin-top: 0;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.feature-card {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #4fc3f7;
+}
+
+.feature-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  color: #333;
+}
+
+.feature-card p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.diagram-box {
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.ascii-art {
+  color: #4fc3f7;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: clamp(10px, 1.5vw, 12px);
+  line-height: 1.4;
+  margin: 0;
+  white-space: pre;
+}
+
+.info-box {
+  padding: 16px;
+  background: #e3f8ff;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.info-box strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #0288d1;
+}
+
+.info-box p {
+  margin: 0;
+  font-size: 13px;
+  color: #455a64;
+  line-height: 1.6;
+}
+
+.info-box ul {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+}
+
+.info-box li {
+  font-size: 13px;
+  color: #455a64;
+  margin-bottom: 4px;
+}
+
+.info-box.warning {
+  background: #fff3e0;
+}
+
+.info-box.warning strong {
+  color: #e65100;
+}
+
+.scenario-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.scenario-list li {
+  padding: 10px 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.scenario-list li strong {
+  color: #333;
+}
+
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+  gap: 12px;
+}
+
+.scenario-card {
+  padding: 14px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.scenario-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.scenario-card p {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.config-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.config-table th,
+.config-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.config-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+.config-table code {
+  padding: 2px 6px;
+  background: #e8e8e8;
+  border-radius: 3px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 12px;
+}
+
+/* Demo Section */
+.demo-section h2 {
+  margin: 24px 0 16px 0;
+  font-size: clamp(16px, 3vw, 18px);
+  color: #333;
+}
+
+.demo-section h2:first-child {
+  margin-top: 0;
+}
+
+.connection-demo,
+.window-demo,
+.udp-packet-demo,
+.packet-loss-demo,
+.kcp-config-demo,
+.latency-compare {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.state-diagram {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.state-node {
+  padding: 10px 16px;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.state-node.active {
+  background: #4fc3f7;
+  border-color: #4fc3f7;
+  color: #fff;
+}
+
+.state-arrow {
+  color: #999;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.step-info {
+  padding: 12px;
+  background: #fff;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.step-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.step-info p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.demo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.demo-controls button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.demo-controls button:first-child {
+  background: #4fc3f7;
+  color: #fff;
+}
+
+.demo-controls button:first-child:hover:not(:disabled) {
+  background: #29b6f6;
+}
+
+.demo-controls button:first-child:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.demo-controls button:last-child {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.demo-controls button:last-child:hover {
+  background: #d0d0d0;
+}
+
+/* Sliding Window */
+.window-config {
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.window-config label {
+  font-size: 13px;
+  color: #333;
+}
+
+.window-config input[type="range"] {
+  width: 150px;
+}
+
+.seq-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+.seq-cell {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #f0f0f0;
+  color: #999;
+  flex-shrink: 0;
+}
+
+.seq-cell.acked {
+  background: #4caf50;
+  color: #fff;
+}
+
+.seq-cell.sent {
+  background: #ff9800;
+  color: #fff;
+}
+
+.seq-cell.window {
+  background: #e3f2fd;
+  color: #1976d2;
+  border: 2px solid #1976d2;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-item::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legend-item.acked::before {
+  background: #4caf50;
+}
+
+.legend-item.sent::before {
+  background: #ff9800;
+}
+
+.legend-item.window::before {
+  background: #e3f2fd;
+  border: 1px solid #1976d2;
+}
+
+.window-stats {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+/* UDP Packet Demo */
+.packet-config {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.config-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.config-row label {
+  font-size: 12px;
+  color: #666;
+}
+
+.config-row input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.packet-output {
+  background: #1e1e1e;
+  color: #4fc3f7;
+  padding: 16px;
+  border-radius: 6px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 12px;
+  overflow-x: auto;
+}
+
+/* Packet Loss Demo */
+.loss-config {
+  margin-bottom: 16px;
+}
+
+.loss-config label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #333;
+}
+
+.loss-config input {
+  width: 100%;
+  max-width: 200px;
+}
+
+.packet-flow {
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+
+.packet-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.packet-row .label {
+  width: 50px;
+  font-size: 13px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.packet {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.packet.sent {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.packet.received {
+  background: #4caf50;
+  color: #fff;
+}
+
+.packet.lost {
+  background: #ffebee;
+  color: #c62828;
+  text-decoration: line-through;
+}
+
+.result-info {
+  padding: 12px;
+  background: #fff;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.result-info p {
+  margin: 0 0 4px 0;
+  color: #666;
+}
+
+/* KCP Config Demo */
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.config-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.config-item label {
+  font-size: 13px;
+  color: #333;
+  font-weight: 500;
+}
+
+.config-item select,
+.config-item input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.config-item input[type="range"] {
+  padding: 0;
+}
+
+.result-box {
+  padding: 16px;
+  background: #fff;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.result-box h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.result-box .hint {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+}
+
+/* Latency Compare */
+.compare-bars {
+  margin-bottom: 16px;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.bar-label {
+  width: 50px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.bar-container {
+  flex: 1;
+  height: 24px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 100px;
+}
+
+.bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.bar.tcp {
+  background: linear-gradient(90deg, #ff9800, #f57c00);
+}
+
+.bar.kcp {
+  background: linear-gradient(90deg, #4caf50, #388e3c);
+}
+
+.bar-value {
+  width: 60px;
+  text-align: right;
+  font-size: 13px;
+  color: #666;
+  font-family: 'Consolas', monospace;
+  flex-shrink: 0;
+}
+
+.compare-result {
+  padding: 12px;
+  background: #e8f5e9;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.compare-result p {
+  margin: 0;
+  font-size: 14px;
+  color: #2e7d32;
+}
+
+.compare-result strong {
+  font-size: 18px;
+}
+
+/* Code Section */
+.code-section h2 {
+  margin: 24px 0 12px 0;
+  font-size: clamp(16px, 3vw, 18px);
+  color: #333;
+}
+
+.code-section h2:first-child {
+  margin-top: 0;
+}
+
+.code-block {
+  margin-bottom: 20px;
+}
+
+.code-block pre {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: clamp(12px, 1.5vw, 13px);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Comparison table */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 16px 0;
+  display: block;
+  overflow-x: auto;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+}
+
+.comparison-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+.comparison-table thead {
+  display: table-header-group;
+}
+
+.comparison-table tbody {
+  display: table-row-group;
+}
+
+.comparison-table tr {
+  display: table-row;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tool-page {
+    padding: 16px;
+  }
+
+  .tool-tabs {
+    gap: 6px;
+    padding-bottom: 10px;
+  }
+
+  .tool-tabs button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .tool-content {
+    padding: 14px;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .connection-demo,
+  .window-demo,
+  .udp-packet-demo,
+  .packet-loss-demo,
+  .kcp-config-demo,
+  .latency-compare {
+    padding: 16px;
+  }
+
+  .state-node {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  .seq-cell {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+  }
+
+  .comparison-table {
+    font-size: 12px;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tool-page {
+    padding: 12px;
+  }
+
+  .tool-content {
+    padding: 12px;
+  }
+
+  .tool-tabs button {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
+  .demo-controls button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .bar-label {
+    width: 40px;
+    font-size: 12px;
+  }
+
+  .bar-value {
+    width: 50px;
+    font-size: 12px;
+  }
+}

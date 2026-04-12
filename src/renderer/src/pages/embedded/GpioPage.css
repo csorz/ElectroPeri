@@ -1,5 +1,5 @@
 .gpio-page {
-  padding: 24px;
+  padding: clamp(12px, 2vw, 24px);
   min-height: 100%;
   overflow: auto;
   display: flex;
@@ -8,13 +8,15 @@
 
 .gpio-page .page-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
 .gpio-page .page-header h1 {
-  font-size: 24px;
+  font-size: clamp(18px, 3vw, 24px);
   font-weight: 700;
   color: #333;
 }
@@ -22,7 +24,7 @@
 .gpio-page .content-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: clamp(12px, 2vw, 16px);
   flex: 1;
   min-height: 0;
 }
@@ -30,8 +32,8 @@
 .gpio-page .device-list,
 .gpio-page .data-panel {
   background: white;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(12px, 2vw, 16px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
@@ -41,7 +43,7 @@
 .gpio-page h3 {
   margin-bottom: 10px;
   color: #333;
-  font-size: 16px;
+  font-size: clamp(14px, 2vw, 16px);
 }
 
 .gpio-page .form {
@@ -96,12 +98,12 @@
 
 .gpio-page .data-display {
   flex: 1;
-  min-height: 0;
+  min-height: clamp(100px, 20vw, 200px);
   border: 1px solid #eee;
-  border-radius: 10px;
+  border-radius: clamp(6px, 1.5vw, 10px);
   background: #0b1020;
   color: #d6e1ff;
-  padding: 10px;
+  padding: clamp(8px, 1.5vw, 10px);
   overflow: auto;
 }
 
@@ -109,16 +111,17 @@
   white-space: pre-wrap;
   word-break: break-word;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-  font-size: 12px;
+  font-size: clamp(11px, 1.3vw, 12px);
 }
 
 .gpio-page .status-bar {
   margin-top: 12px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   color: #555;
-  font-size: 13px;
+  font-size: clamp(12px, 1.5vw, 13px);
 }
 
 .gpio-page .status-indicator {
@@ -138,5 +141,50 @@
 
 .gpio-page .status-indicator.error {
   background: #f44336;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .gpio-page .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .gpio-page {
+    padding: 12px;
+  }
+
+  .gpio-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .gpio-page .device-list,
+  .gpio-page .data-panel {
+    padding: 12px;
+  }
+
+  .gpio-page .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .gpio-page {
+    padding: 8px;
+  }
+
+  .gpio-page .device-list,
+  .gpio-page .data-panel {
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  .gpio-page .data-display {
+    min-height: 80px;
+    padding: 8px;
+  }
 }
 

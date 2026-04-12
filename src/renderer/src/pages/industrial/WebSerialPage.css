@@ -6,19 +6,22 @@
 
 .web-serial-page .page-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 20px;
 }
 
 .web-serial-page .page-header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: clamp(20px, 4vw, 24px);
   color: #333;
 }
 
 .web-serial-page .header-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -27,6 +30,7 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   background: #fff;
+  font-size: 13px;
 }
 
 .web-serial-page .error-message {
@@ -36,6 +40,7 @@
   border-radius: 4px;
   margin-bottom: 20px;
   color: #c00;
+  font-size: 13px;
 }
 
 .web-serial-page .content-grid {
@@ -52,11 +57,12 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
+  min-height: 300px;
 }
 
 .web-serial-page .device-list h3 {
   margin: 0 0 12px 0;
-  font-size: 16px;
+  font-size: clamp(14px, 2vw, 16px);
   color: #333;
 }
 
@@ -66,6 +72,9 @@
   align-items: center;
   justify-content: center;
   color: #999;
+  font-size: 13px;
+  text-align: center;
+  padding: 20px;
 }
 
 .web-serial-page .port-list {
@@ -78,8 +87,10 @@
 
 .web-serial-page .port-item {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   padding: 12px;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
@@ -97,9 +108,18 @@
   background: #f1f8e9;
 }
 
+.web-serial-page .port-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
 .web-serial-page .port-path {
   font-weight: 600;
   color: #333;
+  font-size: 13px;
 }
 
 .web-serial-page .data-panel {
@@ -108,18 +128,21 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
+  min-height: 300px;
 }
 
 .web-serial-page .panel-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
 .web-serial-page .panel-header h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: clamp(14px, 2vw, 16px);
   color: #333;
 }
 
@@ -129,26 +152,28 @@
   border-radius: 6px;
   padding: 12px;
   overflow-y: auto;
-  min-height: 200px;
+  min-height: 150px;
 }
 
 .web-serial-page .data-display pre {
   margin: 0;
   color: #4fc3f7;
   font-family: 'Consolas', 'Monaco', monospace;
-  font-size: 13px;
+  font-size: clamp(11px, 1.5vw, 13px);
   white-space: pre-wrap;
   word-break: break-all;
 }
 
 .web-serial-page .send-panel {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 12px;
 }
 
 .web-serial-page .send-panel input {
   flex: 1;
+  min-width: 150px;
   padding: 10px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -162,13 +187,14 @@
 
 .web-serial-page .status-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   margin-top: 16px;
   padding: 10px 16px;
   background: #fff;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: clamp(12px, 2vw, 14px);
   color: #666;
 }
 
@@ -176,6 +202,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .web-serial-page .status-indicator.idle {
@@ -202,5 +229,97 @@
   }
   50% {
     opacity: 0.5;
+  }
+}
+
+/* Browser support info box */
+.browser-support-info {
+  background: #e3f2fd;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.browser-support-info strong {
+  color: #1565c0;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .web-serial-page .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .web-serial-page .device-list,
+  .web-serial-page .data-panel {
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .web-serial-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .web-serial-page .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .web-serial-page .device-list,
+  .web-serial-page .data-panel {
+    padding: 14px;
+    min-height: 200px;
+  }
+
+  .web-serial-page .port-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .web-serial-page .port-actions {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .web-serial-page .port-actions .btn {
+    width: 100%;
+  }
+
+  .web-serial-page .send-panel {
+    flex-direction: column;
+  }
+
+  .web-serial-page .send-panel input,
+  .web-serial-page .send-panel .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .web-serial-page .page-header h1 {
+    font-size: 20px;
+  }
+
+  .web-serial-page .device-list,
+  .web-serial-page .data-panel {
+    padding: 12px;
+    min-height: 180px;
+  }
+
+  .web-serial-page .data-display {
+    min-height: 120px;
+    padding: 10px;
+  }
+
+  .web-serial-page .data-display pre {
+    font-size: 11px;
+  }
+
+  .web-serial-page .status-bar {
+    padding: 8px 12px;
+    font-size: 12px;
   }
 }

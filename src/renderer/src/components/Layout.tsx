@@ -60,6 +60,7 @@ const navGroups: { key: string; title: string; items: NavItem[] }[] = [
         children: [
           { to: '/frontend-toolbox/http/request', icon: '📤', label: 'HTTP 请求' },
           { to: '/frontend-toolbox/http/websocket', icon: '🔌', label: 'WebSocket' },
+          { to: '/frontend-toolbox/http/mqtt', icon: '📨', label: 'MQTT' },
           { to: '/frontend-toolbox/http/status', icon: '📊', label: '状态码查询' }
         ]
       },
@@ -183,6 +184,99 @@ const navGroups: { key: string; title: string; items: NavItem[] }[] = [
           { to: '/frontend-toolbox/fun/voice', icon: '🎤', label: '语音合成' },
           { to: '/frontend-toolbox/fun/avatar', icon: '👤', label: '头像生成' }
         ]
+      },
+      {
+        to: '/frontend-toolbox/network',
+        icon: '🌐',
+        label: '网络编程',
+        children: [
+          { to: '/frontend-toolbox/network/tcp', icon: '🔗', label: 'TCP 协议' },
+          { to: '/frontend-toolbox/network/udp', icon: '📡', label: 'UDP 协议' },
+          { to: '/frontend-toolbox/network/kcp', icon: '⚡', label: 'KCP 协议' }
+        ]
+      },
+      {
+        to: '/frontend-toolbox/database',
+        icon: '🗄️',
+        label: '数据库',
+        children: [
+          { to: '/frontend-toolbox/database/mysql', icon: '🐬', label: 'MySQL' },
+          { to: '/frontend-toolbox/database/postgresql', icon: '🐘', label: 'PostgreSQL' },
+          { to: '/frontend-toolbox/database/mongodb', icon: '🍃', label: 'MongoDB' },
+          { to: '/frontend-toolbox/database/sharding', icon: '📊', label: '分库分表' },
+          { to: '/frontend-toolbox/database/index', icon: '🔍', label: '索引优化' },
+          { to: '/frontend-toolbox/database/replication', icon: '🔄', label: '读写分离' }
+        ]
+      },
+      {
+        to: '/frontend-toolbox/pool',
+        icon: '🔗',
+        label: '连接池',
+        children: [
+          { to: '/frontend-toolbox/pool/connection', icon: '🔗', label: '连接池' },
+          { to: '/frontend-toolbox/pool/thread', icon: '🧵', label: '线程池' },
+          { to: '/frontend-toolbox/pool/object', icon: '📦', label: '对象池' }
+        ]
+      },
+      {
+        to: '/frontend-toolbox/redis',
+        icon: '📦',
+        label: 'Redis',
+        children: [
+          { to: '/frontend-toolbox/redis/cache', icon: '💾', label: '缓存策略' },
+          { to: '/frontend-toolbox/redis/problems', icon: '⚠️', label: '缓存问题' },
+          { to: '/frontend-toolbox/redis/resilience', icon: '🛡️', label: '高可用机制' }
+        ]
+      },
+      {
+        to: '/frontend-toolbox/deploy',
+        icon: '🖥️',
+        label: '部署运维',
+        children: [
+          { to: '/frontend-toolbox/deploy/architecture', icon: '🏗️', label: '部署架构' },
+          { to: '/frontend-toolbox/deploy/linux', icon: '🐧', label: 'Linux 运维' },
+          { to: '/frontend-toolbox/deploy/docker', icon: '🐳', label: 'Docker' },
+          { to: '/frontend-toolbox/deploy/kubernetes', icon: '☸️', label: 'Kubernetes' },
+          { to: '/frontend-toolbox/deploy/security', icon: '🔒', label: '安全配置' }
+        ]
+      },
+      {
+        to: '/frontend-toolbox/monitor',
+        icon: '📊',
+        label: '监控告警',
+        children: [
+          { to: '/frontend-toolbox/monitor/grafana', icon: '📊', label: 'Grafana 监控' }
+        ]
+      },
+      {
+        to: '/frontend-toolbox/release',
+        icon: '🚀',
+        label: '发布策略',
+        children: [
+          { to: '/frontend-toolbox/release/canary', icon: '🐦', label: '灰度发布' },
+          { to: '/frontend-toolbox/release/blue-green', icon: '🔵', label: '蓝绿部署' },
+          { to: '/frontend-toolbox/release/rolling', icon: '🔄', label: '滚动更新' }
+        ]
+      },
+      {
+        to: '/frontend-toolbox/scaling',
+        icon: '🌍',
+        label: '集群扩容',
+        children: [
+          { to: '/frontend-toolbox/scaling/multi-active', icon: '🌍', label: '多活架构' },
+          { to: '/frontend-toolbox/scaling/backup', icon: '💾', label: '备份同步' }
+        ]
+      },
+      {
+        to: '/frontend-toolbox/ha',
+        icon: '⚡',
+        label: '高可用',
+        children: [
+          { to: '/frontend-toolbox/ha/loadbalancer', icon: '⚖️', label: '负载均衡' },
+          { to: '/frontend-toolbox/ha/dns', icon: '🌐', label: 'DNS 解析' },
+          { to: '/frontend-toolbox/ha/proxy', icon: '🔄', label: '反向代理' },
+          { to: '/frontend-toolbox/ha/cdn', icon: '🚀', label: 'CDN 加速' }
+        ]
       }
     ]
   },
@@ -193,8 +287,11 @@ const navGroups: { key: string; title: string; items: NavItem[] }[] = [
       { to: '/serial', icon: '🔌', label: '串口采集' },
       { to: '/web-serial', icon: '🧪', label: 'Web 串口' },
       { to: '/usb', icon: '📱', label: 'USB采集' },
+      { to: '/web-usb', icon: '🔌', label: 'WebUSB' },
       { to: '/bluetooth', icon: '📶', label: '蓝牙采集' },
+      { to: '/web-bluetooth', icon: '📶', label: 'Web Bluetooth' },
       { to: '/hid', icon: '⌨️', label: 'HID采集' },
+      { to: '/web-hid', icon: '⌨️', label: 'WebHID' },
       { to: '/network', icon: '🌐', label: '网络采集' }
     ]
   },
@@ -227,6 +324,7 @@ export default function Layout() {
   const location = useLocation()
   const [notice, setNotice] = useState<{ type: string; message: string; ts: number } | null>(null)
   const [manualExpanded, setManualExpanded] = useState<Record<string, boolean>>({})
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const currentPath = location.pathname
 
   const pageType = useMemo(() => {
@@ -258,7 +356,25 @@ export default function Layout() {
 
   return (
     <div className="layout">
-      <aside className="sidebar">
+      {/* Mobile menu toggle */}
+      <button
+        type="button"
+        className="menu-toggle"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label="Toggle menu"
+      >
+        {sidebarOpen ? '✕' : '☰'}
+      </button>
+
+      {/* Sidebar overlay for mobile */}
+      {sidebarOpen && (
+        <div
+          className="sidebar-overlay visible"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="logo">
           <h2>ElectronPeri</h2>
         </div>
@@ -266,6 +382,7 @@ export default function Layout() {
           <NavLink
             to="/home"
             className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
+            onClick={() => setSidebarOpen(false)}
           >
             <span className="icon">🏠</span>
             <span>首页</span>
@@ -324,6 +441,7 @@ export default function Layout() {
                                   className={({ isActive }) =>
                                     isActive ? 'nav-item nav-child-item active' : 'nav-item nav-child-item'
                                   }
+                                  onClick={() => setSidebarOpen(false)}
                                 >
                                   <span className="icon">{child.icon}</span>
                                   <span>{child.label}</span>
@@ -343,6 +461,7 @@ export default function Layout() {
                         className={({ isActive }) =>
                           isActive ? 'nav-item nav-sub-item active' : 'nav-item nav-sub-item'
                         }
+                        onClick={() => setSidebarOpen(false)}
                       >
                         <span className="icon">{item.icon}</span>
                         <span>{item.label}</span>

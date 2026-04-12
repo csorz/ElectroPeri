@@ -2,6 +2,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .toolbox-page .page-header {
@@ -10,13 +12,13 @@
 
 .toolbox-page .page-header h1 {
   margin: 0 0 8px 0;
-  font-size: 24px;
+  font-size: clamp(20px, 4vw, 24px);
   color: #333;
 }
 
 .toolbox-page .page-sub {
   margin: 0;
-  font-size: 14px;
+  font-size: clamp(13px, 2vw, 14px);
   color: #666;
 }
 
@@ -34,7 +36,7 @@
 
 .toolbox-hub-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
   gap: 16px;
 }
 
@@ -69,16 +71,9 @@
 }
 
 .toolbox-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
-  align-items: start;
-}
-
-@media (max-width: 960px) {
-  .toolbox-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .tool-card {
@@ -90,7 +85,7 @@
 
 .tool-card h2 {
   margin: 0 0 8px 0;
-  font-size: 18px;
+  font-size: clamp(16px, 3vw, 18px);
   color: #333;
 }
 
@@ -110,6 +105,9 @@
 
 .tool-row {
   margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .tool-label {
@@ -123,18 +121,19 @@
 .tool-label select,
 .tool-label input[type='text'],
 .tool-label input[type='number'] {
-  max-width: 280px;
+  max-width: 100%;
+  width: 100%;
   padding: 8px 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   background: #fff;
+  font-size: 13px;
 }
 
 .tool-inline {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 12px;
-  align-items: center;
   margin-bottom: 12px;
 }
 
@@ -199,6 +198,7 @@
   font-size: 13px;
   word-break: break-all;
   white-space: pre-wrap;
+  overflow-x: auto;
 }
 
 .tool-result.mono {
@@ -222,6 +222,7 @@
   cursor: pointer;
   font-size: 13px;
   transition: background 0.2s;
+  white-space: nowrap;
 }
 
 .btn:disabled {
@@ -269,13 +270,13 @@
 }
 
 .page-icon {
-  font-size: 28px;
+  font-size: clamp(24px, 5vw, 28px);
 }
 
 /* Category grid */
 .toolbox-category-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: 16px;
 }
 
@@ -353,7 +354,7 @@
 /* Tool input */
 .tool-input {
   width: 100%;
-  max-width: 400px;
+  max-width: 100%;
   padding: 10px 12px;
   border: 1px solid #ddd;
   border-radius: 6px;
@@ -368,6 +369,7 @@
 /* Tool stats */
 .tool-stats {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   padding: 10px 12px;
   background: #f5f5f5;
@@ -404,6 +406,10 @@
   color: #e65100;
 }
 
+.tool-notice p {
+  margin: 0;
+}
+
 /* Color preview */
 .color-preview {
   width: 60px;
@@ -434,6 +440,8 @@
   justify-content: center;
   gap: 2px;
   margin: 20px 0;
+  overflow-x: auto;
+  padding: 10px 0;
 }
 
 .piano-key {
@@ -450,6 +458,7 @@
   font-size: 11px;
   color: #333;
   transition: background 0.1s;
+  flex-shrink: 0;
 }
 
 .piano-key:hover {
@@ -498,6 +507,57 @@
   color: #e57373;
 }
 
+/* Comparison table */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 16px 0;
+  overflow-x: auto;
+  display: block;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.comparison-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.comparison-table td {
+  color: #666;
+}
+
+/* Responsive utility classes */
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.responsive-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.responsive-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.responsive-row > * {
+  flex: 1;
+  min-width: 120px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .toolbox-hub-grid,
@@ -507,5 +567,89 @@
 
   .toolbox-grid {
     grid-template-columns: 1fr;
+  }
+
+  .tool-card {
+    padding: 14px;
+  }
+
+  .tool-block {
+    margin-top: 14px;
+    padding-top: 14px;
+  }
+
+  .tool-actions {
+    gap: 6px;
+  }
+
+  .btn {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+
+  .tool-textarea {
+    min-height: 60px;
+  }
+
+  .tool-result {
+    font-size: 12px;
+  }
+
+  .comparison-table {
+    font-size: 12px;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 8px 10px;
+  }
+
+  /* 响应式网格 - 小屏幕单列 */
+  .responsive-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .responsive-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 响应式行 - 小屏幕换行 */
+  .responsive-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .responsive-row > * {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .tool-card {
+    padding: 12px;
+  }
+
+  .tool-inline {
+    gap: 8px;
+  }
+
+  .tool-label {
+    font-size: 12px;
+  }
+
+  .tool-block-title {
+    font-size: 13px;
+  }
+
+  .piano-key {
+    width: 32px;
+    height: 100px;
+  }
+
+  .piano-key.black {
+    width: 24px;
+    height: 65px;
+    margin-left: -12px;
+    margin-right: -12px;
   }
 }
