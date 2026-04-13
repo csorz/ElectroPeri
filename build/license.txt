@@ -1,0 +1,32 @@
+ElectroPeri 软件许可协议
+
+版权所有 (C) 2024 ElectroPeri 开发团队
+
+本软件免费提供，您可以自由使用、复制、修改和分发本软件，
+但必须保留原作者的版权声明。
+
+本软件按"原样"提供，不提供任何明示或暗示的担保，包括但不限于
+适销性和特定用途适用性的担保。在任何情况下，作者均不对任何
+直接、间接、偶然、特殊、惩罚性或后果性损害承担责任。
+
+使用本软件即表示您同意本许可协议的条款。
+
+---
+
+ElectroPeri Software License Agreement
+
+Copyright (C) 2024 ElectroPeri Development Team
+
+This software is provided free of charge. You are free to use, copy,
+modify, and distribute this software, provided that you keep the
+original author's copyright notice.
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+By using this software, you agree to the terms of this license agreement.

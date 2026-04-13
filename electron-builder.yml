@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: electronperi
+productName: ElectroPeri
 directories:
   buildResources: build
 files:
@@ -12,12 +12,39 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: electronperi
+  executableName: ElectroPeri
+  icon: build/icon.ico
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  createStartMenuShortcut: true
+  # 安装向导图片
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  # 安装界面头部图片 (推荐 150x57 像素 BMP 格式)
+  # installerHeader: build/installerHeader.bmp
+  # 安装向导侧边图片 (推荐 164x314 像素 BMP 格式)
+  # installerSidebar: build/installerSidebar.bmp
+  # 卸载向导侧边图片
+  # uninstallerSidebar: build/uninstallerSidebar.bmp
+  # 许可协议
+  license: build/license.txt
+  # 安装选项
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  allowElevation: true
+  # 安装完成后运行
+  runAfterFinish: true
+  # 安装界面语言
+  language: "2052"
+  # 安装脚本自定义
+  include: build/installer.nsh
+  # 删除安装后残留数据
+  deleteAppDataOnUninstall: true
+  # 显示安装进度
+  displayLanguageSelector: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
