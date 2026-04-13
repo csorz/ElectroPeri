@@ -18,7 +18,10 @@
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "ELECTRON_BUILDER_BINARIES_MIRROR=https://registry.npmmirror.com/-/binary/electron-builder-binaries/ electron-vite build && ELECTRON_BUILDER_BINARIES_MIRROR=https://registry.npmmirror.com/-/binary/electron-builder-binaries/ electron-builder --mac",
-    "build:linux": "electron-vite build && electron-builder --linux"
+    "build:linux": "electron-vite build && electron-builder --linux",
+    "web:dev": "vite --config vite.config.web.ts",
+    "web:build": "vite build --config vite.config.web.ts",
+    "web:preview": "vite preview --config vite.config.web.ts"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",

@@ -7,25 +7,61 @@ export default function Base64ToolPage() {
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [mode, setMode] = useState<'encode' | 'decode'>('encode')
+  const [variant, setVariant] = useState<'standard' | 'urlsafe'>('standard')
   const [error, setError] = useState<string | null>(null)
 
   const onCopy = useCallback((t: string) => void copyToClipboard(t), [])
+
+  // 标准 Base64 编码
+  const base64Encode = (str: string): string => {
+    const encoder = new TextEncoder()
+    const data = encoder.encode(str)
+    return btoa(String.fromCharCode(...data))
+  }
+
+  // 标准 Base64 解码
+  const base64Decode = (str: string): string => {
+    const binary = atob(str)
+    const bytes = new Uint8Array(binary.length)
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i)
+    }
+    const decoder = new TextDecoder()
+    return decoder.decode(bytes)
+  }
+
+  // Base64URL 编码 (URL Safe)
+  const base64UrlEncode = (str: string): string => {
+    return base64Encode(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+  }
+
+  // Base64URL 解码 (URL Safe)
+  const base64UrlDecode = (str: string): string => {
+    // 还原为标准 Base64
+    let standard = str.replace(/-/g, '+').replace(/_/g, '/')
+    // 添加填充
+    const pad = standard.length % 4
+    if (pad) {
+      standard += '='.repeat(4 - pad)
+    }
+    return base64Decode(standard)
+  }
 
   const handleConvert = () => {
     setError(null)
     try {
       if (mode === 'encode') {
-        const encoder = new TextEncoder()
-        const data = encoder.encode(input)
-        setOutput(btoa(String.fromCharCode(...data)))
-      } else {
-        const binary = atob(input)
-        const bytes = new Uint8Array(binary.length)
-        for (let i = 0; i < binary.length; i++) {
-          bytes[i] = binary.charCodeAt(i)
+        if (variant === 'standard') {
+          setOutput(base64Encode(input))
+        } else {
+          setOutput(base64UrlEncode(input))
         }
-        const decoder = new TextDecoder()
-        setOutput(decoder.decode(bytes))
+      } else {
+        if (variant === 'standard') {
+          setOutput(base64Decode(input))
+        } else {
+          setOutput(base64UrlDecode(input))
+        }
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : '转换失败')
@@ -189,7 +225,24 @@ export default function Base64ToolPage() {
                     <option value="decode">解码 (Decode)</option>
                   </select>
                 </div>
+                <div className="config-item">
+                  <label>变体</label>
+                  <select value={variant} onChange={(e) => setVariant(e.target.value as 'standard' | 'urlsafe')}>
+                    <option value="standard">标准 Base64</option>
+                    <option value="urlsafe">Base64URL (URL Safe)</option>
+                  </select>
+                </div>
               </div>
+
+              {variant === 'urlsafe' && (
+                <div className="info-box" style={{ marginTop: 12 }}>
+                  <strong>Base64URL 说明</strong>
+                  <p style={{ marginTop: 4 }}>
+                    使用 <code>-</code> 替代 <code>+</code>，<code>_</code> 替代 <code>/</code>，并移除填充符 <code>=</code>。
+                    适用于 URL 和文件名场景，如 JWT Token。
+                  </p>
+                </div>
+              )}
 
               {error && (
                 <div style={{ color: '#c62828', padding: '12px', background: '#ffebee', borderRadius: '6px', marginBottom: 12 }}>
@@ -199,12 +252,12 @@ export default function Base64ToolPage() {
 
               <div style={{ marginTop: 16 }}>
                 <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>
-                  {mode === 'encode' ? '原始文本' : 'Base64 字符串'}
+                  {mode === 'encode' ? '原始文本' : variant === 'urlsafe' ? 'Base64URL 字符串' : 'Base64 字符串'}
                 </label>
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的 Base64 字符串...'}
+                  placeholder={mode === 'encode' ? '输入要编码的文本...' : variant === 'urlsafe' ? '输入要解码的 Base64URL 字符串 (可包含 - 和 _)...' : '输入要解码的 Base64 字符串...'}
                   rows={6}
                   style={{
                     width: '100%',
@@ -237,7 +290,9 @@ export default function Base64ToolPage() {
               {output && (
                 <div style={{ marginTop: 16 }}>
                   <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>
-                    {mode === 'encode' ? 'Base64 结果' : '解码结果'}
+                    {mode === 'encode'
+                      ? (variant === 'urlsafe' ? 'Base64URL 结果' : 'Base64 结果')
+                      : '解码结果'}
                   </label>
                   <pre style={{
                     background: '#f5f5f5',

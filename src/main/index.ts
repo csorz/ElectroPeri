@@ -36,6 +36,33 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
+  // Handle Web API permission requests (Serial, USB, Bluetooth, HID)
+  mainWindow.webContents.session.setPermissionCheckHandler((_webContents, permission) => {
+    // Allow Web Serial, Web USB, Web Bluetooth, WebHID permissions
+    if (['serial', 'usb', 'bluetooth', 'hid'].includes(permission)) {
+      return true
+    }
+    return false
+  })
+
+  mainWindow.webContents.session.setPermissionRequestHandler((_webContents, permission, callback) => {
+    // Auto-grant Web Serial, Web USB, Web Bluetooth, WebHID permissions
+    if (['serial', 'usb', 'bluetooth', 'hid'].includes(permission)) {
+      callback(true)
+    } else {
+      callback(false)
+    }
+  })
+
+  // Handle serial device selection - return first port or empty to show picker
+  mainWindow.webContents.session.on('select-serial-port', (_event, portList, _webContents, callback) => {
+    if (portList && portList.length > 0) {
+      callback(portList[0].portId)
+    } else {
+      callback('')
+    }
+  })
+
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (process.env['ELECTRON_RENDERER_URL']) {

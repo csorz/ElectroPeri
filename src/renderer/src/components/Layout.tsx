@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
+import { isElectron } from '../utils/environment'
 import './Layout.css'
 
 type NavItem = { to: string; icon: string; label: string; end?: boolean; children?: NavItem[] }
@@ -337,6 +338,9 @@ export default function Layout() {
   }, [location.pathname])
 
   useEffect(() => {
+    // Only listen for hotplug events in Electron environment
+    if (!isElectron() || !window.api?.events?.onHotplug) return
+
     const off = window.api.events.onHotplug((evt) => {
       if (evt.type === pageType) setNotice(evt)
     })
