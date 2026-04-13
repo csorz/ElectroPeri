@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import '../toolbox.css'
+import './CategoryPage.css'
 
 const tools = [
   { to: '/frontend-toolbox/time/stamp', icon: '⏱️', title: '时间戳转换', desc: 'Unix 时间戳与日期互转' },
@@ -9,25 +9,19 @@ const tools = [
 
 export default function TimeCategoryPage() {
   return (
-    <div className="toolbox-page">
-      <Link to="/home" className="toolbox-back">
-        ← 返回首页
-      </Link>
-      <div className="page-header">
-        <div className="page-header-title">
-          <span className="page-icon">🕐</span>
-          <h1>时间与时间戳</h1>
-        </div>
-        <p className="page-sub">时间戳转换、当前时间、时区转换</p>
+    <div className="category-page">
+      <div className="category-header">
+        <h1>🕐 时间与时间戳</h1>
+        <p>时间戳转换、当前时间、时区转换</p>
       </div>
 
-      <div className="toolbox-category-grid">
+      <div className="tool-grid">
         {tools.map((tool) => (
-          <Link key={tool.to} to={tool.to} className="toolbox-tool-card">
+          <Link key={tool.to} to={tool.to} className="tool-card">
             <span className="tool-icon">{tool.icon}</span>
             <div className="tool-info">
-              <div className="tool-title">{tool.title}</div>
-              <div className="tool-desc">{tool.desc}</div>
+              <h3>{tool.title}</h3>
+              <p>{tool.desc}</p>
             </div>
           </Link>
         ))}

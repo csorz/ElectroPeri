@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import '../toolbox.css'
+import './CategoryPage.css'
 
 const tools = [
   { to: '/frontend-toolbox/encoding/hash', icon: '#️⃣', title: 'Hash 计算', desc: 'MD5、SHA1、SHA256 等哈希值计算' },
@@ -11,25 +11,19 @@ const tools = [
 
 export default function EncodingCategoryPage() {
   return (
-    <div className="toolbox-page">
-      <Link to="/home" className="toolbox-back">
-        ← 返回首页
-      </Link>
-      <div className="page-header">
-        <div className="page-header-title">
-          <span className="page-icon">🔐</span>
-          <h1>编码与加解密</h1>
-        </div>
-        <p className="page-sub">Hash 计算、Base64、URL 编解码、加密解密、Unicode 编码</p>
+    <div className="category-page">
+      <div className="category-header">
+        <h1>🔐 编码与加解密</h1>
+        <p>Hash 计算、Base64、URL 编解码、加密解密、Unicode 编码</p>
       </div>
 
-      <div className="toolbox-category-grid">
+      <div className="tool-grid">
         {tools.map((tool) => (
-          <Link key={tool.to} to={tool.to} className="toolbox-tool-card">
+          <Link key={tool.to} to={tool.to} className="tool-card">
             <span className="tool-icon">{tool.icon}</span>
             <div className="tool-info">
-              <div className="tool-title">{tool.title}</div>
-              <div className="tool-desc">{tool.desc}</div>
+              <h3>{tool.title}</h3>
+              <p>{tool.desc}</p>
             </div>
           </Link>
         ))}

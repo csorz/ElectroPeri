@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import '../toolbox.css'
+import './CategoryPage.css'
 
 const tools = [
   { to: '/frontend-toolbox/text/regex', icon: '🔎', title: '正则测试', desc: '正则表达式在线测试' },
@@ -11,25 +11,19 @@ const tools = [
 
 export default function TextCategoryPage() {
   return (
-    <div className="toolbox-page">
-      <Link to="/home" className="toolbox-back">
-        ← 返回首页
-      </Link>
-      <div className="page-header">
-        <div className="page-header-title">
-          <span className="page-icon">📝</span>
-          <h1>文本与数据转换</h1>
-        </div>
-        <p className="page-sub">正则测试、文本比对、CSV/JSON/YAML 互转、字数统计</p>
+    <div className="category-page">
+      <div className="category-header">
+        <h1>📝 文本与数据转换</h1>
+        <p>正则测试、文本比对、CSV/JSON/YAML 互转、字数统计</p>
       </div>
 
-      <div className="toolbox-category-grid">
+      <div className="tool-grid">
         {tools.map((tool) => (
-          <Link key={tool.to} to={tool.to} className="toolbox-tool-card">
+          <Link key={tool.to} to={tool.to} className="tool-card">
             <span className="tool-icon">{tool.icon}</span>
             <div className="tool-info">
-              <div className="tool-title">{tool.title}</div>
-              <div className="tool-desc">{tool.desc}</div>
+              <h3>{tool.title}</h3>
+              <p>{tool.desc}</p>
             </div>
           </Link>
         ))}

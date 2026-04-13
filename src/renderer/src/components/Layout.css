@@ -7,13 +7,13 @@
 
 .sidebar {
   width: 220px;
-  background: linear-gradient(180deg, #1a1a2e 0%, #16162a 100%);
-  color: #fff;
+  background: #ffffff;
+  color: #1f2937;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   min-height: 0;
-  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 1px 0 0 #e5e7eb, 2px 0 8px rgba(0, 0, 0, 0.04);
   position: relative;
   transition: transform 0.3s ease, width 0.3s ease;
 }
@@ -25,20 +25,19 @@
   right: 0;
   width: 1px;
   height: 100%;
-  background: linear-gradient(180deg, rgba(79, 195, 247, 0.3) 0%, rgba(79, 195, 247, 0.05) 100%);
+  background: #e5e7eb;
 }
 
 .logo {
   padding: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
 }
 
 .logo h2 {
   margin: 0;
   font-size: 18px;
-  color: #4fc3f7;
-  text-shadow: 0 0 20px rgba(79, 195, 247, 0.3);
+  color: #3b82f6;
 }
 
 .nav {
@@ -58,12 +57,12 @@
 }
 
 .nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: #d1d5db;
   border-radius: 2px;
 }
 
 .nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #9ca3af;
 }
 
 .nav-group {
@@ -85,7 +84,7 @@
   padding: 8px 16px;
   font-size: 11px;
   font-weight: 600;
-  color: #5a5a72;
+  color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   transition: all 0.2s;
@@ -93,11 +92,12 @@
 }
 
 .nav-group-title:hover {
-  color: #7a7a92;
+  color: #374151;
+  background: #f3f4f6;
 }
 
 .nav-group-title.expanded {
-  color: #8a8aa2;
+  color: #1f2937;
 }
 
 .group-title-text {
@@ -106,7 +106,7 @@
 
 .group-toggle-icon {
   font-size: 10px;
-  color: #4a4a62;
+  color: #9ca3af;
   transition: transform 0.2s;
 }
 
@@ -129,7 +129,7 @@
   align-items: center;
   padding: 10px 16px;
   margin: 1px 8px;
-  color: #9a9ab0;
+  color: #4b5563;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s;
@@ -139,15 +139,15 @@
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #d0d0e0;
+  background: #f3f4f6;
+  color: #1f2937;
 }
 
 .nav-item.active {
-  background: linear-gradient(135deg, rgba(79, 195, 247, 0.15) 0%, rgba(79, 195, 247, 0.08) 100%);
-  color: #4fc3f7;
+  background: #eff6ff;
+  color: #3b82f6;
   font-weight: 500;
-  box-shadow: inset 3px 0 0 #4fc3f7, 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 3px 0 0 #3b82f6;
 }
 
 .nav-item.active::before {
@@ -158,9 +158,8 @@
   transform: translateY(-50%);
   width: 3px;
   height: 60%;
-  background: #4fc3f7;
+  background: #3b82f6;
   border-radius: 0 2px 2px 0;
-  box-shadow: 0 0 8px rgba(79, 195, 247, 0.5);
 }
 
 .nav-item .icon {
@@ -195,22 +194,23 @@
 .nav-sub-toggle .sub-toggle-icon {
   margin-left: auto;
   font-size: 9px;
-  color: #5a5a72;
+  color: #9ca3af;
   transition: transform 0.2s;
 }
 
 .nav-sub-group.expanded .nav-sub-toggle .sub-toggle-icon {
   transform: rotate(90deg);
-  color: #7a7a92;
+  color: #6b7280;
 }
 
 .nav-sub-children {
   display: none;
   flex-direction: column;
-  background: rgba(0, 0, 0, 0.2);
+  background: #f9fafb;
   margin: 2px 0;
   border-radius: 4px;
   padding: 4px 0;
+  border: 1px solid #f3f4f6;
 }
 
 .nav-sub-group.expanded .nav-sub-children {
@@ -223,18 +223,19 @@
   padding-top: 8px;
   padding-bottom: 8px;
   margin: 1px 4px;
-  color: #7a7a90;
+  color: #6b7280;
 }
 
 .nav-child-item:hover {
-  color: #b0b0c8;
+  color: #1f2937;
+  background: #f3f4f6;
 }
 
 .nav-child-item.active {
-  background: linear-gradient(135deg, rgba(79, 195, 247, 0.12) 0%, rgba(79, 195, 247, 0.05) 100%);
-  color: #4fc3f7;
+  background: #eff6ff;
+  color: #3b82f6;
   font-weight: 500;
-  box-shadow: inset 2px 0 0 rgba(79, 195, 247, 0.6);
+  box-shadow: inset 2px 0 0 rgba(59, 130, 246, 0.6);
 }
 
 .nav-child-item .icon {
@@ -244,7 +245,7 @@
 }
 
 .nav-sub-group.expanded .nav-sub-toggle {
-  color: #c0c0d8;
+  color: #1f2937;
 }
 
 .main-content {
@@ -276,11 +277,12 @@
   height: 40px;
   border: none;
   border-radius: 8px;
-  background: #1a1a2e;
-  color: #4fc3f7;
+  background: #ffffff;
+  color: #3b82f6;
   font-size: 20px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
 }
 
 .sidebar-overlay {
@@ -290,7 +292,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.3);
   z-index: 999;
 }
 

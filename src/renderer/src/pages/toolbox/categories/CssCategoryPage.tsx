@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import '../toolbox.css'
+import './CategoryPage.css'
 
 const tools = [
   { to: '/frontend-toolbox/css/shadow', icon: '🌫️', title: '阴影生成', desc: 'CSS 阴影效果生成' },
@@ -11,25 +11,19 @@ const tools = [
 
 export default function CssCategoryPage() {
   return (
-    <div className="toolbox-page">
-      <Link to="/home" className="toolbox-back">
-        ← 返回首页
-      </Link>
-      <div className="page-header">
-        <div className="page-header-title">
-          <span className="page-icon">💅</span>
-          <h1>CSS 样式工具</h1>
-        </div>
-        <p className="page-sub">阴影生成、按钮设计、Grid 布局、背景生成、CSS 格式化</p>
+    <div className="category-page">
+      <div className="category-header">
+        <h1>💅 CSS 样式工具</h1>
+        <p>阴影生成、按钮设计、Grid 布局、背景生成、CSS 格式化</p>
       </div>
 
-      <div className="toolbox-category-grid">
+      <div className="tool-grid">
         {tools.map((tool) => (
-          <Link key={tool.to} to={tool.to} className="toolbox-tool-card">
+          <Link key={tool.to} to={tool.to} className="tool-card">
             <span className="tool-icon">{tool.icon}</span>
             <div className="tool-info">
-              <div className="tool-title">{tool.title}</div>
-              <div className="tool-desc">{tool.desc}</div>
+              <h3>{tool.title}</h3>
+              <p>{tool.desc}</p>
             </div>
           </Link>
         ))}
