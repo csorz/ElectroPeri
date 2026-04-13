@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, globalShortcut } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 
@@ -20,6 +20,15 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    // Open DevTools in development mode
+    if (process.env['ELECTRON_RENDERER_URL']) {
+      mainWindow.webContents.openDevTools()
+    }
+  })
+
+  // Register global shortcut for DevTools
+  globalShortcut.register('Alt+Shift+F11', () => {
+    mainWindow.webContents.toggleDevTools()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -118,4 +127,9 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+// Unregister all shortcuts when app is about to quit
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll()
 })
