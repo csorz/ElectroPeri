@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import '../toolbox.css'
+import './ToolPage.css'
 
 interface KeyConfig {
   note: string
@@ -31,6 +30,333 @@ const KEYS: KeyConfig[] = [
 ]
 
 export default function PianoToolPage() {
+  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('concept')
+
+  return (
+    <div className="tool-page">
+      <div className="tool-header">
+        <h1>🎹 在线钢琴</h1>
+        <p>Web Audio API - 浏览器音频合成</p>
+      </div>
+
+      <div className="tool-tabs">
+        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
+        <button className={activeTab === 'demo' ? 'active' : ''} onClick={() => setActiveTab('demo')}>交互演示</button>
+        <button className={activeTab === 'code' ? 'active' : ''} onClick={() => setActiveTab('code')}>代码示例</button>
+      </div>
+
+      <div className="tool-content">
+        {activeTab === 'concept' && (
+          <div className="concept-section">
+            <h2>核心特性</h2>
+            <div className="feature-grid">
+              <div className="feature-card">
+                <h3>Web Audio API</h3>
+                <p>浏览器原生音频处理接口，支持音频生成、处理、分析，无需任何插件</p>
+              </div>
+              <div className="feature-card">
+                <h3>振荡器发声</h3>
+                <p>使用 OscillatorNode 生成正弦波、方波、三角波等基础波形，模拟乐器声音</p>
+              </div>
+              <div className="feature-card">
+                <h3>增益控制</h3>
+                <p>通过 GainNode 控制音量大小，实现淡入淡出、音量包络等效果</p>
+              </div>
+              <div className="feature-card">
+                <h3>实时交互</h3>
+                <p>支持键盘和鼠标同时操作，可弹奏和弦，响应时间低于 10ms</p>
+              </div>
+            </div>
+
+            <h2>音频原理</h2>
+            <div className="diagram-box">
+              <pre className="ascii-art">{`
+    用户操作（按键/点击）
+           │
+           ▼
+    ┌──────────────────┐
+    │   AudioContext   │  音频上下文管理
+    └────────┬─────────┘
+             │
+             ▼
+    ┌──────────────────┐
+    │   OscillatorNode │  振荡器生成波形
+    │   type: sine     │  正弦波 = 纯净音色
+    │   frequency: Hz  │  频率决定音高
+    └────────┬─────────┘
+             │
+             ▼
+    ┌──────────────────┐
+    │    GainNode      │  增益节点控制音量
+    │   gain: 0-1      │  0 = 静音, 1 = 最大
+    └────────┬─────────┘
+             │
+             ▼
+    ┌──────────────────┐
+    │   destination    │  音频输出设备
+    └──────────────────┘
+              `}</pre>
+            </div>
+            <div className="info-box">
+              <strong>频率与音高的关系</strong>
+              <p>音高由声波频率决定。标准音 A4 = 440Hz，每升高一个八度频率翻倍，每降低一个八度频率减半。</p>
+              <p>相邻半音之间的频率比约为 1.0595（2 的 1/12 次方）。</p>
+            </div>
+
+            <h2>音名与频率对照</h2>
+            <div className="config-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>音名</th>
+                    <th>频率 (Hz)</th>
+                    <th>说明</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>C4</td><td>261.63</td><td>中央 C，钢琴中央音</td></tr>
+                  <tr><td>A4</td><td>440.00</td><td>标准音 A，调音基准</td></tr>
+                  <tr><td>C5</td><td>523.25</td><td>高音 C，比 C4 高八度</td></tr>
+                  <tr><td>C#4</td><td>277.18</td><td>升 C，比 C4 高半音</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h2>应用场景</h2>
+            <ul className="scenario-list">
+              <li><strong>在线音乐教育</strong> - 音乐理论学习、钢琴入门教学</li>
+              <li><strong>音乐创作工具</strong> - 快速试听旋律、创作灵感记录</li>
+              <li><strong>游戏音效</strong> - 网页游戏背景音乐、交互音效</li>
+              <li><strong>音频可视化</strong> - 结合 AnalyserNode 实现频谱动画</li>
+              <li><strong>辅助功能</strong> - 为视障用户提供音频反馈</li>
+            </ul>
+          </div>
+        )}
+
+        {activeTab === 'demo' && (
+          <div className="demo-section">
+            <h2>在线钢琴</h2>
+            <PianoDemo />
+          </div>
+        )}
+
+        {activeTab === 'code' && (
+          <div className="code-section">
+            <h2>TypeScript 示例</h2>
+            <div className="code-block">
+              <pre>{`// Web Audio API 钢琴实现
+import { useRef, useCallback, useState } from 'react'
+
+interface Note {
+  note: string
+  frequency: number
+}
+
+export function usePiano() {
+  const audioContextRef = useRef<AudioContext | null>(null)
+  const oscillators = useRef<Map<string, OscillatorNode>>(new Map())
+
+  const getContext = useCallback(() => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContext()
+    }
+    return audioContextRef.current
+  }, [])
+
+  const playNote = useCallback((note: Note, volume: number = 0.5) => {
+    const ctx = getContext()
+    if (ctx.state === 'suspended') ctx.resume()
+
+    // 防止重复播放
+    if (oscillators.current.has(note.note)) return
+
+    // 创建振荡器
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+
+    osc.type = 'sine' // 正弦波
+    osc.frequency.setValueAtTime(note.frequency, ctx.currentTime)
+    gain.gain.setValueAtTime(volume, ctx.currentTime)
+
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.start()
+
+    oscillators.current.set(note.note, osc)
+  }, [getContext])
+
+  const stopNote = useCallback((note: string) => {
+    const osc = oscillators.current.get(note)
+    if (osc) {
+      osc.stop()
+      oscillators.current.delete(note)
+    }
+  }, [])
+
+  return { playNote, stopNote }
+}`}</pre>
+            </div>
+
+            <h2>JavaScript 示例</h2>
+            <div className="code-block">
+              <pre>{`// 原生 JavaScript 实现
+class SimplePiano {
+  constructor() {
+    this.audioContext = null
+    this.oscillators = new Map()
+  }
+
+  init() {
+    this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
+  }
+
+  play(frequency, noteId) {
+    if (!this.audioContext) this.init()
+    if (this.audioContext.state === 'suspended') {
+      this.audioContext.resume()
+    }
+
+    const osc = this.audioContext.createOscillator()
+    const gain = this.audioContext.createGain()
+
+    osc.type = 'sine'
+    osc.frequency.value = frequency
+    gain.gain.value = 0.5
+
+    osc.connect(gain)
+    gain.connect(this.audioContext.destination)
+    osc.start()
+
+    this.oscillators.set(noteId, osc)
+  }
+
+  stop(noteId) {
+    const osc = this.oscillators.get(noteId)
+    if (osc) {
+      osc.stop()
+      this.oscillators.delete(noteId)
+    }
+  }
+}
+
+// 使用示例
+const piano = new SimplePiano()
+
+// C4 = 261.63Hz
+piano.play(261.63, 'C4')
+
+// 停止
+piano.stop('C4')`}</pre>
+            </div>
+
+            <h2>Python 示例（pygame）</h2>
+            <div className="code-block">
+              <pre>{`# 使用 pygame 播放音符
+import pygame
+import numpy as np
+
+def generate_tone(frequency, duration=0.5, sample_rate=44100):
+    """生成指定频率的音调"""
+    t = np.linspace(0, duration, int(sample_rate * duration), False)
+    tone = np.sin(2 * np.pi * frequency * t)
+    # 淡入淡出效果
+    fade = np.linspace(0, 1, int(sample_rate * 0.01))
+    tone[:len(fade)] *= fade
+    tone[-len(fade):] *= fade[::-1]
+    return (tone * 32767).astype(np.int16)
+
+class Piano:
+    NOTES = {
+        'C4': 261.63, 'D4': 293.66, 'E4': 329.63,
+        'F4': 349.23, 'G4': 392.00, 'A4': 440.00,
+        'B4': 493.88, 'C5': 523.25
+    }
+
+    def __init__(self):
+        pygame.mixer.init(frequency=44100, size=-16, channels=1)
+        self.sounds = {}
+
+    def play(self, note):
+        if note not in self.sounds:
+            freq = self.NOTES.get(note)
+            if freq:
+                tone = generate_tone(freq)
+                self.sounds[note] = pygame.sndarray.make_sound(tone)
+
+        if note in self.sounds:
+            self.sounds[note].play()
+
+# 使用
+piano = Piano()
+piano.play('C4')  # 播放中央C`}</pre>
+            </div>
+
+            <h2>Go 示例（beep 库）</h2>
+            <div className="code-block">
+              <pre>{`// Go 音频播放示例
+package main
+
+import (
+    "fmt"
+    "math"
+    "time"
+
+    "github.com/faiface/beep"
+    "github.com/faiface/beep/speaker"
+)
+
+// 生成正弦波
+type sineWave struct {
+    freq     float64
+    duration time.Duration
+    pos     int
+}
+
+func (s *sineWave) Stream(samples [][2]float64) (int, bool) {
+    sampleRate := 44100.0
+    for i := range samples {
+        t := float64(s.pos) / sampleRate
+        val := math.Sin(2 * math.Pi * s.freq * t)
+        samples[i][0] = val * 0.5 // 左声道
+        samples[i][1] = val * 0.5 // 右声道
+        s.pos++
+    }
+    return len(samples), true
+}
+
+func (s *sineWave) Err() error {
+    return nil
+}
+
+func playNote(freq float64, duration time.Duration) {
+    sr := beep.SampleRate(44100)
+    speaker.Init(sr, sr.N(duration/10))
+
+    wave := &sineWave{freq: freq, duration: duration}
+    speaker.Play(wave)
+    time.Sleep(duration)
+}
+
+func main() {
+    // 音符频率
+    notes := map[string]float64{
+        "C4": 261.63, "D4": 293.66, "E4": 329.63,
+        "F4": 349.23, "G4": 392.00, "A4": 440.00,
+    }
+
+    fmt.Println("Playing C4...")
+    playNote(notes["C4"], 500*time.Millisecond)
+}`}</pre>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// 钢琴演示组件
+function PianoDemo() {
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set())
   const [volume, setVolume] = useState(0.5)
   const audioContextRef = useRef<AudioContext | null>(null)
@@ -49,7 +375,6 @@ export default function PianoToolPage() {
       ctx.resume()
     }
 
-    // 如果该音符已经在播放，先停止
     if (activeOscillators.current.has(key.note)) {
       return
     }
@@ -83,7 +408,6 @@ export default function PianoToolPage() {
     })
   }, [])
 
-  // 键盘事件监听
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return
@@ -113,173 +437,80 @@ export default function PianoToolPage() {
   const blackKeys = KEYS.filter(k => k.note.includes('#'))
 
   return (
-    <div className="toolbox-page">
-      <Link to="/frontend-toolbox/fun" className="toolbox-back">
-        ← 返回娱乐工具
-      </Link>
-      <div className="page-header">
-        <div className="page-header-title">
-          <span className="page-icon">🎹</span>
-          <h1>在线钢琴</h1>
-        </div>
-        <p className="page-sub">使用键盘或鼠标弹奏钢琴</p>
+    <div className="piano-demo">
+      <div className="piano-controls">
+        <label>音量: </label>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          value={volume}
+          onChange={(e) => setVolume(parseFloat(e.target.value))}
+        />
+        <span>{Math.round(volume * 100)}%</span>
       </div>
 
-      <section className="tool-card">
-        <div className="tool-block" style={{ borderTop: 'none', paddingTop: 0 }}>
-          <div className="tool-block-title">控制面板</div>
-          <div className="tool-row">
-            <label className="tool-label">
-              音量
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={volume}
-                onChange={(e) => setVolume(parseFloat(e.target.value))}
-                style={{ marginLeft: '8px' }}
-              />
-              <span style={{ marginLeft: '8px' }}>{Math.round(volume * 100)}%</span>
-            </label>
-          </div>
-        </div>
-
-        <div className="tool-block">
-          <div className="tool-block-title">钢琴键盘</div>
-          <div
-            style={{
-              position: 'relative',
-              display: 'flex',
-              justifyContent: 'center',
-              padding: '20px',
-              backgroundColor: '#1a1a2e',
-              borderRadius: '8px',
-              overflowX: 'auto'
-            }}
-          >
-            {/* 白键 */}
-            <div style={{ display: 'flex', gap: '2px' }}>
-              {whiteKeys.map((key) => (
-                <button
-                  key={key.note}
-                  type="button"
-                  onMouseDown={() => playNote(key)}
-                  onMouseUp={() => stopNote(key.note)}
-                  onMouseLeave={() => stopNote(key.note)}
-                  style={{
-                    width: '50px',
-                    height: '180px',
-                    backgroundColor: activeKeys.has(key.note) ? '#ddd' : '#fff',
-                    border: '1px solid #333',
-                    borderRadius: '0 0 4px 4px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    paddingBottom: '10px',
-                    transition: 'background-color 0.1s',
-                    boxShadow: activeKeys.has(key.note) ? 'inset 0 2px 4px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.2)'
-                  }}
-                >
-                  <span style={{ fontSize: '10px', color: '#666' }}>{key.note}</span>
-                  <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#333', marginTop: '4px' }}>
-                    {key.key.toUpperCase()}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            {/* 黑键 */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                display: 'flex',
-                pointerEvents: 'none'
-              }}
+      <div className="piano-keyboard">
+        <div className="white-keys">
+          {whiteKeys.map((key) => (
+            <button
+              key={key.note}
+              className={`white-key ${activeKeys.has(key.note) ? 'active' : ''}`}
+              onMouseDown={() => playNote(key)}
+              onMouseUp={() => stopNote(key.note)}
+              onMouseLeave={() => stopNote(key.note)}
             >
-              {blackKeys.map((key, index) => {
-                // 计算黑键位置
-                const blackKeyPositions: Record<number, number> = {
-                  0: 35, 1: 87, 2: 191, 3: 243, 4: 295, 5: 399, 6: 451
-                }
-                return (
-                  <button
-                    key={key.note}
-                    type="button"
-                    onMouseDown={() => playNote(key)}
-                    onMouseUp={() => stopNote(key.note)}
-                    onMouseLeave={() => stopNote(key.note)}
-                    style={{
-                      position: 'absolute',
-                      left: `${blackKeyPositions[index] || 0}px`,
-                      width: '30px',
-                      height: '110px',
-                      backgroundColor: activeKeys.has(key.note) ? '#444' : '#000',
-                      border: 'none',
-                      borderRadius: '0 0 4px 4px',
-                      cursor: 'pointer',
-                      pointerEvents: 'auto',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-end',
-                      alignItems: 'center',
-                      paddingBottom: '8px',
-                      zIndex: 1,
-                      boxShadow: activeKeys.has(key.note) ? 'inset 0 2px 4px rgba(255,255,255,0.2)' : '0 4px 8px rgba(0,0,0,0.5)'
-                    }}
-                  >
-                    <span style={{ fontSize: '8px', color: '#999' }}>{key.note}</span>
-                    <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#fff', marginTop: '2px' }}>
-                      {key.key.toUpperCase()}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+              <span className="note-name">{key.note}</span>
+              <span className="key-binding">{key.key.toUpperCase()}</span>
+            </button>
+          ))}
         </div>
+        <div className="black-keys">
+          {blackKeys.map((key, index) => {
+            const blackKeyPositions: Record<number, number> = {
+              0: 35, 1: 87, 2: 191, 3: 243, 4: 295, 5: 399, 6: 451
+            }
+            return (
+              <button
+                key={key.note}
+                className={`black-key ${activeKeys.has(key.note) ? 'active' : ''}`}
+                style={{ left: `${blackKeyPositions[index] || 0}px` }}
+                onMouseDown={() => playNote(key)}
+                onMouseUp={() => stopNote(key.note)}
+                onMouseLeave={() => stopNote(key.note)}
+              >
+                <span className="note-name">{key.note}</span>
+                <span className="key-binding">{key.key.toUpperCase()}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
 
-        <div className="tool-block">
-          <div className="tool-block-title">键盘快捷键</div>
-          <div className="tool-result">
-            <p>使用键盘弹奏钢琴：</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
-              {KEYS.map((key) => (
-                <span
-                  key={key.note}
-                  style={{
-                    display: 'inline-block',
-                    padding: '4px 8px',
-                    backgroundColor: key.note.includes('#') ? '#333' : '#eee',
-                    color: key.note.includes('#') ? '#fff' : '#333',
-                    borderRadius: '4px',
-                    fontSize: '12px'
-                  }}
-                >
-                  {key.key.toUpperCase()}: {key.note}
-                </span>
-              ))}
-            </div>
-          </div>
+      <div className="key-shortcuts">
+        <h4>键盘快捷键</h4>
+        <div className="key-list">
+          {KEYS.map((key) => (
+            <span
+              key={key.note}
+              className={`key-hint ${key.note.includes('#') ? 'black' : 'white'}`}
+            >
+              {key.key.toUpperCase()}: {key.note}
+            </span>
+          ))}
         </div>
+      </div>
 
-        <div className="tool-block">
-          <div className="tool-block-title">使用说明</div>
-          <div className="tool-result">
-            <ul style={{ paddingLeft: '20px' }}>
-              <li>点击钢琴键或按键盘对应的按键发声</li>
-              <li>白键对应自然音，黑键对应升/降音</li>
-              <li>可以同时按多个键弹奏和弦</li>
-              <li>调节音量滑块控制声音大小</li>
-            </ul>
-          </div>
-        </div>
-      </section>
+      <div className="usage-tips">
+        <h4>使用说明</h4>
+        <ul>
+          <li>点击钢琴键或按键盘对应的按键发声</li>
+          <li>白键对应自然音，黑键对应升/降音</li>
+          <li>可以同时按多个键弹奏和弦</li>
+          <li>调节音量滑块控制声音大小</li>
+        </ul>
+      </div>
     </div>
   )
 }

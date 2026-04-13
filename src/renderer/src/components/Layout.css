@@ -147,19 +147,6 @@
   background: #eff6ff;
   color: #3b82f6;
   font-weight: 500;
-  box-shadow: inset 3px 0 0 #3b82f6;
-}
-
-.nav-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 60%;
-  background: #3b82f6;
-  border-radius: 0 2px 2px 0;
 }
 
 .nav-item .icon {
@@ -232,10 +219,8 @@
 }
 
 .nav-child-item.active {
-  background: #eff6ff;
   color: #3b82f6;
   font-weight: 500;
-  box-shadow: inset 2px 0 0 rgba(59, 130, 246, 0.6);
 }
 
 .nav-child-item .icon {
@@ -365,4 +350,42 @@
     font-size: 12px;
     padding: 6px 8px;
   }
+}
+
+/* Electron Only Notice */
+.electron-only-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  max-width: 480px;
+  margin: 24px auto;
+}
+
+.electron-only-notice .notice-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.electron-only-notice h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.electron-only-notice p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.electron-only-notice .notice-hint {
+  font-size: 13px;
+  color: #9ca3af;
 }

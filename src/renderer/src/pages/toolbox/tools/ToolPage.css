@@ -167,6 +167,7 @@
   border-radius: 6px;
   margin-bottom: 8px;
   font-size: 13px;
+  color: #455a64;
 }
 
 .scenario-list li strong {
@@ -811,4 +812,105 @@
     width: 50px;
     font-size: 12px;
   }
+}
+
+/* Time Demo Styles */
+.timestamp-demo,
+.current-time-demo,
+.timezone-demo {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.timestamp-display {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.timestamp-card {
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+  border-left: 3px solid #4fc3f7;
+}
+
+.timestamp-label {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.timestamp-value {
+  font-size: 20px;
+  font-weight: bold;
+  font-family: 'Consolas', 'Monaco', monospace;
+  color: #333;
+  word-break: break-all;
+}
+
+.copy-btn {
+  margin-top: 12px;
+  padding: 6px 12px;
+  background: #e0e0e0;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.copy-btn:hover {
+  background: #d0d0d0;
+}
+
+.copy-btn-small {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copy-btn-small:hover {
+  background: #f0f0f0;
+  border-color: #ccc;
+}
+
+.format-list {
+  display: grid;
+  gap: 8px;
+}
+
+.format-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #fff;
+  border-radius: 6px;
+}
+
+.format-label {
+  font-size: 12px;
+  color: #888;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.format-value {
+  flex: 1;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  color: #333;
+  word-break: break-all;
 }

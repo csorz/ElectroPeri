@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { copyToClipboard } from '../clipboard'
-import '../toolbox.css'
+import './ToolPage.css'
 
 export default function ButtonDesignerToolPage() {
+  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('concept')
   const [text, setText] = useState('按钮')
   const [bgColor, setBgColor] = useState('#3498db')
   const [textColor, setTextColor] = useState('#ffffff')
@@ -20,7 +20,6 @@ export default function ButtonDesignerToolPage() {
 
   const onCopy = useCallback((t: string) => void copyToClipboard(t), [])
 
-  // 计算悬停颜色
   const adjustColor = (hex: string, amount: number): string => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     if (!result) return hex
@@ -100,199 +99,296 @@ ${hoverCss}
   }
 
   return (
-    <div className="toolbox-page">
-      <Link to="/frontend-toolbox/css" className="toolbox-back">
-        ← 返回 CSS 样式工具
-      </Link>
-      <div className="page-header">
-        <div className="page-header-title">
-          <span className="page-icon">🔘</span>
-          <h1>按钮设计</h1>
-        </div>
-        <p className="page-sub">CSS 按钮样式设计器</p>
+    <div className="tool-page">
+      <div className="tool-header">
+        <h1>🔘 按钮设计</h1>
+        <p>CSS 按钮样式设计器</p>
       </div>
 
-      <section className="tool-card">
-        {/* 预览 */}
-        <div
-          style={{
-            width: '100%',
-            minHeight: '150px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'var(--bg-secondary)',
-            borderRadius: '8px',
-            marginBottom: '24px'
-          }}
-        >
-          <button
-            style={{
-              padding: `${paddingY}px ${paddingX}px`,
-              fontSize: `${fontSize}px`,
-              fontWeight: fontWeight,
-              color: textColor,
-              backgroundColor: bgColor,
-              borderRadius: `${borderRadius}px`,
-              border: borderWidth > 0 ? `${borderWidth}px solid ${borderColor}` : 'none',
-              boxShadow: shadow ? `0 4px ${shadowBlur}px rgba(0, 0, 0, 0.15)` : 'none',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            {text}
-          </button>
-        </div>
+      <div className="tool-tabs">
+        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
+        <button className={activeTab === 'demo' ? 'active' : ''} onClick={() => setActiveTab('demo')}>交互演示</button>
+        <button className={activeTab === 'code' ? 'active' : ''} onClick={() => setActiveTab('code')}>代码示例</button>
+      </div>
 
-        {/* 预设样式 */}
-        <div className="tool-block" style={{ borderTop: 'none', paddingTop: 0 }}>
-          <div className="tool-block-title">预设样式</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {presetStyles.map((preset) => (
-              <button
-                key={preset.name}
-                onClick={() => applyPreset(preset)}
-                style={{
-                  padding: '8px 16px',
-                  fontSize: '14px',
-                  color: preset.text,
-                  backgroundColor: preset.bg,
-                  borderRadius: '4px',
-                  border: preset.border ? `2px solid ${preset.border}` : 'none',
-                  cursor: 'pointer'
-                }}
-              >
-                {preset.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* 基本设置 */}
-        <div className="tool-block">
-          <div className="tool-block-title">基本设置</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
-            <label className="tool-label">
-              按钮文字
-              <input
-                type="text"
-                className="tool-input"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-              />
-            </label>
-            <label className="tool-label">
-              字体大小: {fontSize}px
-              <input
-                type="range"
-                min="12"
-                max="32"
-                value={fontSize}
-                onChange={(e) => setFontSize(parseInt(e.target.value))}
-              />
-            </label>
-            <label className="tool-label">
-              字重
-              <select value={fontWeight} onChange={(e) => setFontWeight(e.target.value as typeof fontWeight)}>
-                <option value="normal">正常</option>
-                <option value="bold">粗体</option>
-              </select>
-            </label>
-          </div>
-        </div>
-
-        {/* 颜色设置 */}
-        <div className="tool-block">
-          <div className="tool-block-title">颜色</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
-            <label className="tool-label">
-              背景色
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} style={{ width: '40px' }} />
-                <input type="text" className="tool-input" value={bgColor} onChange={(e) => setBgColor(e.target.value)} />
+      <div className="tool-content">
+        {activeTab === 'concept' && (
+          <div className="concept-section">
+            <h2>按钮样式属性</h2>
+            <div className="feature-grid">
+              <div className="feature-card">
+                <h3>背景与颜色</h3>
+                <p>background-color 设置按钮背景，color 设置文字颜色，保持足够对比度</p>
               </div>
-            </label>
-            <label className="tool-label">
-              文字颜色
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} style={{ width: '40px' }} />
-                <input type="text" className="tool-input" value={textColor} onChange={(e) => setTextColor(e.target.value)} />
+              <div className="feature-card">
+                <h3>内边距 (padding)</h3>
+                <p>控制按钮内部空间，垂直和水平方向可分别设置</p>
               </div>
-            </label>
-          </div>
-        </div>
+              <div className="feature-card">
+                <h3>圆角 (border-radius)</h3>
+                <p>设置按钮圆角大小，0 为直角，50% 为圆形或椭圆形</p>
+              </div>
+              <div className="feature-card">
+                <h3>边框 (border)</h3>
+                <p>可设置边框宽度、样式和颜色，常用于轮廓按钮</p>
+              </div>
+            </div>
 
-        {/* 尺寸设置 */}
-        <div className="tool-block">
-          <div className="tool-block-title">尺寸与边框</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
-            <label className="tool-label">
-              水平内边距: {paddingX}px
-              <input type="range" min="5" max="50" value={paddingX} onChange={(e) => setPaddingX(parseInt(e.target.value))} />
-            </label>
-            <label className="tool-label">
-              垂直内边距: {paddingY}px
-              <input type="range" min="5" max="30" value={paddingY} onChange={(e) => setPaddingY(parseInt(e.target.value))} />
-            </label>
-            <label className="tool-label">
-              圆角: {borderRadius}px
-              <input type="range" min="0" max="50" value={borderRadius} onChange={(e) => setBorderRadius(parseInt(e.target.value))} />
-            </label>
-            <label className="tool-label">
-              边框宽度: {borderWidth}px
-              <input type="range" min="0" max="5" value={borderWidth} onChange={(e) => setBorderWidth(parseInt(e.target.value))} />
-            </label>
-            {borderWidth > 0 && (
-              <label className="tool-label">
-                边框颜色
+            <h2>交互状态</h2>
+            <div className="info-box">
+              <strong>伪类选择器</strong>
+              <p>按钮应具有清晰的交互反馈，通过伪类实现不同状态的样式变化：</p>
+              <ul>
+                <li><strong>:hover</strong> - 鼠标悬停状态</li>
+                <li><strong>:active</strong> - 点击按下状态</li>
+                <li><strong>:focus</strong> - 获得焦点状态</li>
+                <li><strong>:disabled</strong> - 禁用状态</li>
+              </ul>
+            </div>
+
+            <h2>过渡动画</h2>
+            <div className="diagram-box">
+              <pre className="ascii-art">{`
+  transition: property duration timing-function delay;
+
+  常用配置:
+  ┌──────────────────────────────────────────────────────┐
+  │ transition: all 0.2s ease;        /* 简写 */        │
+  │ transition: background 0.3s;      /* 仅背景 */      │
+  │ transition: transform 0.2s ease;  /* 仅变换 */      │
+  └──────────────────────────────────────────────────────┘
+
+  时间函数:
+  ease        - 开始慢，中间快，结束慢
+  linear      - 匀速
+  ease-in     - 开始慢
+  ease-out    - 结束慢
+  ease-in-out - 两头慢，中间快
+              `}</pre>
+            </div>
+
+            <h2>最佳实践</h2>
+            <ul className="scenario-list">
+              <li><strong>足够的点击区域</strong> - 最小 44x44px，方便触摸操作</li>
+              <li><strong>清晰的视觉反馈</strong> - hover/active 状态有明显变化</li>
+              <li><strong>一致性</strong> - 同一应用中按钮风格保持统一</li>
+              <li><strong>语义化</strong> - 使用 button 元素而非 div</li>
+              <li><strong>无障碍</strong> - 提供焦点样式，支持键盘操作</li>
+            </ul>
+          </div>
+        )}
+
+        {activeTab === 'demo' && (
+          <div className="demo-section">
+            <h2>按钮预览</h2>
+            <div className="button-demo">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa', borderRadius: '8px', padding: '40px', marginBottom: '20px' }}>
+                <button
+                  style={{
+                    padding: `${paddingY}px ${paddingX}px`,
+                    fontSize: `${fontSize}px`,
+                    fontWeight: fontWeight,
+                    color: textColor,
+                    backgroundColor: bgColor,
+                    borderRadius: `${borderRadius}px`,
+                    border: borderWidth > 0 ? `${borderWidth}px solid ${borderColor}` : 'none',
+                    boxShadow: shadow ? `0 4px ${shadowBlur}px rgba(0, 0, 0, 0.15)` : 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {text}
+                </button>
+              </div>
+
+              <h3>预设样式</h3>
+              <div className="preset-buttons">
+                {presetStyles.map((preset) => (
+                  <button key={preset.name} onClick={() => applyPreset(preset)} style={{ padding: '8px 16px', fontSize: '14px', color: preset.text, backgroundColor: preset.bg, borderRadius: '4px', border: preset.border ? `2px solid ${preset.border}` : 'none', cursor: 'pointer' }}>
+                    {preset.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <h2>基本设置</h2>
+            <div className="config-grid">
+              <div className="config-item">
+                <label>按钮文字</label>
+                <input type="text" value={text} onChange={(e) => setText(e.target.value)} style={{ padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+              </div>
+              <div className="config-item">
+                <label>字体大小: {fontSize}px</label>
+                <input type="range" min="12" max="32" value={fontSize} onChange={(e) => setFontSize(parseInt(e.target.value))} />
+              </div>
+              <div className="config-item">
+                <label>字重</label>
+                <select value={fontWeight} onChange={(e) => setFontWeight(e.target.value as typeof fontWeight)} style={{ padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                  <option value="normal">正常</option>
+                  <option value="bold">粗体</option>
+                </select>
+              </div>
+            </div>
+
+            <h2>颜色设置</h2>
+            <div className="config-grid">
+              <div className="config-item">
+                <label>背景色</label>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <input type="color" value={borderColor} onChange={(e) => setBorderColor(e.target.value)} style={{ width: '40px' }} />
-                  <input type="text" className="tool-input" value={borderColor} onChange={(e) => setBorderColor(e.target.value)} />
+                  <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} style={{ width: '40px', height: '32px', border: 'none' }} />
+                  <input type="text" value={bgColor} onChange={(e) => setBgColor(e.target.value)} style={{ flex: 1, padding: '6px', border: '1px solid #ddd', borderRadius: '4px' }} />
                 </div>
-              </label>
-            )}
-          </div>
-        </div>
+              </div>
+              <div className="config-item">
+                <label>文字颜色</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} style={{ width: '40px', height: '32px', border: 'none' }} />
+                  <input type="text" value={textColor} onChange={(e) => setTextColor(e.target.value)} style={{ flex: 1, padding: '6px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+              </div>
+            </div>
 
-        {/* 效果设置 */}
-        <div className="tool-block">
-          <div className="tool-block-title">效果</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
-            <label className="tool-label" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
-              <input type="checkbox" checked={shadow} onChange={(e) => setShadow(e.target.checked)} />
-              添加阴影
-            </label>
-            {shadow && (
-              <label className="tool-label">
-                阴影模糊: {shadowBlur}px
-                <input type="range" min="5" max="30" value={shadowBlur} onChange={(e) => setShadowBlur(parseInt(e.target.value))} />
-              </label>
-            )}
-            <label className="tool-label">
-              悬停效果
-              <select value={hoverEffect} onChange={(e) => setHoverEffect(e.target.value as typeof hoverEffect)}>
-                <option value="none">无</option>
-                <option value="darken">变暗</option>
-                <option value="lighten">变亮</option>
-                <option value="scale">放大</option>
-              </select>
-            </label>
-          </div>
-        </div>
+            <h2>尺寸与边框</h2>
+            <div className="config-grid">
+              <div className="config-item">
+                <label>水平内边距: {paddingX}px</label>
+                <input type="range" min="5" max="50" value={paddingX} onChange={(e) => setPaddingX(parseInt(e.target.value))} />
+              </div>
+              <div className="config-item">
+                <label>垂直内边距: {paddingY}px</label>
+                <input type="range" min="5" max="30" value={paddingY} onChange={(e) => setPaddingY(parseInt(e.target.value))} />
+              </div>
+              <div className="config-item">
+                <label>圆角: {borderRadius}px</label>
+                <input type="range" min="0" max="50" value={borderRadius} onChange={(e) => setBorderRadius(parseInt(e.target.value))} />
+              </div>
+              <div className="config-item">
+                <label>边框宽度: {borderWidth}px</label>
+                <input type="range" min="0" max="5" value={borderWidth} onChange={(e) => setBorderWidth(parseInt(e.target.value))} />
+              </div>
+              {borderWidth > 0 && (
+                <div className="config-item">
+                  <label>边框颜色</label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input type="color" value={borderColor} onChange={(e) => setBorderColor(e.target.value)} style={{ width: '40px', height: '32px', border: 'none' }} />
+                    <input type="text" value={borderColor} onChange={(e) => setBorderColor(e.target.value)} style={{ flex: 1, padding: '6px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  </div>
+                </div>
+              )}
+            </div>
 
-        {/* CSS 代码 */}
-        <div className="tool-block">
-          <div className="tool-block-title">CSS 代码</div>
-          <pre className="tool-result mono" style={{ fontSize: '12px', maxHeight: '300px', overflow: 'auto' }}>
-            {generateCss()}
-          </pre>
-          <div className="tool-actions" style={{ marginTop: '12px' }}>
-            <button type="button" className="btn btn-primary" onClick={() => onCopy(generateCss())}>
-              复制 CSS
-            </button>
+            <h2>效果设置</h2>
+            <div className="config-grid">
+              <div className="config-item" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+                <input type="checkbox" checked={shadow} onChange={(e) => setShadow(e.target.checked)} />
+                <label style={{ margin: 0 }}>添加阴影</label>
+              </div>
+              {shadow && (
+                <div className="config-item">
+                  <label>阴影模糊: {shadowBlur}px</label>
+                  <input type="range" min="5" max="30" value={shadowBlur} onChange={(e) => setShadowBlur(parseInt(e.target.value))} />
+                </div>
+              )}
+              <div className="config-item">
+                <label>悬停效果</label>
+                <select value={hoverEffect} onChange={(e) => setHoverEffect(e.target.value as typeof hoverEffect)} style={{ padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                  <option value="none">无</option>
+                  <option value="darken">变暗</option>
+                  <option value="lighten">变亮</option>
+                  <option value="scale">放大</option>
+                </select>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        )}
+
+        {activeTab === 'code' && (
+          <div className="code-section">
+            <h2>生成的 CSS</h2>
+            <div className="code-block">
+              <pre>{generateCss()}</pre>
+            </div>
+            <div className="demo-controls">
+              <button onClick={() => onCopy(generateCss())}>复制 CSS</button>
+            </div>
+
+            <h2>更多按钮示例</h2>
+            <div className="code-block">
+              <pre>{`/* 主要按钮 */
+.btn-primary {
+  background-color: #3498db;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+}
+
+/* 轮廓按钮 */
+.btn-outline {
+  background-color: transparent;
+  color: #3498db;
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: 2px solid #3498db;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+  background-color: #3498db;
+  color: #fff;
+}
+
+/* 圆形按钮 */
+.btn-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #27ae60;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 禁用状态 */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 加载状态 */
+.btn-loading {
+  position: relative;
+  color: transparent;
+}
+
+.btn-loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}`}</pre>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

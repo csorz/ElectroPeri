@@ -80,7 +80,7 @@ import CdnToolPage from './pages/toolbox/tools/CdnToolPage'
 // Encoding tools
 import HashToolPage from './pages/toolbox/tools/HashToolPage'
 import Base64ToolPage from './pages/toolbox/tools/Base64ToolPage'
-import UrlEncodeToolPage from './pages/toolbox/tools/UrlEncodeToolPage'
+import UrlToolPage from './pages/toolbox/tools/UrlToolPage'
 import EncryptToolPage from './pages/toolbox/tools/EncryptToolPage'
 import UnicodeToolPage from './pages/toolbox/tools/UnicodeToolPage'
 
@@ -232,7 +232,7 @@ function App(): React.JSX.Element {
           <Route path="frontend-toolbox/encoding" element={<EncodingCategoryPage />} />
           <Route path="frontend-toolbox/encoding/hash" element={<HashToolPage />} />
           <Route path="frontend-toolbox/encoding/base64" element={<Base64ToolPage />} />
-          <Route path="frontend-toolbox/encoding/url" element={<UrlEncodeToolPage />} />
+          <Route path="frontend-toolbox/encoding/url" element={<UrlToolPage />} />
           <Route path="frontend-toolbox/encoding/encrypt" element={<EncryptToolPage />} />
           <Route path="frontend-toolbox/encoding/unicode" element={<UnicodeToolPage />} />
 
@@ -246,7 +246,7 @@ function App(): React.JSX.Element {
 
           {/* URL Category & Tools */}
           <Route path="frontend-toolbox/url" element={<UrlCategoryPage />} />
-          <Route path="frontend-toolbox/url/encode" element={<UrlEncodeToolPage />} />
+          <Route path="frontend-toolbox/url/encode" element={<UrlToolPage />} />
           <Route path="frontend-toolbox/url/short" element={<ShortUrlToolPage />} />
           <Route path="frontend-toolbox/url/query" element={<QueryParserToolPage />} />
 
