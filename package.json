@@ -14,37 +14,39 @@
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "node scripts/postinstall.js",
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "ELECTRON_BUILDER_BINARIES_MIRROR=https://registry.npmmirror.com/-/binary/electron-builder-binaries/ electron-vite build && ELECTRON_BUILDER_BINARIES_MIRROR=https://registry.npmmirror.com/-/binary/electron-builder-binaries/ electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux"
   },
   "dependencies": {
-    "@abandonware/noble": "1.9.2-26",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "crypto-js": "^4.2.0",
-    "ds18b20": "^0.1.0",
     "electron-updater": "^6.3.9",
     "file-saver": "^2.0.5",
-    "i2c-bus": "^5.2.3",
     "js-yaml": "^4.1.0",
     "jsqr": "^1.4.0",
     "jszip": "^3.10.1",
     "mqtt": "^5.15.1",
-    "node-hid": "^3.3.0",
-    "onoff": "^6.0.3",
-    "pigpio": "^3.3.1",
     "ps-list": "^9.0.0",
     "qrcode": "^1.5.4",
     "react-router-dom": "^7.14.0",
     "serialport": "^13.0.0",
-    "spi-device": "^3.1.2",
     "systeminformation": "^5.31.5",
     "tesseract.js": "^7.0.0",
     "usb": "^2.17.0",
     "zustand": "^5.0.12"
+  },
+  "optionalDependencies": {
+    "@abandonware/noble": "1.9.2-26",
+    "node-hid": "^3.3.0",
+    "pigpio": "^3.3.1",
+    "onoff": "^6.0.3",
+    "i2c-bus": "^5.2.3",
+    "spi-device": "^3.1.2",
+    "ds18b20": "^0.1.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
@@ -74,6 +76,10 @@
     "onlyBuiltDependencies": [
       "electron",
       "esbuild"
-    ]
+    ],
+    "supportedArchitectures": {
+      "os": ["win32", "linux", "darwin"],
+      "cpu": ["x64", "arm64"]
+    }
   }
 }

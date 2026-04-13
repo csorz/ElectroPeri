@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(cat \"C:\\\\\\\\Users\\\\\\\\zma\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\d--csApps-Github-cs-ElectroPeri\\\\\\\\3aeae6ec-61dc-4d08-9f72-8a2b9336e042\\\\\\\\tasks\\\\\\\\brahixzhm.output\")",
+      "Bash(pnpm list:*)"
+    ]
+  }
+}
