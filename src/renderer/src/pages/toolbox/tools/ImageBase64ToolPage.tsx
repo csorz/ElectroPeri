@@ -3,7 +3,7 @@ import { copyToClipboard } from '../clipboard'
 import './ToolPage.css'
 
 export default function ImageBase64ToolPage() {
-  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('concept')
+  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('demo')
 
   const [mode, setMode] = useState<'imageToBase64' | 'base64ToImage'>('imageToBase64')
   const [file, setFile] = useState<File | null>(null)
@@ -92,8 +92,8 @@ export default function ImageBase64ToolPage() {
       </div>
 
       <div className="tool-tabs">
-        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'demo' ? 'active' : ''} onClick={() => setActiveTab('demo')}>交互演示</button>
+        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'code' ? 'active' : ''} onClick={() => setActiveTab('code')}>代码示例</button>
       </div>
 

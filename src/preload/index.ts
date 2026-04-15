@@ -236,6 +236,14 @@ const mqttApi = {
   }
 }
 
+// Startup Log API
+const startupLogApi = {
+  path: () => ipcRenderer.invoke('startup-log:path'),
+  list: () => ipcRenderer.invoke('startup-log:list'),
+  read: (filename: string) => ipcRenderer.invoke('startup-log:read', filename),
+  latest: () => ipcRenderer.invoke('startup-log:latest')
+}
+
 // Custom APIs for renderer
 const api = {
   serial: serialApi,
@@ -259,7 +267,8 @@ const api = {
   dns: dnsApi,
   meta: metaApi,
   fileTransfer: fileTransferApi,
-  mqtt: mqttApi
+  mqtt: mqttApi,
+  startupLog: startupLogApi
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

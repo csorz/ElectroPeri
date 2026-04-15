@@ -3,7 +3,7 @@ import { copyToClipboard } from '../clipboard'
 import './ToolPage.css'
 
 export default function ContrastToolPage() {
-  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('concept')
+  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('demo')
   const [foregroundColor, setForegroundColor] = useState('#333333')
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [contrastRatio, setContrastRatio] = useState<number>(0)
@@ -87,8 +87,8 @@ export default function ContrastToolPage() {
       </div>
 
       <div className="tool-tabs">
-        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'demo' ? 'active' : ''} onClick={() => setActiveTab('demo')}>交互演示</button>
+        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'code' ? 'active' : ''} onClick={() => setActiveTab('code')}>代码示例</button>
       </div>
 

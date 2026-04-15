@@ -259,6 +259,13 @@ interface MqttApi {
   onError: (callback: (error: string) => void) => void
 }
 
+interface StartupLogApi {
+  path: () => Promise<string>
+  list: () => Promise<string[]>
+  read: (filename: string) => Promise<string | null>
+  latest: () => Promise<{ filename: string; content: string } | null>
+}
+
 interface Api {
   serial: SerialApi
   usb: UsbApi
@@ -282,6 +289,7 @@ interface Api {
   meta: MetaApi
   fileTransfer: FileTransferApi
   mqtt: MqttApi
+  startupLog: StartupLogApi
 }
 
 declare global {

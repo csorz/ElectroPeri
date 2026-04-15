@@ -1,4 +1,4 @@
-ElectroPeri 软件许可协议
+﻿ElectroPeri 软件许可协议
 
 版权所有 (C) 2024 ElectroPeri 开发团队
 

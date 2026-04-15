@@ -8,7 +8,7 @@ interface GradientStop {
 }
 
 export default function GradientGeneratorToolPage() {
-  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('concept')
+  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('demo')
   const [gradientType, setGradientType] = useState<'linear' | 'radial' | 'conic'>('linear')
   const [angle, setAngle] = useState(90)
   const [stops, setStops] = useState<GradientStop[]>([
@@ -77,8 +77,8 @@ export default function GradientGeneratorToolPage() {
       </div>
 
       <div className="tool-tabs">
-        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'demo' ? 'active' : ''} onClick={() => setActiveTab('demo')}>交互演示</button>
+        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'code' ? 'active' : ''} onClick={() => setActiveTab('code')}>代码示例</button>
       </div>
 

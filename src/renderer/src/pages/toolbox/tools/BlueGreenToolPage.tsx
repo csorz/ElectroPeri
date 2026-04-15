@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './ToolPage.css'
 
 export default function BlueGreenToolPage() {
-  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('concept')
+  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('demo')
   const [activeEnv, setActiveEnv] = useState<'blue' | 'green'>('blue')
 
   return (
@@ -13,8 +13,8 @@ export default function BlueGreenToolPage() {
       </div>
 
       <div className="tool-tabs">
-        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'demo' ? 'active' : ''} onClick={() => setActiveTab('demo')}>交互演示</button>
+        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'code' ? 'active' : ''} onClick={() => setActiveTab('code')}>代码示例</button>
       </div>
 

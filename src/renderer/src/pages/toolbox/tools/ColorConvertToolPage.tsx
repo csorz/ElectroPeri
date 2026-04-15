@@ -6,7 +6,7 @@ interface RGB { r: number; g: number; b: number }
 interface HSL { h: number; s: number; l: number }
 
 export default function ColorConvertToolPage() {
-  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('concept')
+  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('demo')
   const [hex, setHex] = useState('#ff5722')
   const [rgb, setRgb] = useState<RGB>({ r: 255, g: 87, b: 34 })
   const [hsl, setHsl] = useState<HSL>({ h: 14, s: 100, l: 56 })
@@ -128,8 +128,8 @@ export default function ColorConvertToolPage() {
       </div>
 
       <div className="tool-tabs">
-        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'demo' ? 'active' : ''} onClick={() => setActiveTab('demo')}>交互演示</button>
+        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'code' ? 'active' : ''} onClick={() => setActiveTab('code')}>代码示例</button>
       </div>
 

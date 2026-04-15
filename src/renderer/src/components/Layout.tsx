@@ -349,6 +349,9 @@ export default function Layout() {
 
   const [subExpanded, setSubExpanded] = useState<Record<string, boolean>>({})
 
+  // Track manually collapsed items (user explicitly collapsed)
+  const [manualCollapsed, setManualCollapsed] = useState<Record<string, boolean>>({})
+
   // Check if a nav item or its children is active
   const isItemActive = (item: NavItem, currentPath: string): boolean => {
     if (currentPath === item.to || currentPath.startsWith(item.to + '/')) return true
@@ -417,7 +420,8 @@ export default function Layout() {
                   {group.items.map((item) => {
                     const hasChildren = item.children && item.children.length > 0
                     const itemActive = isItemActive(item, currentPath)
-                    const isSubExpanded = itemActive || Boolean(subExpanded[item.to])
+                    // Expand if: user manually expanded, OR (item is active AND user hasn't manually collapsed)
+                    const isSubExpanded = Boolean(subExpanded[item.to]) || (itemActive && !manualCollapsed[item.to])
 
                     if (hasChildren) {
                       return (
@@ -425,12 +429,18 @@ export default function Layout() {
                           <button
                             type="button"
                             className={`nav-item nav-sub-item nav-sub-toggle ${itemActive ? 'active' : ''}`}
-                            onClick={() =>
-                              setSubExpanded((prev) => ({
-                                ...prev,
-                                [item.to]: !Boolean(prev[item.to])
-                              }))
-                            }
+                            onClick={() => {
+                              // Toggle: if expanded, collapse it; if collapsed, expand it
+                              if (isSubExpanded) {
+                                // Currently expanded, so collapse
+                                setManualCollapsed((prev) => ({ ...prev, [item.to]: true }))
+                                setSubExpanded((prev) => ({ ...prev, [item.to]: false }))
+                              } else {
+                                // Currently collapsed, so expand
+                                setManualCollapsed((prev) => ({ ...prev, [item.to]: false }))
+                                setSubExpanded((prev) => ({ ...prev, [item.to]: true }))
+                              }
+                            }}
                           >
                             <span className="icon">{item.icon}</span>
                             <span>{item.label}</span>

@@ -12,7 +12,7 @@ export default function PrinterPage() {
 }
 
 function PrinterPageContent() {
-  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('concept')
+  const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('demo')
   const [status, setStatus] = useState<'idle' | 'scanning' | 'error'>('idle')
   const [error, setError] = useState<string | null>(null)
   const [printers, setPrinters] = useState<any[]>([])
@@ -52,8 +52,8 @@ function PrinterPageContent() {
       </div>
 
       <div className="tool-tabs">
-        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'demo' ? 'active' : ''} onClick={() => setActiveTab('demo')}>交互演示</button>
+        <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'code' ? 'active' : ''} onClick={() => setActiveTab('code')}>代码示例</button>
       </div>
 
