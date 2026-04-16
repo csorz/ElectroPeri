@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import '../toolbox/tools/ToolPage.css'
 import { usePageSnapshotStore } from '../../store/pageSnapshotStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
-import { StatCard, SectionCard, InfoRow } from '../../components/dashboard'
+import { StatCard, SectionCard } from '../../components/dashboard'
 
 const formatHex = (n: number | undefined) => n !== undefined ? `0x${n.toString(16).toUpperCase().padStart(4, '0')}` : '-'
 

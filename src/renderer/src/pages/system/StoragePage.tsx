@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import '../toolbox/tools/ToolPage.css'
 import { usePageSnapshotStore } from '../../store/pageSnapshotStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
-import { GaugeBar, StatCard, SectionCard, InfoRow } from '../../components/dashboard'
+import { GaugeBar, SectionCard, InfoRow } from '../../components/dashboard'
 
 const toGB = (value = 0) => `${(value / 1024 / 1024 / 1024).toFixed(1)} GB`
 
