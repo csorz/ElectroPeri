@@ -4,10 +4,27 @@ import type { WebUSBDevice } from 'usb'
 // Store current connection
 let currentDevice: WebUSBDevice | null = null
 
+async function getWebUSB() {
+  try {
+    const module = await import('usb')
+    const WebUSB = module.WebUSB || (module.default?.WebUSB)
+    if (!WebUSB) {
+      throw new Error('WebUSB not found in usb module')
+    }
+    return WebUSB
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : String(error)
+    if (errMsg.includes('Could not locate the bindings file') || errMsg.includes('Module version mismatch')) {
+      throw new Error('USB模块未正确编译。请运行: pnpm electron-builder install-app-deps 或 pnpm rebuild usb')
+    }
+    throw new Error(`USB模块加载失败: ${errMsg}`)
+  }
+}
+
 export function setupUsbHandlers(): void {
   ipcMain.handle('usb:list', async () => {
     try {
-      const { WebUSB } = await import('usb')
+      const WebUSB = await getWebUSB()
       const webusb = new WebUSB({ allowAllDevices: true })
       const devices = await webusb.getDevices()
 
@@ -36,7 +53,7 @@ export function setupUsbHandlers(): void {
 
   ipcMain.handle('usb:open', async (_event, vendorId: number, productId: number) => {
     try {
-      const { WebUSB } = await import('usb')
+      const WebUSB = await getWebUSB()
       const webusb = new WebUSB({ allowAllDevices: true })
 
       const devices = await webusb.getDevices()

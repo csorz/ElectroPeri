@@ -26,10 +26,14 @@ async function ensureNoble() {
     const mod: any = await import('@abandonware/noble')
     noble = mod.default ?? mod
     return noble
-  } catch {
-    throw new Error(
-      '蓝牙原生模块不可用。请执行: pnpm approve-builds && pnpm rebuild @abandonware/noble'
-    )
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : String(error)
+    if (errMsg.includes('Could not locate the bindings file') || errMsg.includes('Module version mismatch')) {
+      throw new Error(
+        '蓝牙模块未正确编译。请运行: pnpm electron-builder install-app-deps 或 pnpm rebuild @abandonware/noble'
+      )
+    }
+    throw new Error(`蓝牙模块加载失败: ${errMsg}`)
   }
 }
 

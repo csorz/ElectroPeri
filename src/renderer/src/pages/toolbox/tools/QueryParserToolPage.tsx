@@ -1,70 +1,98 @@
 import { useState } from 'react'
+import { copyToClipboard } from '../clipboard'
 import './ToolPage.css'
 
 export default function QueryParserToolPage() {
   const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('demo')
   const [input, setInput] = useState('')
-  const [output, setOutput] = useState('')
+  const [queryOutput, setQueryOutput] = useState('')
+  const [hashOutput, setHashOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
+
+  const onCopy = (t: string) => void copyToClipboard(t)
 
   const handleParse = () => {
     setError(null)
+    setQueryOutput('')
+    setHashOutput('')
+
     if (!input.trim()) {
       setError('请输入要解析的 URL')
-      setOutput('')
       return
     }
 
     try {
-      let queryString = input.trim()
+      let url = input.trim()
+      let hasQuery = false
+      let hasHash = false
 
-      if (input.includes('?')) {
-        const url = new URL(input)
-        queryString = url.search
-      } else if (!input.startsWith('?')) {
-        queryString = '?' + input
+      // 解析 Query 参数 (?后面的部分)
+      const queryIndex = url.indexOf('?')
+      if (queryIndex >= 0) {
+        hasQuery = true
+        let queryString = url.slice(queryIndex + 1)
+        // 移除 hash 部分
+        const hashInQuery = queryString.indexOf('#')
+        if (hashInQuery >= 0) {
+          queryString = queryString.slice(0, hashInQuery)
+        }
+        const querySp = new URLSearchParams(queryString)
+        const queryObj: Record<string, string> = {}
+        querySp.forEach((v, k) => {
+          queryObj[k] = v
+        })
+        if (Object.keys(queryObj).length > 0) {
+          setQueryOutput(JSON.stringify(queryObj, null, 2))
+        }
       }
 
-      const params = new URLSearchParams(queryString)
-      const result: Record<string, string | string[]> = {}
-
-      params.forEach((value, key) => {
-        const existing = result[key]
-        if (existing) {
-          if (Array.isArray(existing)) {
-            existing.push(value)
-          } else {
-            result[key] = [existing, value]
-          }
-        } else {
-          result[key] = value
+      // 解析 Hash 参数 (#后面的部分)
+      const hashIndex = url.indexOf('#')
+      if (hashIndex >= 0) {
+        hasHash = true
+        let hashString = url.slice(hashIndex + 1)
+        // 支持 #/path?param=value 格式 (SPA路由)
+        const pathQueryIndex = hashString.indexOf('?')
+        if (pathQueryIndex >= 0) {
+          hashString = hashString.slice(pathQueryIndex + 1)
+        } else if (hashString.includes('=') && !hashString.includes('/')) {
+          // 纯参数格式 #a=1&b=2
+        } else if (!hashString.includes('=')) {
+          // 纯路径格式 #/path/to/page，无参数
+          hashString = ''
         }
-      })
+        if (hashString) {
+          const hashSp = new URLSearchParams(hashString)
+          const hashObj: Record<string, string> = {}
+          hashSp.forEach((v, k) => {
+            hashObj[k] = v
+          })
+          if (Object.keys(hashObj).length > 0) {
+            setHashOutput(JSON.stringify(hashObj, null, 2))
+          }
+        }
+      }
 
-      setOutput(JSON.stringify(result, null, 2))
+      if (!queryOutput && !hashOutput && !hasQuery && !hasHash) {
+        setError('未找到 Query 或 Hash 参数')
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : '解析失败')
-      setOutput('')
     }
   }
 
   const handleClear = () => {
     setInput('')
-    setOutput('')
+    setQueryOutput('')
+    setHashOutput('')
     setError(null)
-  }
-
-  const handleCopy = () => {
-    if (output) {
-      navigator.clipboard.writeText(output)
-    }
   }
 
   return (
     <div className="tool-page">
       <div className="tool-header">
         <h1>Query 参数解析</h1>
-        <p>URL Query String Parser - 解析 URL 参数为结构化数据</p>
+        <p>解析 URL 中的 Query 参数(?后)和 Hash 参数(#后)，支持 SPA 路由格式</p>
       </div>
 
       <div className="tool-tabs">
@@ -99,16 +127,46 @@ export default function QueryParserToolPage() {
             <h2>URL 结构解析</h2>
             <div className="diagram-box">
               <pre className="ascii-art">{`
-  https://example.com:443/path?name=test&age=18#section
-  └───┬───┘└───┬───┘└─┬─┘└──────┬──────┘└──┬──┘
-    协议     域名    端口    路径      Query   Fragment
+  完整 URL 结构:
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  protocol  │  host  │  path  │  query参数  │  hash参数        │
+  └─────────────────────────────────────────────────────────────────┘
+  https://example.com/path/page?name=张三&age=18#/detail?token=abc
 
-  Query String 格式:
-  ?key1=value1&key2=value2&key3=value3
+  Query 参数 (?后面的部分):
+  - 以 ? 开始，多个参数用 & 连接
+  - 传递给服务器的参数
+  - 示例: ?name=张三&age=18
 
-  同名参数:
-  ?color=red&color=blue&color=green  => color: ['red', 'blue', 'green']
+  Hash 参数 (#后面的部分):
+  - 以 # 开始，不会发送到服务器
+  - 用于前端路由(SPA)或锚点定位
+  - 支持格式:
+    • #section        → 锚点定位
+    • #/path/to/page  → SPA 路由路径
+    • #/page?a=1&b=2  → SPA 路由 + 参数
+    • #a=1&b=2        → 纯参数格式
               `}</pre>
+            </div>
+
+            <h2>Hash 参数应用场景</h2>
+            <div className="feature-grid">
+              <div className="feature-card">
+                <h3>SPA 路由</h3>
+                <p>React/Vue 等前端框架使用 hash 路由，如 #/user/list</p>
+              </div>
+              <div className="feature-card">
+                <h3>页面锚点</h3>
+                <p>跳转到页面指定位置，如 #section-intro</p>
+              </div>
+              <div className="feature-card">
+                <h3>前端状态</h3>
+                <p>保存筛选条件、分页等状态，不刷新页面</p>
+              </div>
+              <div className="feature-card">
+                <h3>OAuth 回调</h3>
+                <p>第三方授权回调传递 token，如 #access_token=xxx</p>
+              </div>
             </div>
 
             <h2>常见编码规则</h2>
@@ -169,7 +227,7 @@ export default function QueryParserToolPage() {
 
         {activeTab === 'demo' && (
           <div className="demo-section">
-            <h2>Query 参数解析器</h2>
+            <h2>URL 参数解析器</h2>
             <div className="connection-demo">
               {error && (
                 <div className="info-box warning" style={{ marginBottom: '16px' }}>
@@ -179,7 +237,7 @@ export default function QueryParserToolPage() {
               )}
 
               <div className="config-row" style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '13px', color: '#666', marginBottom: '8px', display: 'block' }}>输入 URL 或 Query 字符串</label>
+                <label style={{ fontSize: '13px', color: '#666', marginBottom: '8px', display: 'block' }}>输入 URL</label>
                 <textarea
                   style={{
                     width: '100%',
@@ -188,33 +246,66 @@ export default function QueryParserToolPage() {
                     borderRadius: '6px',
                     fontSize: '14px',
                     resize: 'vertical',
-                    minHeight: '100px',
+                    minHeight: '80px',
                     fontFamily: 'Consolas, Monaco, monospace'
                   }}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="输入完整 URL 或 Query 字符串，如：https://example.com?name=test&age=18"
+                  placeholder="输入 URL，支持 Query 参数(?后)和 Hash 参数(#后)&#10;示例: https://example.com?name=张三&age=18#/page?token=abc123"
                 />
               </div>
 
               <div className="demo-controls">
                 <button onClick={handleParse}>解析参数</button>
                 <button onClick={handleClear} style={{ background: '#e0e0e0', color: '#333' }}>清空</button>
-                {output && <button onClick={handleCopy} style={{ background: '#4caf50', color: '#fff' }}>复制结果</button>}
+                {(queryOutput || hashOutput) && (
+                  <button onClick={() => onCopy(queryOutput || hashOutput)} style={{ background: '#4caf50', color: '#fff' }}>复制结果</button>
+                )}
               </div>
 
-              {output && (
-                <div className="result-box" style={{ marginTop: '16px' }}>
-                  <h4>解析结果 (JSON)</h4>
+              {queryOutput && (
+                <div style={{ marginTop: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+                    <span style={{ fontWeight: 500, color: '#1976d2' }}>📋 Query 参数 (?后面的参数)</span>
+                    <button onClick={() => onCopy(queryOutput)} style={{ marginLeft: 'auto', padding: '4px 8px', fontSize: '12px', background: '#e3f2fd', color: '#1976d2', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>复制</button>
+                  </div>
                   <pre style={{
-                    background: '#1e1e1e',
-                    color: '#4fc3f7',
-                    padding: '16px',
+                    background: '#e3f2fd',
+                    padding: '12px',
                     borderRadius: '6px',
+                    fontSize: '13px',
+                    margin: 0,
                     overflow: 'auto',
-                    fontFamily: 'Consolas, Monaco, monospace',
-                    maxHeight: '400px'
-                  }}>{output}</pre>
+                    fontFamily: 'Consolas, Monaco, monospace'
+                  }}>
+                    {queryOutput}
+                  </pre>
+                </div>
+              )}
+
+              {hashOutput && (
+                <div style={{ marginTop: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+                    <span style={{ fontWeight: 500, color: '#7b1fa2' }}>🏷️ Hash 参数 (#后面的参数)</span>
+                    <button onClick={() => onCopy(hashOutput)} style={{ marginLeft: 'auto', padding: '4px 8px', fontSize: '12px', background: '#f3e5f5', color: '#7b1fa2', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>复制</button>
+                  </div>
+                  <pre style={{
+                    background: '#f3e5f5',
+                    padding: '12px',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    margin: 0,
+                    overflow: 'auto',
+                    fontFamily: 'Consolas, Monaco, monospace'
+                  }}>
+                    {hashOutput}
+                  </pre>
+                </div>
+              )}
+
+              {!queryOutput && !hashOutput && input && !error && (
+                <div style={{ marginTop: '16px', color: '#666', fontSize: '14px' }}>
+                  💡 提示：URL 中未找到参数。Query 参数以 <code style={{ background: '#f5f5f5', padding: '2px 6px', borderRadius: '4px' }}>?</code> 开始，Hash 参数以 <code style={{ background: '#f5f5f5', padding: '2px 6px', borderRadius: '4px' }}>#</code> 开始。
                 </div>
               )}
             </div>

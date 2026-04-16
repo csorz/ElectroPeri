@@ -273,7 +273,6 @@ BluetoothGatt gatt = device.connectGatt(this, false, new BluetoothGattCallback()
   )
 }
 
-// 蓝牙演示组件
 function BluetoothDemo() {
   const {
     bluetoothDevices,
@@ -409,8 +408,8 @@ function BluetoothDemo() {
       </div>
 
       {bluetoothError && (
-        <div style={{ padding: 12, background: '#ffebee', borderRadius: 6, marginBottom: 16, color: '#c62828' }}>
-          {bluetoothError}
+        <div style={{ marginBottom: 16, padding: 16, background: '#fff5f5', borderRadius: 8, border: '1px solid #ffcdd2' }}>
+          <div style={{ fontWeight: 500, color: '#c62828' }}>⚠️ {bluetoothError.split('。')[0]}</div>
         </div>
       )}
 

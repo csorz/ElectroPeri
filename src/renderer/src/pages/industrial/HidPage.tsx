@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { ElectronOnly } from '../../components/ElectronOnly'
 import '../toolbox/tools/ToolPage.css'
 
+type DeviceStatus = 'idle' | 'scanning' | 'connected' | 'error'
+
 type HidDeviceInfo = {
   product?: string
   manufacturer?: string
@@ -256,11 +258,10 @@ public class HidExample {
   )
 }
 
-// HID 演示组件
 function HidDemo() {
   const [devices, setDevices] = useState<HidDeviceInfo[]>([])
   const [selected, setSelected] = useState<HidDeviceInfo | null>(null)
-  const [status, setStatus] = useState<'idle' | 'scanning' | 'connected' | 'error'>('idle')
+  const [status, setStatus] = useState<DeviceStatus>('idle')
   const [error, setError] = useState<string | null>(null)
   const [log, setLog] = useState('')
   const [message, setMessage] = useState('')
@@ -350,7 +351,7 @@ function HidDemo() {
       </div>
 
       {error && (
-        <div style={{ padding: 12, background: '#ffebee', borderRadius: 6, marginBottom: 16, color: '#c62828' }}>
+        <div style={{ marginBottom: 16, padding: 12, background: '#ffebee', borderRadius: 6, color: '#c62828' }}>
           {error}
         </div>
       )}

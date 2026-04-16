@@ -4,7 +4,10 @@ import '../toolbox/tools/ToolPage.css'
 
 export default function OnewirePage() {
   return (
-    <ElectronOnly>
+    <ElectronOnly
+      featureName="1-Wire 通信"
+      supportedDevices="树莓派、Arduino 等支持 1-Wire 协议的设备，常用于 DS18B20 温度传感器"
+    >
       <OnewirePageContent />
     </ElectronOnly>
   )

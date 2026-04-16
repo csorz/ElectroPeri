@@ -6,12 +6,30 @@ const activePorts: Map<string, SerialPort> = new Map()
 let currentPort: SerialPort | null = null
 let mainWindow: BrowserWindow | null = null
 
+async function getSerialPort() {
+  try {
+    const module = await import('serialport')
+    return module.SerialPort
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : String(error)
+    if (errMsg.includes('Cannot find module') && errMsg.includes('bindings-cpp')) {
+      throw new Error('串口原生模块未安装。请运行: pnpm add @serialport/bindings-cpp && pnpm electron-builder install-app-deps')
+    }
+    if (errMsg.includes('Could not locate the bindings file') || errMsg.includes('Module version mismatch')) {
+      throw new Error('串口模块未正确编译。请运行: pnpm electron-builder install-app-deps')
+    }
+    if (errMsg.includes('Visual Studio')) {
+      throw new Error('缺少编译工具。请安装 Visual Studio Build Tools (C++ 工作负载)，然后运行: pnpm electron-builder install-app-deps')
+    }
+    throw new Error(`串口模块加载失败: ${errMsg}`)
+  }
+}
+
 export function setupSerialHandlers(): void {
   // Get main window for sending data back
   ipcMain.handle('serial:list', async () => {
     try {
-      // Dynamic import for serialport (native module)
-      const { SerialPort } = await import('serialport')
+      const SerialPort = await getSerialPort()
       const ports = await SerialPort.list()
       return ports.map((port) => ({
         path: port.path,
@@ -30,7 +48,7 @@ export function setupSerialHandlers(): void {
 
   ipcMain.handle('serial:open', async (event, path: string, baudRate: number) => {
     try {
-      const { SerialPort } = await import('serialport')
+      const SerialPort = await getSerialPort()
       mainWindow = BrowserWindow.fromWebContents(event.sender)
 
       if (currentPort && currentPort.isOpen) {

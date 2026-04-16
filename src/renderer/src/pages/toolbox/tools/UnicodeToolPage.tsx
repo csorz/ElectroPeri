@@ -188,6 +188,56 @@ export default function UnicodeToolPage() {
               </tbody>
             </table>
 
+            <h2>ASCII 与 Unicode</h2>
+            <div className="info-box">
+              <p><strong>ASCII 是 Unicode 的子集</strong>：前 128 个 Unicode 码点（U+0000 到 U+007F）与 ASCII 完全一致。</p>
+              <p>ASCII 字符在 UTF-8 编码中只占 1 字节，且字节值与 ASCII 码值相同。</p>
+            </div>
+
+            <h3>ASCII 可打印字符表 (32-126)</h3>
+            <div style={{ background: '#f5f5f5', padding: '12px', borderRadius: '6px', overflow: 'auto' }}>
+              <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+                <tbody>
+                  {Array.from({ length: 10 }, (_, row) => (
+                    <tr key={row}>
+                      {Array.from({ length: 10 }, (_, col) => {
+                        const code = 32 + row * 10 + col
+                        if (code > 126) return <td key={col}></td>
+                        const char = String.fromCharCode(code)
+                        const displayChar = code === 32 ? 'SP' : code === 127 ? 'DEL' : char
+                        return (
+                          <td key={col} style={{ textAlign: 'center', padding: '4px', border: '1px solid #ddd' }}>
+                            <div style={{ fontFamily: 'monospace', fontSize: '14px' }}>{displayChar}</div>
+                            <div style={{ color: '#666', fontSize: '10px' }}>{code}</div>
+                          </td>
+                        )
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <h3>ASCII 控制字符 (0-31)</h3>
+            <table className="comparison-table">
+              <thead>
+                <tr>
+                  <th>码点</th>
+                  <th>缩写</th>
+                  <th>名称</th>
+                  <th>说明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>0</td><td>NUL</td><td>Null</td><td>空字符</td></tr>
+                <tr><td>9</td><td>TAB</td><td>Horizontal Tab</td><td>制表符</td></tr>
+                <tr><td>10</td><td>LF</td><td>Line Feed</td><td>换行</td></tr>
+                <tr><td>13</td><td>CR</td><td>Carriage Return</td><td>回车</td></tr>
+                <tr><td>27</td><td>ESC</td><td>Escape</td><td>转义</td></tr>
+                <tr><td>127</td><td>DEL</td><td>Delete</td><td>删除</td></tr>
+              </tbody>
+            </table>
+
             <h2>应用场景</h2>
             <div className="scenario-grid">
               <div className="scenario-card">

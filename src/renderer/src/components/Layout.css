@@ -389,3 +389,26 @@
   font-size: 13px;
   color: #9ca3af;
 }
+
+.electron-only-notice .supported-devices {
+  margin: 16px 0;
+  padding: 12px 16px;
+  background: #f0f9ff;
+  border-radius: 8px;
+  text-align: left;
+  width: 100%;
+}
+
+.electron-only-notice .supported-devices strong {
+  display: block;
+  font-size: 13px;
+  color: #0369a1;
+  margin-bottom: 6px;
+}
+
+.electron-only-notice .supported-devices p {
+  margin: 0;
+  font-size: 13px;
+  color: #0c4a6e;
+  line-height: 1.5;
+}

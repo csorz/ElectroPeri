@@ -109,8 +109,6 @@ import MqttToolPage from './pages/toolbox/tools/MqttToolPage'
 // Text tools
 import RegexToolPage from './pages/toolbox/tools/RegexToolPage'
 import TextDiffToolPage from './pages/toolbox/tools/TextDiffToolPage'
-import CsvJsonToolPage from './pages/toolbox/tools/CsvJsonToolPage'
-import YamlJsonToolPage from './pages/toolbox/tools/YamlJsonToolPage'
 import WordCountToolPage from './pages/toolbox/tools/WordCountToolPage'
 
 // Color tools
@@ -123,6 +121,7 @@ import ColorPickerToolPage from './pages/toolbox/tools/ColorPickerToolPage'
 // CSS tools
 import ShadowGeneratorToolPage from './pages/toolbox/tools/ShadowGeneratorToolPage'
 import ButtonDesignerToolPage from './pages/toolbox/tools/ButtonDesignerToolPage'
+import FlexGeneratorToolPage from './pages/toolbox/tools/FlexGeneratorToolPage'
 import GridGeneratorToolPage from './pages/toolbox/tools/GridGeneratorToolPage'
 import BackgroundGeneratorToolPage from './pages/toolbox/tools/BackgroundGeneratorToolPage'
 import CssFormatToolPage from './pages/toolbox/tools/CssFormatToolPage'
@@ -267,8 +266,6 @@ function App(): React.JSX.Element {
           <Route path="frontend-toolbox/text" element={<TextCategoryPage />} />
           <Route path="frontend-toolbox/text/regex" element={<RegexToolPage />} />
           <Route path="frontend-toolbox/text/diff" element={<TextDiffToolPage />} />
-          <Route path="frontend-toolbox/text/csv-json" element={<CsvJsonToolPage />} />
-          <Route path="frontend-toolbox/text/yaml-json" element={<YamlJsonToolPage />} />
           <Route path="frontend-toolbox/text/count" element={<WordCountToolPage />} />
 
           {/* Color Category & Tools */}
@@ -283,6 +280,7 @@ function App(): React.JSX.Element {
           <Route path="frontend-toolbox/css" element={<CssCategoryPage />} />
           <Route path="frontend-toolbox/css/shadow" element={<ShadowGeneratorToolPage />} />
           <Route path="frontend-toolbox/css/button" element={<ButtonDesignerToolPage />} />
+          <Route path="frontend-toolbox/css/flex" element={<FlexGeneratorToolPage />} />
           <Route path="frontend-toolbox/css/grid" element={<GridGeneratorToolPage />} />
           <Route path="frontend-toolbox/css/background" element={<BackgroundGeneratorToolPage />} />
           <Route path="frontend-toolbox/css/format" element={<CssFormatToolPage />} />

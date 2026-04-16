@@ -4,7 +4,10 @@ import '../toolbox/tools/ToolPage.css'
 
 export default function I2cPage() {
   return (
-    <ElectronOnly>
+    <ElectronOnly
+      featureName="I2C 通信"
+      supportedDevices="树莓派、Arduino、ESP32、STM32 等支持 I2C 总线的嵌入式设备"
+    >
       <I2cPageContent />
     </ElectronOnly>
   )

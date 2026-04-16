@@ -1,12 +1,8 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import mqtt, { MqttClient } from 'mqtt'
 
-interface MqttConnection {
-  client: MqttClient
-  window: BrowserWindow
-}
-
-const connections = new Map<string, MqttConnection>()
+// Single connection for the tool page
+let currentConnection: { client: MqttClient; window: BrowserWindow } | null = null
 
 export function setupMqttHandlers(): void {
   // Connect to MQTT broker
@@ -23,14 +19,10 @@ export function setupMqttHandlers(): void {
     }) => {
       const { url, port, username, password, clientId, clean, keepalive } = options
 
-      // Generate connection ID for tracking
-      const connectionId = clientId || `mqtt_${Date.now()}`
-
-      // If there's an existing connection with this ID, close it first
-      const existing = connections.get(connectionId)
-      if (existing) {
-        existing.client.end()
-        connections.delete(connectionId)
+      // If there's an existing connection, close it first
+      if (currentConnection) {
+        currentConnection.client.end()
+        currentConnection = null
       }
 
       const win = BrowserWindow.fromWebContents(event.sender)
@@ -43,23 +35,29 @@ export function setupMqttHandlers(): void {
           port,
           username,
           password,
-          clientId: connectionId,
+          clientId: clientId || `mqtt_${Date.now()}`,
           clean: clean !== false,
           keepalive: keepalive || 60,
           reconnectPeriod: 0 // Disable auto-reconnect, let client handle it
         }
 
         const client = mqtt.connect(url, connectOptions)
+        let resolved = false
 
         client.on('connect', () => {
-          connections.set(connectionId, { client, window: win })
-          win.webContents.send('mqtt:connected', { connectionId })
+          currentConnection = { client, window: win }
+          if (!resolved) {
+            resolved = true
+            resolve({ success: true })
+          }
+          if (!win.isDestroyed()) {
+            win.webContents.send('mqtt:connected')
+          }
         })
 
         client.on('message', (topic: string, message: Buffer) => {
           if (!win.isDestroyed()) {
             win.webContents.send('mqtt:message', {
-              connectionId,
               topic,
               message: message.toString()
             })
@@ -67,54 +65,43 @@ export function setupMqttHandlers(): void {
         })
 
         client.on('error', (err: Error) => {
+          if (!resolved) {
+            resolved = true
+            resolve({ success: false, error: err.message })
+          }
           if (!win.isDestroyed()) {
-            win.webContents.send('mqtt:error', {
-              connectionId,
-              error: err.message
-            })
+            win.webContents.send('mqtt:error', { error: err.message })
           }
         })
 
         client.on('close', () => {
           if (!win.isDestroyed()) {
-            win.webContents.send('mqtt:disconnected', { connectionId })
+            win.webContents.send('mqtt:disconnected')
           }
-          connections.delete(connectionId)
+          currentConnection = null
         })
 
         // Set a timeout for connection
-        const timeout = setTimeout(() => {
-          if (!connections.has(connectionId)) {
+        setTimeout(() => {
+          if (!resolved) {
+            resolved = true
             client.end()
             resolve({ success: false, error: 'Connection timeout' })
           }
         }, 10000)
-
-        client.on('connect', () => {
-          clearTimeout(timeout)
-          resolve({ success: true, connectionId })
-        })
-
-        client.on('error', (err: Error) => {
-          clearTimeout(timeout)
-          if (!connections.has(connectionId)) {
-            resolve({ success: false, error: err.message })
-          }
-        })
       })
     }
   )
 
   // Disconnect from MQTT broker
-  ipcMain.handle('mqtt:disconnect', async (_event, connectionId: string) => {
-    const connection = connections.get(connectionId)
-    if (!connection) {
-      return { success: false, error: 'Connection not found' }
+  ipcMain.handle('mqtt:disconnect', async () => {
+    if (!currentConnection) {
+      return { success: true }
     }
 
     return new Promise((resolve) => {
-      connection.client.end(false, () => {
-        connections.delete(connectionId)
+      currentConnection!.client.end(false, () => {
+        currentConnection = null
         resolve({ success: true })
       })
     })
@@ -123,14 +110,13 @@ export function setupMqttHandlers(): void {
   // Subscribe to a topic
   ipcMain.handle(
     'mqtt:subscribe',
-    async (_event, connectionId: string, topic: string, qos: 0 | 1 | 2 = 0) => {
-      const connection = connections.get(connectionId)
-      if (!connection) {
-        return { success: false, error: 'Connection not found' }
+    async (_event, topic: string, qos: 0 | 1 | 2 = 0) => {
+      if (!currentConnection) {
+        return { success: false, error: 'Not connected' }
       }
 
       return new Promise((resolve) => {
-        connection.client.subscribe(topic, { qos }, (err) => {
+        currentConnection!.client.subscribe(topic, { qos }, (err) => {
           if (err) {
             resolve({ success: false, error: err.message })
           } else {
@@ -142,14 +128,13 @@ export function setupMqttHandlers(): void {
   )
 
   // Unsubscribe from a topic
-  ipcMain.handle('mqtt:unsubscribe', async (_event, connectionId: string, topic: string) => {
-    const connection = connections.get(connectionId)
-    if (!connection) {
-      return { success: false, error: 'Connection not found' }
+  ipcMain.handle('mqtt:unsubscribe', async (_event, topic: string) => {
+    if (!currentConnection) {
+      return { success: false, error: 'Not connected' }
     }
 
     return new Promise((resolve) => {
-      connection.client.unsubscribe(topic, (err) => {
+      currentConnection!.client.unsubscribe(topic, (err) => {
         if (err) {
           resolve({ success: false, error: err.message })
         } else {
@@ -162,21 +147,13 @@ export function setupMqttHandlers(): void {
   // Publish a message
   ipcMain.handle(
     'mqtt:publish',
-    async (
-      _event,
-      connectionId: string,
-      topic: string,
-      message: string,
-      qos: 0 | 1 | 2 = 0,
-      retain: boolean = false
-    ) => {
-      const connection = connections.get(connectionId)
-      if (!connection) {
-        return { success: false, error: 'Connection not found' }
+    async (_event, topic: string, message: string, qos: 0 | 1 | 2 = 0, retain: boolean = false) => {
+      if (!currentConnection) {
+        return { success: false, error: 'Not connected' }
       }
 
       return new Promise((resolve) => {
-        connection.client.publish(topic, message, { qos, retain }, (err) => {
+        currentConnection!.client.publish(topic, message, { qos, retain }, (err) => {
           if (err) {
             resolve({ success: false, error: err.message })
           } else {

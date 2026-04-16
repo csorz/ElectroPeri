@@ -224,9 +224,6 @@ export default function UrlToolPage() {
                 </div>
               )}
             </div>
-
-            <h2>Query 参数解析</h2>
-            <QueryParserDemo onCopy={onCopy} />
           </div>
         )}
 
@@ -353,71 +350,6 @@ public class UrlExample {
           </div>
         )}
       </div>
-    </div>
-  )
-}
-
-function QueryParserDemo({ onCopy }: { onCopy: (t: string) => void }) {
-  const [input, setInput] = useState('')
-  const [output, setOutput] = useState('')
-  const [error, setError] = useState<string | null>(null)
-
-  const handleParse = () => {
-    setError(null)
-    try {
-      let search = input.trim()
-      const q = search.indexOf('?')
-      if (q >= 0) search = search.slice(q + 1)
-      const sp = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search)
-      const obj: Record<string, string> = {}
-      sp.forEach((v, k) => {
-        obj[k] = v
-      })
-      setOutput(JSON.stringify(obj, null, 2))
-    } catch (e) {
-      setError(e instanceof Error ? e.message : '解析失败')
-    }
-  }
-
-  return (
-    <div className="url-demo">
-      {error && (
-        <div style={{ color: '#c62828', padding: '12px', background: '#ffebee', borderRadius: '6px', marginBottom: 12 }}>
-          ❌ {error}
-        </div>
-      )}
-      <textarea
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="输入 URL 或 Query 字符串，如: https://example.com?name=张三&age=18"
-        rows={3}
-        style={{
-          width: '100%',
-          padding: '12px',
-          border: '1px solid #ddd',
-          borderRadius: '6px',
-          fontSize: '14px',
-          resize: 'vertical'
-        }}
-      />
-      <div className="demo-controls" style={{ marginTop: 12 }}>
-        <button onClick={handleParse}>解析为 JSON</button>
-        {output && (
-          <button onClick={() => onCopy(output)} style={{ background: '#e0e0e0', color: '#333' }}>复制</button>
-        )}
-      </div>
-      {output && (
-        <pre style={{
-          background: '#f5f5f5',
-          padding: '12px',
-          borderRadius: '6px',
-          fontSize: '13px',
-          margin: '16px 0 0 0',
-          overflow: 'auto'
-        }}>
-          {output}
-        </pre>
-      )}
     </div>
   )
 }

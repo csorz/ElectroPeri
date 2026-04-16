@@ -223,16 +223,18 @@ const mqttApi = {
   publish: (topic: string, message: string, qos?: 0 | 1 | 2, retain?: boolean) =>
     ipcRenderer.invoke('mqtt:publish', topic, message, qos, retain),
   onMessage: (callback: (topic: string, message: string) => void) => {
-    ipcRenderer.on('mqtt:message', (_event, topic, message) => callback(topic, message))
+    const listener = (_event: any, data: { topic: string; message: string }) => callback(data.topic, data.message)
+    ipcRenderer.on('mqtt:message', listener)
   },
   onConnect: (callback: () => void) => {
-    ipcRenderer.on('mqtt:connect', () => callback())
+    ipcRenderer.on('mqtt:connected', () => callback())
   },
   onDisconnect: (callback: () => void) => {
-    ipcRenderer.on('mqtt:disconnect', () => callback())
+    ipcRenderer.on('mqtt:disconnected', () => callback())
   },
   onError: (callback: (error: string) => void) => {
-    ipcRenderer.on('mqtt:error', (_event, error) => callback(error))
+    const listener = (_event: any, data: { error: string }) => callback(data.error)
+    ipcRenderer.on('mqtt:error', listener)
   }
 }
 

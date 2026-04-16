@@ -313,16 +313,18 @@ export default function Base64ToolPage() {
 
         {activeTab === 'code' && (
           <div className="code-section">
-            <h2>JavaScript 示例</h2>
+            <h2>JavaScript - 浏览器原生</h2>
             <div className="code-block">
-              <pre>{`// 浏览器原生方法
+              <pre>{`// 浏览器原生方法 (btoa/atob)
 const text = "Hello, 世界!";
 
+// ============ 标准 Base64 ============
 // 编码
 const encoder = new TextEncoder();
 const data = encoder.encode(text);
 const base64 = btoa(String.fromCharCode(...data));
-console.log(base64); // "SGVsbG8sIOS4lueVjCE="
+console.log("Base64:", base64);
+// "SGVsbG8sIOS4lueVjCE="
 
 // 解码
 const binary = atob(base64);
@@ -331,10 +333,114 @@ for (let i = 0; i < binary.length; i++) {
   bytes[i] = binary.charCodeAt(i);
 }
 const decoded = new TextDecoder().decode(bytes);
-console.log(decoded); // "Hello, 世界!"
+console.log("Decoded:", decoded);
+// "Hello, 世界!"
 
-// URL Safe 变体
-const urlSafe = base64.replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');`}</pre>
+// ============ Base64URL (URL Safe) ============
+// 编码: + → -, / → _, 移除 =
+const base64UrlEncode = (str) => {
+  const data = new TextEncoder().encode(str);
+  return btoa(String.fromCharCode(...data))
+    .replace(/\\+/g, '-')
+    .replace(/\\//g, '_')
+    .replace(/=+$/, '');
+};
+
+// 解码: 还原 + 和 /, 补充 =
+const base64UrlDecode = (str) => {
+  let standard = str.replace(/-/g, '+').replace(/_/g, '/');
+  const pad = standard.length % 4;
+  if (pad) standard += '='.repeat(4 - pad);
+  const binary = atob(standard);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+};
+
+const urlSafe = base64UrlEncode(text);
+console.log("Base64URL:", urlSafe);
+// "SGVsbG8sIOS4lueVjCE"
+
+console.log("Decoded:", base64UrlDecode(urlSafe));`}</pre>
+            </div>
+
+            <h2>JavaScript - js-base64（第三方库）</h2>
+            <div className="info-box" style={{ marginBottom: 16 }}>
+              <p>📦 安装: <code>npm install js-base64</code></p>
+              <p>✅ 自动处理 UTF-8，支持 Base64URL，API 简洁</p>
+            </div>
+            <div className="code-block">
+              <pre>{`import { Base64 } from 'js-base64';
+
+const text = "Hello, 世界!";
+
+// ============ 标准 Base64 ============
+const encoded = Base64.encode(text);
+console.log("Encoded:", encoded);
+// "SGVsbG8sIOS4lueVjCE="
+
+const decoded = Base64.decode(encoded);
+console.log("Decoded:", decoded);
+// "Hello, 世界!"
+
+// ============ Base64URL (URL Safe) ============
+// 自动处理 + → -, / → _, 移除 =
+const urlEncoded = Base64.encodeURI(text);
+console.log("Base64URL:", urlEncoded);
+// "SGVsbG8sIOS4lueVjCE"
+
+const urlDecoded = Base64.decode(urlEncoded);
+console.log("Decoded:", urlDecoded);
+
+// ============ 其他方法 ============
+// 检查是否为有效 Base64
+Base64.isValid(encoded);  // true
+
+// 编码二进制数据
+const uint8Array = new TextEncoder().encode(text);
+const fromUint8 = Base64.fromUint8Array(uint8Array);
+
+// 解码为 Uint8Array
+const toUint8 = Base64.toUint8Array(encoded);`}</pre>
+            </div>
+
+            <h2>Node.js 示例</h2>
+            <div className="code-block">
+              <pre>{`// Node.js Buffer 原生支持
+const text = "Hello, 世界!";
+
+// ============ 标准 Base64 ============
+const encoded = Buffer.from(text, 'utf8').toString('base64');
+console.log("Encoded:", encoded);
+// "SGVsbG8sIOS4lueVjCE="
+
+const decoded = Buffer.from(encoded, 'base64').toString('utf8');
+console.log("Decoded:", decoded);
+// "Hello, 世界!"
+
+// ============ Base64URL (URL Safe) ============
+const base64url = require('base64url'); // npm install base64url
+
+const urlEncoded = base64url(text);
+console.log("Base64URL:", urlEncoded);
+
+const urlDecoded = base64url.decode(urlEncoded);
+console.log("Decoded:", urlDecoded);
+
+// 或手动转换
+const toBase64Url = (str) =>
+  Buffer.from(str, 'utf8')
+    .toString('base64')
+    .replace(/\\+/g, '-')
+    .replace(/\\//g, '_')
+    .replace(/=+$/, '');
+
+const fromBase64Url = (str) => {
+  let b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  const pad = b64.length % 4;
+  if (pad) b64 += '='.repeat(4 - pad);
+  return Buffer.from(b64, 'base64').toString('utf8');
+};`}</pre>
             </div>
 
             <h2>Go 语言示例</h2>
@@ -349,21 +455,33 @@ import (
 func main() {
     text := "Hello, 世界!"
 
-    // 标准编码
+    // ============ 标准 Base64 ============
     encoded := base64.StdEncoding.EncodeToString([]byte(text))
     fmt.Println("Encoded:", encoded)
+    // "SGVsbG8sIOS4lueVjCE="
 
-    // 标准解码
     decoded, _ := base64.StdEncoding.DecodeString(encoded)
     fmt.Println("Decoded:", string(decoded))
 
-    // URL Safe 编码
+    // ============ Base64URL (URL Safe) ============
     urlEncoded := base64.URLEncoding.EncodeToString([]byte(text))
     fmt.Println("URL Safe:", urlEncoded)
+    // "SGVsbG8sIOS4lueVjCE=" (有填充)
 
-    // Raw 编码（无填充）
+    // ============ Raw 编码 (无填充) ============
+    // RawStdEncoding: 标准 Base64 无填充
     rawEncoded := base64.RawStdEncoding.EncodeToString([]byte(text))
     fmt.Println("Raw:", rawEncoded)
+    // "SGVsbG8sIOS4lueVjCE"
+
+    // RawURLEncoding: URL Safe 无填充 (JWT 常用)
+    rawUrlEncoded := base64.RawURLEncoding.EncodeToString([]byte(text))
+    fmt.Println("Raw URL:", rawUrlEncoded)
+    // "SGVsbG8sIOS4lueVjCE"
+
+    // 解码
+    rawDecoded, _ := base64.RawURLEncoding.DecodeString(rawUrlEncoded)
+    fmt.Println("Decoded:", string(rawDecoded))
 }`}</pre>
             </div>
 
@@ -372,18 +490,31 @@ func main() {
               <pre>{`import base64
 
 text = "Hello, 世界!"
+data = text.encode('utf-8')
 
-# 编码
-encoded = base64.b64encode(text.encode('utf-8')).decode('ascii')
+# ============ 标准 Base64 ============
+encoded = base64.b64encode(data).decode('ascii')
 print(f"Encoded: {encoded}")
+# "SGVsbG8sIOS4lueVjCE="
 
-# 解码
 decoded = base64.b64decode(encoded).decode('utf-8')
 print(f"Decoded: {decoded}")
 
-# URL Safe 编码
-url_encoded = base64.urlsafe_b64encode(text.encode('utf-8')).decode('ascii')
-print(f"URL Safe: {url_encoded}")`}</pre>
+# ============ Base64URL (URL Safe) ============
+url_encoded = base64.urlsafe_b64encode(data).decode('ascii')
+print(f"URL Safe: {url_encoded}")
+# "SGVsbG8sIOS4lueVjCE="
+
+url_decoded = base64.urlsafe_b64decode(url_encoded).decode('utf-8')
+print(f"Decoded: {url_decoded}")
+
+# ============ 无填充版本 ============
+# 移除填充符 =
+url_encoded_no_pad = url_encoded.rstrip('=')
+print(f"URL Safe (no pad): {url_encoded_no_pad}")
+
+# 解码时自动处理
+url_decoded = base64.urlsafe_b64decode(url_encoded_no_pad + '==').decode('utf-8')`}</pre>
             </div>
 
             <h2>Java 示例</h2>
@@ -394,27 +525,65 @@ import java.nio.charset.StandardCharsets;
 public class Base64Example {
     public static void main(String[] args) {
         String text = "Hello, 世界!";
+        byte[] data = text.getBytes(StandardCharsets.UTF_8);
 
-        // 编码
-        String encoded = Base64.getEncoder().encodeToString(
-            text.getBytes(StandardCharsets.UTF_8)
-        );
+        // ============ 标准 Base64 ============
+        String encoded = Base64.getEncoder().encodeToString(data);
         System.out.println("Encoded: " + encoded);
+        // "SGVsbG8sIOS4lueVjCE="
 
-        // 解码
         String decoded = new String(
             Base64.getDecoder().decode(encoded),
             StandardCharsets.UTF_8
         );
         System.out.println("Decoded: " + decoded);
 
-        // URL Safe 编码
-        String urlEncoded = Base64.getUrlEncoder().encodeToString(
-            text.getBytes(StandardCharsets.UTF_8)
-        );
+        // ============ Base64URL (URL Safe) ============
+        String urlEncoded = Base64.getUrlEncoder().encodeToString(data);
         System.out.println("URL Safe: " + urlEncoded);
+
+        String urlDecoded = new String(
+            Base64.getUrlDecoder().decode(urlEncoded),
+            StandardCharsets.UTF_8
+        );
+        System.out.println("Decoded: " + urlDecoded);
+
+        // ============ MIME 编码 (带换行) ============
+        String mimeEncoded = Base64.getMimeEncoder().encodeToString(data);
+        System.out.println("MIME: " + mimeEncoded);
     }
 }`}</pre>
+            </div>
+
+            <h2>JWT 中的 Base64URL</h2>
+            <div className="info-box" style={{ marginBottom: 16 }}>
+              <p>JWT (JSON Web Token) 使用 Base64URL 编码，特点：</p>
+              <ul>
+                <li>使用 <code>-</code> 替代 <code>+</code></li>
+                <li>使用 <code>_</code> 替代 <code>/</code></li>
+                <li>移除所有填充符 <code>=</code></li>
+              </ul>
+            </div>
+            <div className="code-block">
+              <pre>{`// JWT Header 示例
+const header = { alg: "HS256", typ: "JWT" };
+const headerJson = JSON.stringify(header);
+
+// Base64URL 编码 (JWT 标准)
+const jwtBase64UrlEncode = (str) => {
+  const data = new TextEncoder().encode(str);
+  return btoa(String.fromCharCode(...data))
+    .replace(/\\+/g, '-')
+    .replace(/\\//g, '_')
+    .replace(/=+$/, '');
+};
+
+const encodedHeader = jwtBase64UrlEncode(headerJson);
+console.log(encodedHeader);
+// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXIn0"
+
+// JWT 结构: header.payload.signature
+// 各部分都用 Base64URL 编码`}</pre>
             </div>
           </div>
         )}

@@ -914,3 +914,344 @@
   color: #333;
   word-break: break-all;
 }
+
+/* Piano Demo Styles */
+.piano-demo {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.piano-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 6px;
+}
+
+.piano-controls label {
+  font-size: 14px;
+  color: #333;
+}
+
+.piano-controls input[type="range"] {
+  width: 150px;
+}
+
+.piano-keyboard {
+  position: relative;
+  background: linear-gradient(180deg, #2c2c2c 0%, #1a1a1a 100%);
+  padding: 20px 10px 10px;
+  border-radius: 8px;
+  overflow-x: auto;
+  min-height: 200px;
+}
+
+.white-keys {
+  display: flex;
+  gap: 2px;
+}
+
+.white-key {
+  width: 50px;
+  height: 160px;
+  background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
+  border: 1px solid #ccc;
+  border-radius: 0 0 6px 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 10px;
+  transition: all 0.1s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.white-key:hover {
+  background: linear-gradient(180deg, #f8f8f8 0%, #e8e8e8 100%);
+}
+
+.white-key.active {
+  background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
+  transform: translateY(2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.white-key .note-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+.white-key .key-binding {
+  font-size: 10px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.black-keys {
+  position: absolute;
+  top: 20px;
+  left: 10px;
+}
+
+.black-key {
+  position: absolute;
+  width: 30px;
+  height: 100px;
+  background: linear-gradient(180deg, #333 0%, #000 100%);
+  border-radius: 0 0 4px 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 8px;
+  z-index: 10;
+  transition: all 0.1s;
+}
+
+.black-key:hover {
+  background: linear-gradient(180deg, #444 0%, #222 100%);
+}
+
+.black-key.active {
+  background: linear-gradient(180deg, #1565c0 0%, #0d47a1 100%);
+  transform: translateY(2px);
+}
+
+.black-key .note-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.black-key .key-binding {
+  font-size: 9px;
+  color: #aaa;
+  margin-top: 2px;
+}
+
+.key-shortcuts {
+  margin-top: 20px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 6px;
+}
+
+.key-shortcuts h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.key-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.key-hint {
+  padding: 4px 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: 'Consolas', monospace;
+}
+
+.key-hint.black {
+  background: #333;
+  color: #fff;
+}
+
+.usage-tips {
+  margin-top: 16px;
+  padding: 16px;
+  background: #e3f8ff;
+  border-radius: 6px;
+}
+
+.usage-tips h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #0288d1;
+}
+
+.usage-tips ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.usage-tips li {
+  font-size: 13px;
+  color: #455a64;
+  margin-bottom: 4px;
+}
+
+/* Voice Synthesis Demo Styles */
+.voice-demo {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.voice-config {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.voice-config .config-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.voice-config label {
+  font-size: 13px;
+  color: #333;
+  font-weight: 500;
+}
+
+.voice-config select,
+.voice-config input[type="range"] {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.voice-preview {
+  padding: 16px;
+  background: #fff;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.voice-preview textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Avatar Generator Demo Styles */
+.avatar-demo {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.avatar-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.avatar-preview canvas {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-config {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.avatar-config .config-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.avatar-config label {
+  font-size: 12px;
+  color: #666;
+}
+
+.avatar-config select,
+.avatar-config input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* Grid Demo Styles */
+.grid-demo {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Shadow Demo Styles */
+.shadow-demo {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Button Demo Styles */
+.button-demo {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Layer List Styles */
+.layer-list {
+  margin-top: 20px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 6px;
+}
+
+.layer-list h2 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+/* Preset Grid Styles */
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(120px, 100%), 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.preset-grid > div {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  transition: transform 0.2s;
+}
+
+.preset-grid > div:hover {
+  transform: scale(1.05);
+}

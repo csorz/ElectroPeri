@@ -20,12 +20,17 @@ const generateClientId = (): string => {
   return `mqtt_${Math.random().toString(16).slice(2, 10)}_${Date.now()}`
 }
 
+// Check if running in Electron
+const isElectron = (): boolean => typeof window !== 'undefined' && !!window.api?.mqtt
+
 export default function MqttToolPage() {
   const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('demo')
 
   // Connection config
+  const [protocol, setProtocol] = useState<'mqtt' | 'ws' | 'wss'>('wss')
   const [brokerUrl, setBrokerUrl] = useState('')
-  const [port, setPort] = useState(1883)
+  const [port, setPort] = useState(8083)
+  const [path, setPath] = useState('/mqtt')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [clientId, setClientId] = useState('')
@@ -54,6 +59,9 @@ export default function MqttToolPage() {
   const logIdRef = useRef(0)
   const logContainerRef = useRef<HTMLDivElement>(null)
 
+  // MQTT client ref for browser mode
+  const mqttClientRef = useRef<any>(null)
+
   const addLog = useCallback((type: LogType, message: string, topic?: string) => {
     const timestamp = new Date().toLocaleTimeString()
     logIdRef.current += 1
@@ -66,8 +74,10 @@ export default function MqttToolPage() {
     }
   }, [logs])
 
-  // Set up event listeners
+  // Set up event listeners for Electron mode
   useEffect(() => {
+    if (!isElectron()) return
+
     const handleMessage = (topic: string, message: string) => {
       addLog('receive', message, topic)
     }
@@ -94,6 +104,20 @@ export default function MqttToolPage() {
     }
   }, [addLog])
 
+  // Update port based on protocol
+  useEffect(() => {
+    if (protocol === 'mqtt') setPort(1883)
+    else if (protocol === 'ws') setPort(8083)
+    else setPort(8084)
+  }, [protocol])
+
+  const getConnectionString = (): string => {
+    if (protocol === 'mqtt') {
+      return `${brokerUrl}:${port}`
+    }
+    return `${protocol}://${brokerUrl}:${port}${path}`
+  }
+
   const handleConnect = async () => {
     setError(null)
 
@@ -103,38 +127,91 @@ export default function MqttToolPage() {
     }
 
     setConnecting(true)
-    addLog('system', `正在连接 ${brokerUrl}:${port}...`)
+    addLog('system', `正在连接 ${getConnectionString()}...`)
 
     try {
-      const result = await window.api.mqtt.connect({
-        url: brokerUrl,
-        port,
-        username: username || undefined,
-        password: password || undefined,
-        clientId: clientId || generateClientId(),
-        clean: cleanSession,
-        keepalive: keepAlive
-      })
+      if (isElectron()) {
+        // Electron mode - use native MQTT
+        const result = await window.api.mqtt.connect({
+          url: brokerUrl,
+          port,
+          username: username || undefined,
+          password: password || undefined,
+          clientId: clientId || generateClientId(),
+          clean: cleanSession,
+          keepalive: keepAlive
+        })
 
-      if (result.success) {
-        setConnected(true)
-        addLog('system', '连接成功')
+        if (result.success) {
+          setConnected(true)
+          addLog('system', '连接成功')
+        } else {
+          setError(result.error || '连接失败')
+          addLog('error', result.error || '连接失败')
+        }
       } else {
-        setError(result.error || '连接失败')
-        addLog('error', result.error || '连接失败')
+        // Browser mode - use MQTT.js over WebSocket
+        const mqtt = await import('mqtt')
+
+        const connectUrl = protocol === 'mqtt'
+          ? `ws://${brokerUrl}:${port}/mqtt`
+          : `${protocol}://${brokerUrl}:${port}${path}`
+
+        const client = mqtt.connect(connectUrl, {
+          username: username || undefined,
+          password: password || undefined,
+          clientId: clientId || generateClientId(),
+          clean: cleanSession,
+          keepalive: keepAlive,
+          reconnectPeriod: 0 // Disable auto reconnect
+        })
+
+        mqttClientRef.current = client
+
+        client.on('connect', () => {
+          setConnected(true)
+          setConnecting(false)
+          addLog('system', '连接成功')
+        })
+
+        client.on('message', (topic: string, message: Buffer) => {
+          addLog('receive', message.toString(), topic)
+        })
+
+        client.on('error', (err: Error) => {
+          setError(err.message)
+          addLog('error', err.message)
+          setConnecting(false)
+          setConnected(false)
+        })
+
+        client.on('close', () => {
+          setConnected(false)
+          setSubscriptions([])
+          addLog('system', '已断开连接')
+        })
       }
     } catch (e) {
       const errMsg = e instanceof Error ? e.message : '连接失败'
       setError(errMsg)
       addLog('error', errMsg)
     } finally {
-      setConnecting(false)
+      if (isElectron()) {
+        setConnecting(false)
+      }
     }
   }
 
   const handleDisconnect = async () => {
     addLog('system', '正在断开连接...')
-    await window.api.mqtt.disconnect()
+
+    if (isElectron()) {
+      await window.api.mqtt.disconnect()
+    } else if (mqttClientRef.current) {
+      mqttClientRef.current.end()
+      mqttClientRef.current = null
+    }
+
     setConnected(false)
     setSubscriptions([])
     addLog('system', '已断开')
@@ -146,29 +223,69 @@ export default function MqttToolPage() {
       return
     }
 
-    const result = await window.api.mqtt.subscribe(subTopic, subQos)
-    if (result.success) {
-      addLog('system', `已订阅 ${subTopic} (QoS ${subQos})`)
-      setSubscriptions((prev) => {
-        const exists = prev.find((s) => s.topic === subTopic)
-        if (exists) {
-          return prev.map((s) => (s.topic === subTopic ? { topic: subTopic, qos: subQos } : s))
+    try {
+      if (isElectron()) {
+        const result = await window.api.mqtt.subscribe(subTopic, subQos)
+        if (result.success) {
+          addLog('system', `已订阅 ${subTopic} (QoS ${subQos})`)
+          setSubscriptions((prev) => {
+            const exists = prev.find((s) => s.topic === subTopic)
+            if (exists) {
+              return prev.map((s) => (s.topic === subTopic ? { topic: subTopic, qos: subQos } : s))
+            }
+            return [...prev, { topic: subTopic, qos: subQos }]
+          })
+          setSubTopic('')
+        } else {
+          setError(result.error || '订阅失败')
+          addLog('error', `订阅失败: ${result.error}`)
         }
-        return [...prev, { topic: subTopic, qos: subQos }]
-      })
-      setSubTopic('')
-    } else {
-      setError(result.error || '订阅失败')
-      addLog('error', `订阅失败: ${result.error}`)
+      } else if (mqttClientRef.current) {
+        mqttClientRef.current.subscribe(subTopic, { qos: subQos }, (err: Error | null) => {
+          if (err) {
+            setError(err.message)
+            addLog('error', `订阅失败: ${err.message}`)
+          } else {
+            addLog('system', `已订阅 ${subTopic} (QoS ${subQos})`)
+            setSubscriptions((prev) => {
+              const exists = prev.find((s) => s.topic === subTopic)
+              if (exists) {
+                return prev.map((s) => (s.topic === subTopic ? { topic: subTopic, qos: subQos } : s))
+              }
+              return [...prev, { topic: subTopic, qos: subQos }]
+            })
+            setSubTopic('')
+          }
+        })
+      }
+    } catch (e) {
+      const errMsg = e instanceof Error ? e.message : '订阅失败'
+      setError(errMsg)
+      addLog('error', errMsg)
     }
   }
 
   const handleUnsubscribe = async (topic: string) => {
-    const result = await window.api.mqtt.unsubscribe(topic)
-    if (result.success) {
-      addLog('system', `已取消订阅 ${topic}`)
-      setSubscriptions((prev) => prev.filter((s) => s.topic !== topic))
-    } else {
+    try {
+      if (isElectron()) {
+        const result = await window.api.mqtt.unsubscribe(topic)
+        if (result.success) {
+          addLog('system', `已取消订阅 ${topic}`)
+          setSubscriptions((prev) => prev.filter((s) => s.topic !== topic))
+        } else {
+          addLog('error', `取消订阅失败: ${topic}`)
+        }
+      } else if (mqttClientRef.current) {
+        mqttClientRef.current.unsubscribe(topic, (err: Error | null) => {
+          if (err) {
+            addLog('error', `取消订阅失败: ${topic}`)
+          } else {
+            addLog('system', `已取消订阅 ${topic}`)
+            setSubscriptions((prev) => prev.filter((s) => s.topic !== topic))
+          }
+        })
+      }
+    } catch (e) {
       addLog('error', `取消订阅失败: ${topic}`)
     }
   }
@@ -184,13 +301,31 @@ export default function MqttToolPage() {
       return
     }
 
-    const result = await window.api.mqtt.publish(pubTopic, pubMessage, pubQos, pubRetain)
-    if (result.success) {
-      addLog('send', pubMessage, pubTopic)
-      setPubMessage('')
-    } else {
-      setError(result.error || '发布失败')
-      addLog('error', `发布失败: ${result.error}`)
+    try {
+      if (isElectron()) {
+        const result = await window.api.mqtt.publish(pubTopic, pubMessage, pubQos, pubRetain)
+        if (result.success) {
+          addLog('send', pubMessage, pubTopic)
+          setPubMessage('')
+        } else {
+          setError(result.error || '发布失败')
+          addLog('error', `发布失败: ${result.error}`)
+        }
+      } else if (mqttClientRef.current) {
+        mqttClientRef.current.publish(pubTopic, pubMessage, { qos: pubQos, retain: pubRetain }, (err: Error | null) => {
+          if (err) {
+            setError(err.message)
+            addLog('error', `发布失败: ${err.message}`)
+          } else {
+            addLog('send', pubMessage, pubTopic)
+            setPubMessage('')
+          }
+        })
+      }
+    } catch (e) {
+      const errMsg = e instanceof Error ? e.message : '发布失败'
+      setError(errMsg)
+      addLog('error', errMsg)
     }
   }
 
@@ -227,6 +362,20 @@ export default function MqttToolPage() {
     }
   }
 
+  // Public test brokers
+  const testBrokers = [
+    { name: 'Eclipse Mosquitto', url: 'test.mosquitto.org', port: 8080, protocol: 'ws' as const },
+    { name: 'HiveMQ Public', url: 'broker.hivemq.com', port: 8000, protocol: 'ws' as const },
+    { name: 'EMQX Public', url: 'broker.emqx.io', port: 8083, protocol: 'ws' as const }
+  ]
+
+  const applyTestBroker = (broker: typeof testBrokers[0]) => {
+    setBrokerUrl(broker.url)
+    setPort(broker.port)
+    setProtocol(broker.protocol)
+    setPath('/mqtt')
+  }
+
   return (
     <div className="tool-page">
       <div className="tool-header">
@@ -258,8 +407,8 @@ export default function MqttToolPage() {
                 <p>三级服务质量：最多一次、至少一次、恰好一次</p>
               </div>
               <div className="feature-card">
-                <h3>保持连接</h3>
-                <p>心跳机制保持长连接，支持遗嘱消息和保留消息</p>
+                <h3>多种传输</h3>
+                <p>支持 TCP 和 WebSocket 传输，浏览器也可通过 WebSocket 连接</p>
               </div>
             </div>
 
@@ -281,6 +430,46 @@ export default function MqttToolPage() {
   home/+/temperature            -> + 匹配单层
   home/#                        -> # 匹配多层
               `}</pre>
+            </div>
+
+            <h2>传输协议</h2>
+            <div className="config-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>协议</th>
+                    <th>默认端口</th>
+                    <th>说明</th>
+                    <th>适用场景</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>mqtt://</code></td>
+                    <td>1883</td>
+                    <td>TCP 连接</td>
+                    <td>后端服务、桌面应用</td>
+                  </tr>
+                  <tr>
+                    <td><code>mqtts://</code></td>
+                    <td>8883</td>
+                    <td>TCP + TLS 加密</td>
+                    <td>安全连接</td>
+                  </tr>
+                  <tr>
+                    <td><code>ws://</code></td>
+                    <td>8083</td>
+                    <td>WebSocket</td>
+                    <td>浏览器、Web 应用</td>
+                  </tr>
+                  <tr>
+                    <td><code>wss://</code></td>
+                    <td>8084</td>
+                    <td>WebSocket + TLS</td>
+                    <td>浏览器安全连接</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             <h2>QoS 服务质量</h2>
@@ -315,22 +504,6 @@ export default function MqttToolPage() {
                   </tr>
                 </tbody>
               </table>
-            </div>
-
-            <h2>消息类型</h2>
-            <div className="info-box">
-              <strong>控制报文类型</strong>
-              <ul>
-                <li><code>CONNECT</code> (1) - 客户端请求连接</li>
-                <li><code>CONNACK</code> (2) - 连接确认</li>
-                <li><code>PUBLISH</code> (3) - 发布消息</li>
-                <li><code>PUBACK</code> (4) - 发布确认 (QoS 1)</li>
-                <li><code>SUBSCRIBE</code> (8) - 订阅请求</li>
-                <li><code>SUBACK</code> (9) - 订阅确认</li>
-                <li><code>PINGREQ</code> (12) - 心跳请求</li>
-                <li><code>PINGRESP</code> (13) - 心跳响应</li>
-                <li><code>DISCONNECT</code> (14) - 断开连接</li>
-              </ul>
             </div>
 
             <h2>应用场景</h2>
@@ -372,6 +545,11 @@ export default function MqttToolPage() {
                 <span style={{ fontWeight: 500, color: connected ? '#2e7d32' : connecting ? '#f57c00' : '#c62828' }}>
                   {connected ? '已连接' : connecting ? '连接中...' : '未连接'}
                 </span>
+                {!isElectron() && (
+                  <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#666', background: '#e3f2fd', padding: '2px 8px', borderRadius: '4px' }}>
+                    浏览器模式 (WebSocket)
+                  </span>
+                )}
               </div>
 
               {error && (
@@ -381,8 +559,46 @@ export default function MqttToolPage() {
                 </div>
               )}
 
+              {/* Test Brokers */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', color: '#666' }}>公共测试服务器</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {testBrokers.map((broker) => (
+                    <button
+                      key={broker.name}
+                      onClick={() => applyTestBroker(broker)}
+                      disabled={connected}
+                      style={{
+                        padding: '6px 12px',
+                        background: brokerUrl === broker.url ? '#e3f2fd' : '#f5f5f5',
+                        border: brokerUrl === broker.url ? '1px solid #2196f3' : '1px solid #ddd',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        cursor: connected ? 'not-allowed' : 'pointer',
+                        color: connected ? '#999' : '#333'
+                      }}
+                    >
+                      {broker.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Connection Config */}
               <div className="config-grid" style={{ marginBottom: '16px' }}>
+                <div className="config-item">
+                  <label>协议</label>
+                  <select
+                    value={protocol}
+                    onChange={(e) => setProtocol(e.target.value as 'mqtt' | 'ws' | 'wss')}
+                    disabled={connected}
+                    style={{ padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '13px' }}
+                  >
+                    <option value="wss">wss:// (WebSocket TLS)</option>
+                    <option value="ws">ws:// (WebSocket)</option>
+                    {isElectron() && <option value="mqtt">mqtt:// (TCP)</option>}
+                  </select>
+                </div>
                 <div className="config-item">
                   <label>服务器地址</label>
                   <input
@@ -390,7 +606,7 @@ export default function MqttToolPage() {
                     style={{ padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '13px' }}
                     value={brokerUrl}
                     onChange={(e) => setBrokerUrl(e.target.value)}
-                    placeholder="mqtt://broker.example.com"
+                    placeholder="broker.example.com"
                     disabled={connected}
                   />
                 </div>
@@ -404,6 +620,22 @@ export default function MqttToolPage() {
                     disabled={connected}
                   />
                 </div>
+                {protocol !== 'mqtt' && (
+                  <div className="config-item">
+                    <label>路径</label>
+                    <input
+                      type="text"
+                      style={{ padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '13px' }}
+                      value={path}
+                      onChange={(e) => setPath(e.target.value)}
+                      placeholder="/mqtt"
+                      disabled={connected}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="config-grid" style={{ marginBottom: '16px' }}>
                 <div className="config-item">
                   <label>用户名 (可选)</label>
                   <input
@@ -596,14 +828,17 @@ export default function MqttToolPage() {
             <div className="code-block">
               <pre>{`const mqtt = require('mqtt');
 
-// 连接 Broker
-const client = mqtt.connect('mqtt://broker.example.com', {
+// WebSocket 连接 (浏览器可用)
+const client = mqtt.connect('wss://broker.example.com:8084/mqtt', {
   clientId: 'client_' + Math.random().toString(16).slice(2, 10),
   username: 'user',
   password: 'pass',
   clean: true,
   keepalive: 60
 });
+
+// TCP 连接 (Node.js)
+// const client = mqtt.connect('mqtt://broker.example.com:1883');
 
 // 连接成功
 client.on('connect', () => {
@@ -633,6 +868,34 @@ client.on('error', (err) => {
 client.on('close', () => {
   console.log('已断开连接');
 });`}</pre>
+            </div>
+
+            <h2>浏览器中使用 (CDN)</h2>
+            <div className="code-block">
+              <pre>{`<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+</head>
+<body>
+  <script>
+    // 连接 MQTT Broker (WebSocket)
+    const client = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
+      clientId: 'browser_' + Date.now()
+    });
+
+    client.on('connect', () => {
+      console.log('已连接');
+      client.subscribe('test/topic');
+      client.publish('test/topic', 'Hello from browser!');
+    });
+
+    client.on('message', (topic, message) => {
+      console.log('收到:', message.toString());
+    });
+  </script>
+</body>
+</html>`}</pre>
             </div>
 
             <h2>Python (paho-mqtt) 示例</h2>
@@ -725,56 +988,6 @@ func main() {
     // 保持运行
     time.Sleep(10 * time.Second)
     client.Disconnect(250)
-}`}</pre>
-            </div>
-
-            <h2>Java (Eclipse Paho) 示例</h2>
-            <div className="code-block">
-              <pre>{`import org.eclipse.paho.client.mqttv3.*;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-
-public class MqttExample {
-    public static void main(String[] args) throws Exception {
-        String broker = "tcp://broker.example.com:1883";
-        String clientId = "java_client";
-
-        MqttClient client = new MqttClient(broker, clientId, new MemoryPersistence());
-
-        // 配置选项
-        MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName("user");
-        options.setPassword("pass".toCharArray());
-        options.setCleanSession(true);
-
-        // 设置回调
-        client.setCallback(new MqttCallback() {
-            public void connectionLost(Throwable cause) {
-                System.out.println("连接丢失");
-            }
-
-            public void messageArrived(String topic, MqttMessage message) {
-                System.out.println("收到 [" + topic + "]: " + new String(message.getPayload()));
-            }
-
-            public void deliveryComplete(IMqttDeliveryToken token) {}
-        });
-
-        // 连接
-        client.connect(options);
-        System.out.println("已连接");
-
-        // 订阅
-        client.subscribe("sensor/#", 1);
-
-        // 发布
-        MqttMessage message = new MqttMessage();
-        message.setPayload("{\"value\": 25.5}".getBytes());
-        client.publish("sensor/temperature", message);
-
-        // 保持运行
-        Thread.sleep(10000);
-        client.disconnect();
-    }
 }`}</pre>
             </div>
           </div>

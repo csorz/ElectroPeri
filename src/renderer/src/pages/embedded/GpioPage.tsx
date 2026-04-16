@@ -4,7 +4,10 @@ import '../toolbox/tools/ToolPage.css'
 
 export default function GpioPage() {
   return (
-    <ElectronOnly>
+    <ElectronOnly
+      featureName="GPIO 控制"
+      supportedDevices="树莓派 (Raspberry Pi)、BeagleBone、Orange Pi 等嵌入式开发板"
+    >
       <GpioPageContent />
     </ElectronOnly>
   )

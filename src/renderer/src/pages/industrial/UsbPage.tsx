@@ -282,7 +282,6 @@ public class UsbExample {
   )
 }
 
-// USB 演示组件
 function UsbDemo() {
   const {
     usbDevices,
@@ -384,8 +383,8 @@ function UsbDemo() {
       </div>
 
       {usbError && (
-        <div style={{ padding: 12, background: '#ffebee', borderRadius: 6, marginBottom: 16, color: '#c62828' }}>
-          {usbError}
+        <div style={{ marginBottom: 16, padding: 16, background: '#fff5f5', borderRadius: 8, border: '1px solid #ffcdd2' }}>
+          <div style={{ fontWeight: 500, color: '#c62828' }}>⚠️ {usbError.split('。')[0]}</div>
         </div>
       )}
 

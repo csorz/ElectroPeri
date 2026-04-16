@@ -26,6 +26,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@serialport/bindings-cpp": "^13.0.1",
     "crypto-js": "^4.2.0",
     "electron-updater": "^6.3.9",
     "file-saver": "^2.0.5",

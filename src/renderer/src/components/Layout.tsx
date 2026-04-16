@@ -15,7 +15,7 @@ const navGroups: { key: string; title: string; items: NavItem[] }[] = [
         icon: '🔐',
         label: '编码与加解密',
         children: [
-          { to: '/frontend-toolbox/encoding/hash', icon: '#️⃣', label: 'Hash 计算' },
+          { to: '/frontend-toolbox/encoding/hash', icon: '🔑', label: 'Hash 计算' },
           { to: '/frontend-toolbox/encoding/base64', icon: '📦', label: 'Base64 编解码' },
           { to: '/frontend-toolbox/encoding/url', icon: '🔗', label: 'URL 编解码' },
           { to: '/frontend-toolbox/encoding/encrypt', icon: '🔒', label: '加密解密' },
@@ -68,12 +68,10 @@ const navGroups: { key: string; title: string; items: NavItem[] }[] = [
       {
         to: '/frontend-toolbox/text',
         icon: '📝',
-        label: '文本与数据转换',
+        label: '文本处理',
         children: [
           { to: '/frontend-toolbox/text/regex', icon: '🔎', label: '正则测试' },
           { to: '/frontend-toolbox/text/diff', icon: '📋', label: '文本比对' },
-          { to: '/frontend-toolbox/text/csv-json', icon: '🔄', label: 'CSV/JSON 互转' },
-          { to: '/frontend-toolbox/text/yaml-json', icon: '🔄', label: 'YAML/JSON 互转' },
           { to: '/frontend-toolbox/text/count', icon: '🔢', label: '字数统计' }
         ]
       },
@@ -96,6 +94,7 @@ const navGroups: { key: string; title: string; items: NavItem[] }[] = [
         children: [
           { to: '/frontend-toolbox/css/shadow', icon: '🌫️', label: '阴影生成' },
           { to: '/frontend-toolbox/css/button', icon: '🔘', label: '按钮设计' },
+          { to: '/frontend-toolbox/css/flex', icon: '📦', label: 'Flex 布局' },
           { to: '/frontend-toolbox/css/grid', icon: '📐', label: 'Grid 布局' },
           { to: '/frontend-toolbox/css/background', icon: '🖼️', label: '背景生成' },
           { to: '/frontend-toolbox/css/format', icon: '✨', label: 'CSS 格式化' }

@@ -3,10 +3,23 @@ import { BrowserWindow, ipcMain } from 'electron'
 let mainWindow: BrowserWindow | null = null
 let currentDevice: any | null = null
 
+async function getHID() {
+  try {
+    const mod = await import('node-hid')
+    return mod.default ?? mod
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : String(error)
+    if (errMsg.includes('Could not locate the bindings file') || errMsg.includes('Module version mismatch')) {
+      throw new Error('HID模块未正确编译。请运行: pnpm electron-builder install-app-deps 或 pnpm rebuild node-hid')
+    }
+    throw new Error(`HID模块加载失败: ${errMsg}`)
+  }
+}
+
 export function setupHidHandlers(): void {
   ipcMain.handle('hid:list', async () => {
     try {
-      const HID = (await import('node-hid')).default ?? (await import('node-hid'))
+      const HID = await getHID()
       const devices = HID.devices()
 
       return devices.map((d: any) => ({
@@ -27,7 +40,7 @@ export function setupHidHandlers(): void {
 
   ipcMain.handle('hid:open', async (event, vendorId: number, productId: number) => {
     try {
-      const HID = (await import('node-hid')).default ?? (await import('node-hid'))
+      const HID = await getHID()
       mainWindow = BrowserWindow.fromWebContents(event.sender)
 
       if (currentDevice) {

@@ -2,6 +2,12 @@ import { app, shell, BrowserWindow, ipcMain, globalShortcut, dialog } from 'elec
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 
+// 启用 Web API (WebHID, WebUSB, Web Serial, Web Bluetooth)
+// 必须在 app ready 之前调用
+// Web Serial 在 Electron 19+ 默认启用
+// WebHID 和 WebUSB 需要显式启用
+app.commandLine.appendSwitch('enable-features', 'WebHid,WebUsb,WebBluetooth')
+
 // 最早的调试日志 - 写入到临时文件
 function earlyLog(message: string): void {
   try {
@@ -122,6 +128,29 @@ function createWindow(): void {
         callback('')
       }
     })
+
+    // Handle HID device selection for WebHID API
+    mainWindow.webContents.session.on('select-hid-device', (_event, details, callback) => {
+      // Auto-select first device or show picker
+      if (details.deviceList && details.deviceList.length > 0) {
+        callback(details.deviceList[0].deviceId)
+      } else {
+        callback('')
+      }
+    })
+
+    // Handle USB device selection for WebUSB API
+    mainWindow.webContents.session.on('select-usb-device', (_event, details, callback) => {
+      if (details.deviceList && details.deviceList.length > 0) {
+        callback(details.deviceList[0].deviceId)
+      } else {
+        callback('')
+      }
+    })
+
+    // Handle Bluetooth device pairing request
+    // Note: Web Bluetooth in Electron requires experimental features
+    // and may not work on all platforms
 
     // 监听渲染进程错误
     mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {

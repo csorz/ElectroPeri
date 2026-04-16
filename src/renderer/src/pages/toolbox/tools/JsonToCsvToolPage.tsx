@@ -1,5 +1,8 @@
 import { useState } from 'react'
+import { copyToClipboard } from '../clipboard'
 import './ToolPage.css'
+
+type ConvertMode = 'json-to-csv' | 'csv-to-json'
 
 export default function JsonToCsvToolPage() {
   const [activeTab, setActiveTab] = useState<'concept' | 'demo' | 'code'>('demo')
@@ -7,8 +10,8 @@ export default function JsonToCsvToolPage() {
   return (
     <div className="tool-page">
       <div className="tool-header">
-        <h1>📊 JSON 转 CSV</h1>
-        <p>将 JSON 数组转换为 CSV 格式</p>
+        <h1>📊 JSON/CSV 互转</h1>
+        <p>JSON 与 CSV 格式互相转换，支持导出文件</p>
       </div>
 
       <div className="tool-tabs">
@@ -26,51 +29,91 @@ export default function JsonToCsvToolPage() {
             </div>
 
             <h2>JSON 与 CSV 对比</h2>
+            <table className="comparison-table">
+              <thead>
+                <tr>
+                  <th>特性</th>
+                  <th>JSON</th>
+                  <th>CSV</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>结构</td>
+                  <td>嵌套对象、数组</td>
+                  <td>扁平表格</td>
+                </tr>
+                <tr>
+                  <td>数据类型</td>
+                  <td>丰富（对象、数组、数字、布尔等）</td>
+                  <td>纯文本（无类型）</td>
+                </tr>
+                <tr>
+                  <td>可读性</td>
+                  <td>中等</td>
+                  <td>高（表格形式）</td>
+                </tr>
+                <tr>
+                  <td>文件大小</td>
+                  <td>较大（键名重复）</td>
+                  <td>较小</td>
+                </tr>
+                <tr>
+                  <td>兼容性</td>
+                  <td>现代应用</td>
+                  <td>Excel、数据库</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2>转换规则</h2>
             <div className="feature-grid">
               <div className="feature-card">
-                <h3>结构简单</h3>
-                <p>CSV 是扁平的表格结构，适合二维数据表示</p>
+                <h3>数组必需</h3>
+                <p>JSON 必须是对象数组格式</p>
               </div>
               <div className="feature-card">
-                <h3>兼容性强</h3>
-                <p>几乎所有电子表格软件都支持 CSV 格式</p>
+                <h3>表头生成</h3>
+                <p>自动提取所有对象的键作为表头</p>
               </div>
               <div className="feature-card">
-                <h3>文件小巧</h3>
-                <p>相比 JSON，CSV 没有键名重复，文件更小</p>
+                <h3>特殊字符转义</h3>
+                <p>逗号、引号、换行自动处理</p>
               </div>
               <div className="feature-card">
-                <h3>易于处理</h3>
-                <p>适合大数据处理、数据库导入导出</p>
+                <h3>嵌套对象</h3>
+                <p>嵌套对象转为 JSON 字符串</p>
               </div>
             </div>
 
-            <h2>转换规则</h2>
-            <ul className="scenario-list">
-              <li><strong>数组必需</strong> - JSON 数据必须是数组格式，每个元素转换为 CSV 一行</li>
-              <li><strong>表头生成</strong> - 自动提取所有对象的键作为 CSV 表头</li>
-              <li><strong>字段对齐</strong> - 缺少字段的位置留空</li>
-              <li><strong>特殊字符转义</strong> - 包含逗号、引号、换行的字段用双引号包裹</li>
-              <li><strong>嵌套对象</strong> - 嵌套对象会转换为 JSON 字符串</li>
-            </ul>
-
             <h2>应用场景</h2>
-            <ul className="scenario-list">
-              <li><strong>数据导出</strong> - 将 API 返回的 JSON 数据导出为 Excel 可用的 CSV</li>
-              <li><strong>数据分析</strong> - 转换数据格式用于数据分析工具</li>
-              <li><strong>数据迁移</strong> - 在不同系统间迁移表格数据</li>
-              <li><strong>报表生成</strong> - 生成可导入 Excel/Google Sheets 的数据</li>
-              <li><strong>批量导入</strong> - 准备数据库批量导入的数据</li>
-            </ul>
+            <div className="scenario-grid">
+              <div className="scenario-card">
+                <h4>📊 数据导出</h4>
+                <p>API 数据导出为 Excel 可用格式</p>
+              </div>
+              <div className="scenario-card">
+                <h4>📈 数据分析</h4>
+                <p>转换为表格用于分析工具</p>
+              </div>
+              <div className="scenario-card">
+                <h4>🔄 数据迁移</h4>
+                <p>不同系统间迁移表格数据</p>
+              </div>
+              <div className="scenario-card">
+                <h4>📋 批量导入</h4>
+                <p>准备数据库批量导入数据</p>
+              </div>
+            </div>
 
             <h2>注意事项</h2>
             <div className="info-box warning">
-              <strong>使用提醒</strong>
+              <strong>⚠️ 使用提醒</strong>
               <ul>
-                <li>JSON 必须是数组格式，单个对象无法直接转换</li>
-                <li>嵌套结构和数组会转换为字符串形式</li>
-                <li>注意 CSV 的编码问题，中文建议使用 UTF-8 with BOM</li>
-                <li>字段顺序可能与原 JSON 不同（取决于实现）</li>
+                <li>JSON 转 CSV 要求输入必须是对象数组，如 <code>[{`{"key": "value"}`}]</code></li>
+                <li>嵌套对象和数组会转换为 JSON 字符串</li>
+                <li>CSV 没有类型系统，所有值都是字符串</li>
+                <li>中文建议使用 UTF-8 编码，Excel 兼容需 BOM</li>
               </ul>
             </div>
           </div>
@@ -78,55 +121,180 @@ export default function JsonToCsvToolPage() {
 
         {activeTab === 'demo' && (
           <div className="demo-section">
-            <h2>JSON 转 CSV 工具</h2>
-            <JsonToCsvDemo />
+            <h2>JSON/CSV 双向转换</h2>
+            <JsonCsvConverter />
           </div>
         )}
 
         {activeTab === 'code' && (
           <div className="code-section">
-            <h2>JavaScript 示例</h2>
+            <h2>JavaScript - 使用 papaparse</h2>
+            <div className="info-box" style={{ marginBottom: 16 }}>
+              <p>📦 安装: <code>npm install papaparse</code></p>
+              <p>✅ 功能强大，支持大文件、流式解析</p>
+            </div>
             <div className="code-block">
-              <pre>{`// JSON 转 CSV
-const jsonToCsv = (data) => {
-  if (!Array.isArray(data) || data.length === 0) {
+              <pre>{`import Papa from 'papaparse';
+
+// ============ JSON 转 CSV ============
+const jsonData = [
+  { name: "张三", age: 25, city: "北京" },
+  { name: "李四", age: 30, city: "上海" },
+  { name: "王五", age: 28, city: "广州" }
+];
+
+const csv = Papa.unparse(jsonData, {
+  quotes: false,        // 是否强制加引号
+  quoteChar: '"',       // 引号字符
+  escapeChar: '"',      // 转义字符
+  delimiter: ",",       // 分隔符
+  header: true,         // 包含表头
+  newline: "\\r\\n"      // 换行符
+});
+
+console.log(csv);
+// name,age,city
+// 张三,25,北京
+// 李四,30,上海
+// 王五,28,广州
+
+// ============ CSV 转 JSON ============
+const csvStr = \`name,age,city
+张三,25,北京
+李四,30,上海\`;
+
+const result = Papa.parse(csvStr, {
+  header: true,        // 第一行作为字段名
+  dynamicTyping: true, // 自动转换数字
+  skipEmptyLines: true
+});
+
+console.log(result.data);
+// [{ name: "张三", age: 25, city: "北京" }, ...]
+
+// ============ 处理特殊字符 ============
+const specialData = [
+  { name: '张,三', desc: '包含"引号"' },
+  { name: '李四', desc: '包含\\n换行' }
+];
+
+const specialCsv = Papa.unparse(specialData);
+// 自动处理引号和转义
+// name,desc
+// "张,三","包含""引号"""
+// 李四,"包含\\n换行"`}</pre>
+            </div>
+
+            <h2>JavaScript - 纯实现（无依赖）</h2>
+            <div className="code-block">
+              <pre>{`// ============ JSON 转 CSV (无依赖) ============
+function jsonToCsv(jsonArray, delimiter = ',') {
+  if (!Array.isArray(jsonArray) || jsonArray.length === 0) {
     return '';
   }
 
-  // 获取所有字段
-  const headers = [...new Set(data.flatMap(item => Object.keys(item)))];
+  // 获取所有字段名
+  const headers = [...new Set(jsonArray.flatMap(obj => Object.keys(obj)))];
 
-  // 转义 CSV 字段
+  // 转义字段值
   const escapeField = (value) => {
     if (value === null || value === undefined) return '';
     const str = String(value);
-    if (str.includes(',') || str.includes('"') || str.includes('\\n')) {
-      return \`"\${str.replace(/"/g, '""')}"\`;
+    // 包含特殊字符时需要加引号
+    if (str.includes(delimiter) || str.includes('"') || str.includes('\\n')) {
+      return '"' + str.replace(/"/g, '""') + '"';
     }
     return str;
   };
 
-  // 生成 CSV
-  const rows = [
-    headers.map(escapeField).join(','),
-    ...data.map(item =>
-      headers.map(h => escapeField(item[h])).join(',')
-    )
-  ];
+  // 构建CSV
+  const headerLine = headers.map(escapeField).join(delimiter);
+  const dataLines = jsonArray.map(obj =>
+    headers.map(h => escapeField(obj[h])).join(delimiter)
+  );
 
-  return rows.join('\\n');
-};
+  return [headerLine, ...dataLines].join('\\n');
+}
+
+// ============ CSV 转 JSON (无依赖) ============
+function csvToJson(csvStr, delimiter = ',') {
+  const lines = csvStr.split(/\\r?\\n/).filter(line => line.trim());
+  if (lines.length < 2) return [];
+
+  // 解析一行CSV
+  const parseLine = (line) => {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+
+      if (inQuotes) {
+        if (char === '"') {
+          if (line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = false;
+          }
+        } else {
+          current += char;
+        }
+      } else {
+        if (char === '"') {
+          inQuotes = true;
+        } else if (char === delimiter) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+    }
+    result.push(current);
+    return result;
+  };
+
+  const headers = parseLine(lines[0]);
+  const data = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = parseLine(lines[i]);
+    const obj = {};
+    headers.forEach((header, index) => {
+      let value = values[index] || '';
+      // 尝试转换数字
+      if (/^-?\\d+(\\.\\d+)?$/.test(value)) {
+        value = parseFloat(value);
+      } else if (value === 'true') {
+        value = true;
+      } else if (value === 'false') {
+        value = false;
+      }
+      obj[header] = value;
+    });
+    data.push(obj);
+  }
+
+  return data;
+}
 
 // 使用示例
 const data = [
-  { name: "张三", age: 25, city: "北京" },
-  { name: "李四", age: 30, city: "上海" }
+  { name: '张三', age: 25 },
+  { name: '李四', age: 30 }
 ];
 
-console.log(jsonToCsv(data));
-// name,age,city
-// 张三,25,北京
-// 李四,30,上海`}</pre>
+const csv = jsonToCsv(data);
+console.log(csv);
+// name,age
+// 张三,25
+// 李四,30
+
+const json = csvToJson(csv);
+console.log(json);
+// [{ name: '张三', age: 25 }, { name: '李四', age: 30 }]`}</pre>
             </div>
 
             <h2>Python 示例</h2>
@@ -135,49 +303,48 @@ console.log(jsonToCsv(data));
 import json
 from io import StringIO
 
-def json_to_csv(json_data):
-    """将 JSON 数组转换为 CSV 字符串"""
-    if not isinstance(json_data, list) or len(json_data) == 0:
-        return ''
-
-    # 获取所有字段名
-    fieldnames = []
-    for item in json_data:
-        if isinstance(item, dict):
-            for key in item.keys():
-                if key not in fieldnames:
-                    fieldnames.append(key)
-
-    # 生成 CSV
-    output = StringIO()
-    writer = csv.DictWriter(output, fieldnames=fieldnames)
-    writer.writeheader()
-
-    for item in json_data:
-        if isinstance(item, dict):
-            writer.writerow(item)
-
-    return output.getvalue()
-
-# 使用示例
-data = [
+# ============ JSON 转 CSV ============
+json_data = [
     {"name": "张三", "age": 25, "city": "北京"},
     {"name": "李四", "age": 30, "city": "上海"}
 ]
 
-csv_output = json_to_csv(data)
-print(csv_output)
-# name,age,city
-# 张三,25,北京
-# 李四,30,上海
+# 转换为 CSV 字符串
+output = StringIO()
+if json_data:
+    writer = csv.DictWriter(output, fieldnames=json_data[0].keys())
+    writer.writeheader()
+    writer.writerows(json_data)
 
-# 保存到文件
-def save_csv(json_data, filename):
-    with open(filename, 'w', newline='', encoding='utf-8-sig') as f:
-        if json_data:
-            writer = csv.DictWriter(f, fieldnames=json_data[0].keys())
-            writer.writeheader()
-            writer.writerows(json_data)`}</pre>
+csv_str = output.getvalue()
+print(csv_str)
+
+# 保存到文件（UTF-8 with BOM，Excel 兼容）
+with open('output.csv', 'w', newline='', encoding='utf-8-sig') as f:
+    if json_data:
+        writer = csv.DictWriter(f, fieldnames=json_data[0].keys())
+        writer.writeheader()
+        writer.writerows(json_data)
+
+# ============ CSV 转 JSON ============
+with open('data.csv', 'r', encoding='utf-8-sig') as f:
+    reader = csv.DictReader(f)
+    data = list(reader)
+
+# 转换为 JSON
+json_str = json.dumps(data, ensure_ascii=False, indent=2)
+print(json_str)
+
+# ============ 使用 pandas ============
+import pandas as pd
+
+# 读取各种格式
+df_json = pd.read_json('data.json')
+df_csv = pd.read_csv('data.csv')
+
+# 转换格式
+df_json.to_csv('output.csv', index=False, encoding='utf-8-sig')
+df_csv.to_json('output.json', orient='records', force_ascii=False, indent=2)`}</pre>
             </div>
 
             <h2>Go 示例</h2>
@@ -193,9 +360,10 @@ import (
     "strings"
 )
 
-func jsonToCSV(jsonStr string) (string, error) {
+// ============ JSON 转 CSV ============
+func jsonToCsv(jsonBytes []byte) (string, error) {
     var data []map[string]interface{}
-    if err := json.Unmarshal([]byte(jsonStr), &data); err != nil {
+    if err := json.Unmarshal(jsonBytes, &data); err != nil {
         return "", err
     }
 
@@ -239,68 +407,110 @@ func jsonToCSV(jsonStr string) (string, error) {
     return buf.String(), nil
 }
 
+// ============ CSV 转 JSON ============
+func csvToJson(csvStr string) (string, error) {
+    reader := csv.NewReader(strings.NewReader(csvStr))
+    records, err := reader.ReadAll()
+    if err != nil {
+        return "", err
+    }
+
+    if len(records) < 2 {
+        return "[]", nil
+    }
+
+    headers := records[0]
+    var result []map[string]string
+
+    for _, record := range records[1:] {
+        row := make(map[string]string)
+        for i, h := range headers {
+            if i < len(record) {
+                row[h] = record[i]
+            }
+        }
+        result = append(result, row)
+    }
+
+    jsonBytes, _ := json.MarshalIndent(result, "", "  ")
+    return string(jsonBytes), nil
+}
+
 func main() {
     jsonStr := \`[
         {"name": "张三", "age": 25, "city": "北京"},
         {"name": "李四", "age": 30, "city": "上海"}
     ]\`
 
-    csvStr, _ := jsonToCSV(jsonStr)
+    // JSON → CSV
+    csvStr, _ := jsonToCsv([]byte(jsonStr))
+    fmt.Println("CSV:")
     fmt.Println(csvStr)
+
+    // CSV → JSON
+    jsonOut, _ := csvToJson(csvStr)
+    fmt.Println("JSON:")
+    fmt.Println(jsonOut)
 }`}</pre>
             </div>
 
             <h2>Java 示例</h2>
             <div className="code-block">
               <pre>{`import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opencsv.CSVWriter;
-import java.io.StringWriter;
-import java.util.*;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
-public class JsonToCsv {
-    private static final ObjectMapper mapper = new ObjectMapper();
+import java.util.List;
+import java.util.Map;
 
-    public static String convert(String json) {
-        try {
-            List<Map<String, Object>> data = mapper.readValue(
-                json,
-                mapper.getTypeFactory().constructCollectionType(List.class, Map.class)
-            );
+public class JsonCsvConverter {
 
-            if (data.isEmpty()) return "";
+    private static final ObjectMapper jsonMapper = new ObjectMapper();
+    private static final CsvMapper csvMapper = new CsvMapper();
 
-            // 收集所有字段
-            Set<String> headerSet = new LinkedHashSet<>();
-            for (Map<String, Object> item : data) {
-                headerSet.addAll(item.keySet());
-            }
-            String[] headers = headerSet.toArray(new String[0]);
+    // JSON 转 CSV
+    public static String jsonToCsv(String json) throws Exception {
+        List<Map<String, Object>> data = jsonMapper.readValue(json,
+            jsonMapper.getTypeFactory().constructCollectionType(List.class, Map.class));
 
-            // 生成 CSV
-            StringWriter sw = new StringWriter();
-            CSVWriter writer = new CSVWriter(sw);
+        if (data.isEmpty()) return "";
 
-            writer.writeNext(headers);
-
-            for (Map<String, Object> item : data) {
-                String[] row = new String[headers.length];
-                for (int i = 0; i < headers.length; i++) {
-                    Object val = item.get(headers[i]);
-                    row[i] = val != null ? val.toString() : "";
-                }
-                writer.writeNext(row);
-            }
-
-            writer.close();
-            return sw.toString();
-        } catch (Exception e) {
-            return "Error: " + e.getMessage();
+        // 构建 CSV Schema
+        CsvSchema.Builder builder = CsvSchema.builder();
+        for (String key : data.get(0).keySet()) {
+            builder.addColumn(key);
         }
+        CsvSchema schema = builder.build().withHeader();
+
+        return csvMapper.writer(schema).writeValueAsString(data);
     }
 
-    public static void main(String[] args) {
-        String json = "[{\\"name\\":\\"张三\\",\\"age\\":25}]";
-        System.out.println(convert(json));
+    // CSV 转 JSON
+    public static String csvToJson(String csv) throws Exception {
+        CsvSchema schema = CsvSchema.emptySchema().withHeader();
+        List<Map<String, String>> data = csvMapper.readerFor(Map.class)
+            .with(schema)
+            .<Map<String, String>>readValues(csv)
+            .readAll();
+
+        return jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+    }
+
+    public static void main(String[] args) throws Exception {
+        String json = \"""
+            [
+                {"name": "张三", "age": 25, "city": "北京"},
+                {"name": "李四", "age": 30, "city": "上海"}
+            ]
+            \""";
+
+        // JSON → CSV
+        String csv = jsonToCsv(json);
+        System.out.println("CSV:\\n" + csv);
+
+        // CSV → JSON
+        String jsonOut = csvToJson(csv);
+        System.out.println("JSON:\\n" + jsonOut);
     }
 }`}</pre>
             </div>
@@ -311,33 +521,40 @@ public class JsonToCsv {
   )
 }
 
-function JsonToCsvDemo() {
+function JsonCsvConverter() {
+  const [mode, setMode] = useState<ConvertMode>('json-to-csv')
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
 
-  const jsonToCsv = (data: unknown): string => {
-    if (!Array.isArray(data)) {
+  // JSON 转 CSV
+  const jsonToCsv = (jsonArray: unknown[]): string => {
+    if (!Array.isArray(jsonArray)) {
       throw new Error('JSON 数据必须是数组格式')
     }
-    if (data.length === 0) {
+    if (jsonArray.length === 0) {
       return ''
     }
 
     // 获取所有字段
     const headers = new Set<string>()
-    data.forEach((item) => {
+    jsonArray.forEach((item) => {
       if (typeof item === 'object' && item !== null) {
         Object.keys(item).forEach((key) => headers.add(key))
       }
     })
     const headerList = Array.from(headers)
 
-    // 生成 CSV
+    // 转义 CSV 字段
     const escapeCsv = (value: unknown): string => {
       if (value === null || value === undefined) return ''
-      const str = String(value)
-      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      let str: string
+      if (typeof value === 'object') {
+        str = JSON.stringify(value)
+      } else {
+        str = String(value)
+      }
+      if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
         return `"${str.replace(/"/g, '""')}"`
       }
       return str
@@ -345,7 +562,7 @@ function JsonToCsvDemo() {
 
     const rows = [
       headerList.map(escapeCsv).join(','),
-      ...data.map((item) => {
+      ...jsonArray.map((item) => {
         if (typeof item === 'object' && item !== null) {
           return headerList.map((key) => escapeCsv((item as Record<string, unknown>)[key])).join(',')
         }
@@ -355,21 +572,111 @@ function JsonToCsvDemo() {
     return rows.join('\n')
   }
 
+  // CSV 转 JSON
+  const csvToJson = (csvStr: string): unknown[] => {
+    // 移除 BOM 如果存在
+    let cleanStr = csvStr
+    if (csvStr.charCodeAt(0) === 0xFEFF) {
+      cleanStr = csvStr.slice(1)
+    }
+
+    const lines = cleanStr.split(/\r?\n/).filter((line) => line.trim())
+    if (lines.length < 2) {
+      throw new Error('CSV 格式错误：至少需要表头和一行数据')
+    }
+
+    const parseLine = (line: string): string[] => {
+      const result: string[] = []
+      let current = ''
+      let inQuotes = false
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i]
+
+        if (inQuotes) {
+          if (char === '"') {
+            if (line[i + 1] === '"') {
+              current += '"'
+              i++
+            } else {
+              inQuotes = false
+            }
+          } else {
+            current += char
+          }
+        } else {
+          if (char === '"') {
+            inQuotes = true
+          } else if (char === ',') {
+            result.push(current.trim())
+            current = ''
+          } else {
+            current += char
+          }
+        }
+      }
+      result.push(current.trim())
+      return result
+    }
+
+    const headers = parseLine(lines[0])
+
+    if (headers.length === 0 || headers.every(h => !h)) {
+      throw new Error('CSV 表头为空，请确保第一行是字段名')
+    }
+
+    const data: unknown[] = []
+
+    for (let i = 1; i < lines.length; i++) {
+      const values = parseLine(lines[i])
+      const obj: Record<string, unknown> = {}
+      headers.forEach((header, index) => {
+        if (header) {  // 只处理非空表头
+          let value: unknown = values[index] ?? ''
+          if (typeof value === 'string') {
+            if (/^-?\d+(\.\d+)?$/.test(value)) {
+              value = parseFloat(value)
+            } else if (value === 'true') {
+              value = true
+            } else if (value === 'false') {
+              value = false
+            }
+          }
+          obj[header] = value
+        }
+      })
+      data.push(obj)
+    }
+
+    return data
+  }
+
   const handleConvert = () => {
     setError(null)
     try {
-      const parsed = JSON.parse(input)
-      setOutput(jsonToCsv(parsed))
+      if (mode === 'json-to-csv') {
+        const parsed = JSON.parse(input)
+        setOutput(jsonToCsv(parsed))
+      } else {
+        const parsed = csvToJson(input)
+        setOutput(JSON.stringify(parsed, null, 2))
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : '转换失败')
       setOutput('')
     }
   }
 
-  const handleCopy = () => {
+  const handleSwap = () => {
     if (output) {
-      navigator.clipboard.writeText(output)
+      setInput(output)
+      setOutput('')
+      setMode(mode === 'json-to-csv' ? 'csv-to-json' : 'json-to-csv')
     }
+  }
+
+  const handleCopy = () => {
+    if (output) copyToClipboard(output)
   }
 
   const handleClear = () => {
@@ -378,53 +685,124 @@ function JsonToCsvDemo() {
     setError(null)
   }
 
+  const handleExport = () => {
+    if (!output) return
+
+    const filename = mode === 'json-to-csv' ? 'data.csv' : 'data.json'
+    const mimeType = mode === 'json-to-csv' ? 'text/csv' : 'application/json'
+
+    // CSV 添加 BOM 以支持 Excel 中文
+    const content = mode === 'json-to-csv' ? '\uFEFF' + output : output
+
+    const blob = new Blob([content], { type: mimeType })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const sampleJsonArray = `[
+  {"name": "张三", "age": 25, "city": "北京"},
+  {"name": "李四", "age": 30, "city": "上海"},
+  {"name": "王五", "age": 28, "city": "广州"}
+]`
+
+  const sampleCsv = `name,age,city
+张三,25,北京
+李四,30,上海
+王五,28,广州`
+
+  const loadSample = () => {
+    setInput(mode === 'json-to-csv' ? sampleJsonArray : sampleCsv)
+  }
+
   return (
     <div className="connection-demo">
-      {error && (
-        <div className="info-box warning">
-          <strong>错误</strong>
-          <p>{error}</p>
+      <div className="config-grid" style={{ marginBottom: 16 }}>
+        <div className="config-item">
+          <label>转换方向</label>
+          <select value={mode} onChange={(e) => setMode(e.target.value as ConvertMode)}>
+            <option value="json-to-csv">JSON → CSV</option>
+            <option value="csv-to-json">CSV → JSON</option>
+          </select>
+        </div>
+      </div>
+
+      {mode === 'json-to-csv' && (
+        <div className="info-box" style={{ marginBottom: 12 }}>
+          <strong>提示</strong>
+          <p style={{ marginTop: 4 }}>
+            JSON 必须是对象数组格式，如 <code>[{`{"key": "value"}`}]</code>。嵌套对象会被转为 JSON 字符串。
+          </p>
         </div>
       )}
 
-      <div className="info-box" style={{ marginBottom: '16px' }}>
-        <strong>提示</strong>
-        <p>请输入 JSON 数组格式，例如：<code>{`[{"name": "张三", "age": 25}]`}</code></p>
-      </div>
+      {error && (
+        <div style={{ color: '#c62828', padding: '12px', background: '#ffebee', borderRadius: '6px', marginBottom: 12 }}>
+          ❌ {error}
+        </div>
+      )}
 
-      <div className="config-item" style={{ marginBottom: '12px' }}>
-        <label>输入 JSON 数组</label>
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <label style={{ fontWeight: 500 }}>输入 {mode === 'json-to-csv' ? 'JSON' : 'CSV'}</label>
+          <button onClick={loadSample} style={{ padding: '4px 8px', fontSize: '12px', background: '#e3f2fd', color: '#1976d2', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+            加载示例
+          </button>
+        </div>
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={JSON.stringify([{"name": "张三", "age": 25}, {"name": "李四", "age": 30}])}
-          rows={8}
-          style={{ width: '100%', fontFamily: 'monospace', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+          placeholder={mode === 'json-to-csv' ? '输入 JSON 对象数组...' : '输入 CSV 数据...'}
+          rows={10}
+          style={{
+            width: '100%',
+            fontFamily: 'monospace',
+            padding: '12px',
+            borderRadius: '6px',
+            border: '1px solid #ddd',
+            fontSize: '13px',
+            resize: 'vertical'
+          }}
         />
       </div>
 
       <div className="demo-controls">
         <button onClick={handleConvert}>转换</button>
-        <button onClick={handleCopy} disabled={!output}>复制结果</button>
-        <button onClick={handleClear}>清空</button>
+        {output && (
+          <>
+            <button onClick={handleSwap} style={{ background: '#e0e0e0', color: '#333' }}>交换</button>
+            <button onClick={handleCopy} style={{ background: '#e0e0e0', color: '#333' }}>复制结果</button>
+            <button onClick={handleExport} style={{ background: '#4caf50', color: '#fff' }}>
+              导出 .{mode === 'json-to-csv' ? 'csv' : 'json'}
+            </button>
+          </>
+        )}
+        <button onClick={handleClear} style={{ background: '#e0e0e0', color: '#333' }}>清空</button>
       </div>
 
       {output && (
-        <div style={{ marginTop: '16px' }}>
-          <div className="config-item">
-            <label>CSV 输出</label>
-            <pre style={{
-              background: '#1e1e1e',
-              color: '#d4d4d4',
-              padding: '16px',
-              borderRadius: '8px',
-              overflow: 'auto',
-              maxHeight: '300px',
-              fontSize: '13px'
-            }}>
-              {output}
-            </pre>
-          </div>
+        <div style={{ marginTop: 16 }}>
+          <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>
+            输出 {mode === 'json-to-csv' ? 'CSV' : 'JSON'}
+          </label>
+          <pre style={{
+            background: '#1e1e1e',
+            color: '#d4d4d4',
+            padding: '16px',
+            borderRadius: '8px',
+            overflow: 'auto',
+            maxHeight: '400px',
+            fontSize: '13px',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-all'
+          }}>
+            {output}
+          </pre>
         </div>
       )}
     </div>

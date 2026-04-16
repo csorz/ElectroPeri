@@ -12,7 +12,7 @@ export default function MysqlToolPage() {
       </div>
 
       <div className="tool-tabs">
-        <button className={activeTab === 'demo' ? 'active' : ''} onClick={() => setActiveTab('demo')}>交互演示</button>
+        <button className={activeTab === 'demo' ? 'active' : ''} onClick={() => setActiveTab('demo')}>常用命令</button>
         <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'code' ? 'active' : ''} onClick={() => setActiveTab('code')}>代码示例</button>
       </div>
@@ -122,11 +122,255 @@ export default function MysqlToolPage() {
 
         {activeTab === 'demo' && (
           <div className="demo-section">
-            <h2>EXPLAIN 执行计划分析</h2>
-            <ExplainDemo />
+            <h2>连接与状态</h2>
+            <div className="code-block">
+              <pre>{`-- 连接数据库
+mysql -h 127.0.0.1 -P 3306 -u root -p
+mysql -u root -p database_name
 
-            <h2>索引效果对比</h2>
-            <IndexCompareDemo />
+-- 查看状态
+SHOW STATUS;                    -- 查看服务器状态
+SHOW PROCESSLIST;               -- 查看当前连接
+SHOW VARIABLES LIKE 'max_connections';  -- 查看配置变量
+SELECT VERSION();               -- 查看版本
+SELECT NOW();                   -- 当前时间
+
+-- 查看连接数
+SHOW STATUS LIKE 'Threads_connected';
+SHOW STATUS LIKE 'Max_used_connections';`}</pre>
+            </div>
+
+            <h2>数据库与表操作</h2>
+            <div className="code-block">
+              <pre>{`-- 数据库操作
+CREATE DATABASE db_name CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DROP DATABASE db_name;
+SHOW DATABASES;
+USE db_name;
+
+-- 表操作
+SHOW TABLES;
+DESCRIBE table_name;            -- 查看表结构
+SHOW CREATE TABLE table_name;   -- 查看建表语句
+
+-- 创建表
+CREATE TABLE users (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE,
+    age INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_name (name),
+    INDEX idx_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 修改表
+ALTER TABLE users ADD COLUMN phone VARCHAR(20);
+ALTER TABLE users DROP COLUMN phone;
+ALTER TABLE users MODIFY COLUMN name VARCHAR(200);
+ALTER TABLE users ADD INDEX idx_age (age);
+ALTER TABLE users DROP INDEX idx_age;
+
+-- 清空表（保留结构）
+TRUNCATE TABLE users;           -- 更快，重置AUTO_INCREMENT
+DELETE FROM users;              -- 可带WHERE，记录日志`}</pre>
+            </div>
+
+            <h2>数据操作 (CRUD)</h2>
+            <div className="code-block">
+              <pre>{`-- 插入
+INSERT INTO users (name, email, age) VALUES ('张三', 'zhangsan@example.com', 25);
+INSERT INTO users (name, email) VALUES ('李四', 'lisi@example.com'), ('王五', 'wangwu@example.com');
+INSERT INTO users SET name='赵六', email='zhaoliu@example.com';
+
+-- 查询
+SELECT * FROM users;
+SELECT id, name FROM users WHERE age > 20 ORDER BY created_at DESC LIMIT 10;
+SELECT DISTINCT age FROM users;
+SELECT COUNT(*) FROM users;
+SELECT age, COUNT(*) as cnt FROM users GROUP BY age HAVING cnt > 1;
+
+-- 更新
+UPDATE users SET age = 26, updated_at = NOW() WHERE id = 1;
+UPDATE users SET age = age + 1 WHERE age < 30;
+
+-- 删除
+DELETE FROM users WHERE id = 1;
+DELETE FROM users WHERE created_at < '2024-01-01' LIMIT 1000;`}</pre>
+            </div>
+
+            <h2>索引操作</h2>
+            <div className="code-block">
+              <pre>{`-- 创建索引
+CREATE INDEX idx_name ON users(name);
+CREATE UNIQUE INDEX idx_email ON users(email);
+CREATE INDEX idx_name_age ON users(name, age);  -- 复合索引
+CREATE FULLTEXT INDEX idx_content ON articles(title, content);  -- 全文索引
+
+-- 删除索引
+DROP INDEX idx_name ON users;
+ALTER TABLE users DROP INDEX idx_name;
+
+-- 查看索引
+SHOW INDEX FROM users;
+
+-- 强制使用索引
+SELECT * FROM users FORCE INDEX(idx_name) WHERE name = '张三';
+
+-- 分析索引使用情况
+EXPLAIN SELECT * FROM users WHERE name = '张三';
+EXPLAIN ANALYZE SELECT * FROM users WHERE age > 20;`}</pre>
+            </div>
+
+            <h2>查询优化</h2>
+            <div className="code-block">
+              <pre>{`-- EXPLAIN 分析
+EXPLAIN SELECT * FROM users WHERE name = '张三';
+-- type: ALL(全表扫描) < index < range < ref < eq_ref < const(最优)
+
+-- 查看执行时间
+SET profiling = 1;
+SELECT * FROM users WHERE name = '张三';
+SHOW PROFILES;
+
+-- 分析慢查询
+SHOW VARIABLES LIKE 'slow_query_log';
+SHOW VARIABLES LIKE 'long_query_time';
+SET GLOBAL slow_query_log = ON;
+SET GLOBAL long_query_time = 1;  -- 超过1秒记录
+
+-- 查看表统计信息
+ANALYZE TABLE users;
+SHOW TABLE STATUS LIKE 'users';`}</pre>
+            </div>
+
+            <h2>用户与权限</h2>
+            <div className="code-block">
+              <pre>{`-- 创建用户
+CREATE USER 'app_user'@'%' IDENTIFIED BY 'password123';
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'password';
+
+-- 授权
+GRANT ALL PRIVILEGES ON db_name.* TO 'app_user'@'%';
+GRANT SELECT, INSERT, UPDATE ON db_name.users TO 'app_user'@'%';
+GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
+
+-- 撤销权限
+REVOKE INSERT ON db_name.* FROM 'app_user'@'%';
+
+-- 查看权限
+SHOW GRANTS FOR 'app_user'@'%';
+
+-- 刷新权限
+FLUSH PRIVILEGES;
+
+-- 修改密码
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
+SET PASSWORD FOR 'app_user'@'%' = PASSWORD('new_password');
+
+-- 删除用户
+DROP USER 'app_user'@'%';`}</pre>
+            </div>
+
+            <h2>备份与恢复</h2>
+            <div className="code-block">
+              <pre>{`-- mysqldump 备份
+mysqldump -u root -p db_name > backup.sql
+mysqldump -u root -p db_name table1 table2 > tables.sql
+mysqldump -u root -p --all-databases > all_databases.sql
+mysqldump -u root -p --single-transaction --routines --triggers db_name > backup.sql
+
+-- 恢复
+mysql -u root -p db_name < backup.sql
+
+-- 导出 CSV
+SELECT * FROM users INTO OUTFILE '/tmp/users.csv'
+FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+LINES TERMINATED BY '\\n';
+
+-- 导入 CSV
+LOAD DATA INFILE '/tmp/users.csv' INTO TABLE users
+FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+LINES TERMINATED BY '\\n';`}</pre>
+            </div>
+
+            <h2>主从复制</h2>
+            <div className="code-block">
+              <pre>{`-- Master 配置
+SHOW MASTER STATUS;
+-- 记录 File 和 Position
+
+-- 创建复制用户
+CREATE USER 'repl'@'%' IDENTIFIED BY 'password';
+GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
+
+-- Slave 配置
+CHANGE MASTER TO
+    MASTER_HOST='master_ip',
+    MASTER_USER='repl',
+    MASTER_PASSWORD='password',
+    MASTER_LOG_FILE='mysql-bin.000001',
+    MASTER_LOG_POS=154;
+
+START SLAVE;
+STOP SLAVE;
+SHOW SLAVE STATUS\\G
+
+-- 查看复制延迟
+SHOW SLAVE STATUS\\G  -- 查看 Seconds_Behind_Master`}</pre>
+            </div>
+
+            <h2>性能监控</h2>
+            <div className="code-block">
+              <pre>{`-- 查看InnoDB状态
+SHOW ENGINE INNODB STATUS;
+
+-- 查看锁等待
+SELECT * FROM information_schema.INNODB_LOCKS;
+SELECT * FROM information_schema.INNODB_LOCK_WAITS;
+
+-- 查看事务
+SELECT * FROM information_schema.INNODB_TRX;
+
+-- 查看缓冲池状态
+SHOW STATUS LIKE 'Innodb_buffer_pool%';
+
+-- 查看表大小
+SELECT
+    table_name,
+    ROUND(data_length/1024/1024, 2) AS data_mb,
+    ROUND(index_length/1024/1024, 2) AS index_mb,
+    table_rows
+FROM information_schema.tables
+WHERE table_schema = 'db_name'
+ORDER BY data_length DESC;`}</pre>
+            </div>
+
+            <h2>常用运维命令</h2>
+            <div className="code-block">
+              <pre>{`-- 优化表（重建表、更新统计信息）
+OPTIMIZE TABLE users;
+
+-- 修复表
+REPAIR TABLE users;
+
+-- 检查表
+CHECK TABLE users;
+
+-- 批量kill连接
+SELECT CONCAT('KILL ', id, ';') FROM information_schema.processlist
+WHERE user = 'app_user' AND time > 60;
+
+-- 查看表碎片
+SELECT table_name,
+    data_free/1024/1024 AS fragment_mb
+FROM information_schema.tables
+WHERE data_free > 0;
+
+-- 重置自增ID
+ALTER TABLE users AUTO_INCREMENT = 1;`}</pre>
+            </div>
           </div>
         )}
 
@@ -143,7 +387,7 @@ import (
 )
 
 func main() {
-    db, err := sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/dbname")
+    db, err := sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/dbname?parseTime=true")
     if err != nil {
         panic(err)
     }
@@ -217,107 +461,6 @@ tx.Commit()`}</pre>
             </div>
           </div>
         )}
-      </div>
-    </div>
-  )
-}
-
-function ExplainDemo() {
-  const [query, setQuery] = useState('SELECT * FROM users WHERE name = "张三"')
-  const [result, setResult] = useState<string[]>([])
-
-  const analyze = () => {
-    // 模拟 EXPLAIN 结果
-    const results = [
-      'id: 1',
-      'select_type: SIMPLE',
-      'table: users',
-      'type: ALL (全表扫描)',
-      'possible_keys: NULL',
-      'key: NULL (未使用索引)',
-      'rows: 10000',
-      'Extra: Using where',
-      '',
-      '⚠️ 优化建议:',
-      '- type=ALL 表示全表扫描，考虑添加索引',
-      '- 查询扫描了 10000 行，效率较低',
-      '- 建议在 name 字段添加索引: CREATE INDEX idx_name ON users(name)'
-    ]
-    setResult(results)
-  }
-
-  return (
-    <div className="explain-demo">
-      <div className="query-input">
-        <label>SQL 查询:</label>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-        />
-      </div>
-      <button onClick={analyze} style={{ marginTop: '12px' }}>EXPLAIN 分析</button>
-      {result.length > 0 && (
-        <div className="result-box" style={{ marginTop: '12px' }}>
-          <pre style={{ margin: 0, fontSize: '13px' }}>{result.join('\n')}</pre>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function IndexCompareDemo() {
-  const [withIndex, setWithIndex] = useState(false)
-
-  return (
-    <div className="index-demo">
-      <div className="index-toggle">
-        <button
-          className={withIndex ? '' : 'active'}
-          onClick={() => setWithIndex(false)}
-          style={{ marginRight: '8px', padding: '8px 16px' }}
-        >
-          无索引
-        </button>
-        <button
-          className={withIndex ? 'active' : ''}
-          onClick={() => setWithIndex(true)}
-          style={{ padding: '8px 16px' }}
-        >
-          有索引
-        </button>
-      </div>
-
-      <div className="compare-visual" style={{ marginTop: '16px' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-          <span style={{ width: '80px', flexShrink: 0 }}>扫描行数:</span>
-          <div style={{ flex: '1 1 100px', height: '24px', background: '#f0f0f0', borderRadius: '4px', overflow: 'hidden', minWidth: '100px' }}>
-            <div
-              style={{
-                width: withIndex ? '5%' : '100%',
-                height: '100%',
-                background: withIndex ? '#4caf50' : '#ff9800',
-                transition: 'width 0.3s'
-              }}
-            />
-          </div>
-          <span style={{ width: '60px', flexShrink: 0 }}>{withIndex ? '50' : '10000'}</span>
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px' }}>
-          <span style={{ width: '80px', flexShrink: 0 }}>查询时间:</span>
-          <div style={{ flex: '1 1 100px', height: '24px', background: '#f0f0f0', borderRadius: '4px', overflow: 'hidden', minWidth: '100px' }}>
-            <div
-              style={{
-                width: withIndex ? '10%' : '100%',
-                height: '100%',
-                background: withIndex ? '#4caf50' : '#ff9800',
-                transition: 'width 0.3s'
-              }}
-            />
-          </div>
-          <span style={{ width: '60px', flexShrink: 0 }}>{withIndex ? '2ms' : '50ms'}</span>
-        </div>
       </div>
     </div>
   )

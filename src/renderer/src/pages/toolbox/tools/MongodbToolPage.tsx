@@ -12,7 +12,7 @@ export default function MongodbToolPage() {
       </div>
 
       <div className="tool-tabs">
-        <button className={activeTab === 'demo' ? 'active' : ''} onClick={() => setActiveTab('demo')}>交互演示</button>
+        <button className={activeTab === 'demo' ? 'active' : ''} onClick={() => setActiveTab('demo')}>常用命令</button>
         <button className={activeTab === 'concept' ? 'active' : ''} onClick={() => setActiveTab('concept')}>概念详解</button>
         <button className={activeTab === 'code' ? 'active' : ''} onClick={() => setActiveTab('code')}>代码示例</button>
       </div>
@@ -108,8 +108,316 @@ export default function MongodbToolPage() {
 
         {activeTab === 'demo' && (
           <div className="demo-section">
-            <h2>聚合管道演示</h2>
-            <AggregationDemo />
+            <h2>连接与状态</h2>
+            <div className="code-block">
+              <pre>{`-- 连接数据库
+mongosh "mongodb://localhost:27017"
+mongosh "mongodb://user:pass@localhost:27017/dbname"
+mongosh "mongodb+srv://cluster.example.com/dbname" --username user
+
+-- 查看状态
+db.version()
+db.stats()
+db.serverStatus()
+db.hostInfo()
+
+-- 切换数据库
+use dbname                    -- 不存在则创建
+show dbs                      -- 列出数据库
+db.getName()                  -- 当前数据库
+
+-- 查看集合
+show collections
+db.getCollectionNames()`}</pre>
+            </div>
+
+            <h2>集合与文档操作</h2>
+            <div className="code-block">
+              <pre>{`-- 创建集合
+db.createCollection("users")
+db.createCollection("logs", { capped: true, size: 10000000 })  -- 固定大小
+
+-- 删除集合
+db.users.drop()
+
+-- 插入文档
+db.users.insertOne({ name: "张三", age: 25, email: "zhangsan@example.com" })
+db.users.insertMany([
+    { name: "李四", age: 30 },
+    { name: "王五", age: 28 }
+])
+
+-- 查询文档
+db.users.find()
+db.users.findOne({ name: "张三" })
+db.users.find({ age: { $gt: 25 } })
+db.users.find({ name: "张三" }, { name: 1, age: 1, _id: 0 })  -- 投影
+
+-- 更新文档
+db.users.updateOne({ name: "张三" }, { $set: { age: 26 } })
+db.users.updateMany({ age: { $lt: 30 } }, { $inc: { age: 1 } })
+db.users.replaceOne({ name: "张三" }, { name: "张三", age: 30 })
+
+-- 删除文档
+db.users.deleteOne({ name: "张三" })
+db.users.deleteMany({ age: { $lt: 20 } })
+db.users.deleteMany({})        -- 删除所有`}</pre>
+            </div>
+
+            <h2>查询操作符</h2>
+            <div className="code-block">
+              <pre>{`-- 比较操作符
+db.users.find({ age: { $eq: 25 } })      -- 等于
+db.users.find({ age: { $ne: 25 } })      -- 不等于
+db.users.find({ age: { $gt: 25 } })      -- 大于
+db.users.find({ age: { $gte: 25 } })     -- 大于等于
+db.users.find({ age: { $lt: 30 } })      -- 小于
+db.users.find({ age: { $lte: 30 } })     -- 小于等于
+db.users.find({ age: { $in: [25, 30, 35] } })  -- 在列表中
+db.users.find({ age: { $nin: [25, 30] } })     -- 不在列表中
+
+-- 逻辑操作符
+db.users.find({ $and: [{ age: { $gt: 20 } }, { age: { $lt: 30 } }] })
+db.users.find({ $or: [{ age: 25 }, { age: 30 }] })
+db.users.find({ age: { $not: { $gt: 30 } } })
+db.users.find({ age: { $nor: [25, 30] } })
+
+-- 元素操作符
+db.users.find({ email: { $exists: true } })    -- 字段存在
+db.users.find({ age: { $type: "int" } })       -- 类型匹配
+
+-- 数组操作符
+db.users.find({ tags: "dev" })                 -- 数组包含元素
+db.users.find({ tags: { $all: ["dev", "go"] } })  -- 包含所有
+db.users.find({ tags: { $size: 3 } })          -- 数组长度
+db.users.find({ tags: { $elemMatch: { $gt: 5 } } })  -- 元素匹配`}</pre>
+            </div>
+
+            <h2>更新操作符</h2>
+            <div className="code-block">
+              <pre>{`-- 字段更新
+db.users.updateOne({ _id: 1 }, { $set: { name: "新名字" } })      -- 设置字段
+db.users.updateOne({ _id: 1 }, { $unset: { email: "" } })        -- 删除字段
+db.users.updateOne({ _id: 1 }, { $rename: { name: "username" } }) -- 重命名字段
+db.users.updateOne({ _id: 1 }, { $inc: { age: 1 } })             -- 数值增加
+db.users.updateOne({ _id: 1 }, { $mul: { price: 1.1 } })         -- 数值乘法
+
+-- 数组更新
+db.users.updateOne({ _id: 1 }, { $push: { tags: "new" } })       -- 添加元素
+db.users.updateOne({ _id: 1 }, { $push: { tags: { $each: ["a", "b"] } } })  -- 批量添加
+db.users.updateOne({ _id: 1 }, { $pull: { tags: "old" } })       -- 删除元素
+db.users.updateOne({ _id: 1 }, { $pullAll: { tags: ["a", "b"] } })  -- 批量删除
+db.users.updateOne({ _id: 1 }, { $addToSet: { tags: "unique" } }) -- 添加不重复元素
+db.users.updateOne({ _id: 1 }, { $pop: { tags: 1 } })            -- 删除最后一个
+db.users.updateOne({ _id: 1 }, { $pop: { tags: -1 } })           -- 删除第一个
+
+-- 位运算
+db.users.updateOne({ _id: 1 }, { $bit: { flags: { and: 5 } } })`}</pre>
+            </div>
+
+            <h2>聚合管道</h2>
+            <div className="code-block">
+              <pre>{`-- 基本聚合
+db.orders.aggregate([
+    { $match: { status: "completed" } },
+    { $group: { _id: "$customerId", total: { $sum: "$amount" } } },
+    { $sort: { total: -1 } },
+    { $limit: 10 }
+])
+
+-- 常用阶段
+{ $project: { name: 1, age: 1, _id: 0 } }    -- 字段投影
+{ $match: { age: { $gt: 20 } } }              -- 过滤
+{ $group: { _id: "$category", count: { $sum: 1 } } }  -- 分组
+{ $sort: { age: -1 } }                        -- 排序
+{ $skip: 10 }                                 -- 跳过
+{ $limit: 10 }                                -- 限制
+{ $unwind: "$tags" }                          -- 展开数组
+{ $lookup: {                                  -- 关联查询
+    from: "orders",
+    localField: "_id",
+    foreignField: "userId",
+    as: "orders"
+}}
+
+-- 聚合函数
+{ $sum: 1 }                    -- 计数
+{ $sum: "$amount" }            -- 求和
+{ $avg: "$age" }               -- 平均值
+{ $min: "$age" }               -- 最小值
+{ $max: "$age" }               -- 最大值
+{ $first: "$name" }            -- 第一个
+{ $last: "$name" }             -- 最后一个
+{ $push: "$name" }             -- 推入数组
+{ $addToSet: "$name" }         -- 推入不重复数组`}</pre>
+            </div>
+
+            <h2>索引操作</h2>
+            <div className="code-block">
+              <pre>{`-- 创建索引
+db.users.createIndex({ name: 1 })                    -- 升序索引
+db.users.createIndex({ name: 1, age: -1 })           -- 复合索引
+db.users.createIndex({ email: 1 }, { unique: true }) -- 唯一索引
+db.users.createIndex({ location: "2dsphere" })       -- 地理空间索引
+db.users.createIndex({ content: "text" })            -- 全文索引
+db.users.createIndex({ name: 1 }, { background: true })  -- 后台创建
+
+-- 查看索引
+db.users.getIndexes()
+
+-- 删除索引
+db.users.dropIndex("name_1")
+db.users.dropIndexes()           -- 删除所有索引（除_id）
+
+-- 查看索引大小
+db.users.totalIndexSize()
+
+-- 强制使用索引
+db.users.find({ name: "张三" }).hint({ name: 1 })
+
+-- 执行计划
+db.users.find({ name: "张三" }).explain("executionStats")`}</pre>
+            </div>
+
+            <h2>用户与权限</h2>
+            <div className="code-block">
+              <pre>{`-- 创建管理员
+use admin
+db.createUser({
+    user: "admin",
+    pwd: "password123",
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+})
+
+-- 创建应用用户
+use mydb
+db.createUser({
+    user: "app_user",
+    pwd: "password",
+    roles: [ { role: "readWrite", db: "mydb" } ]
+})
+
+-- 内置角色
+read                    -- 只读
+readWrite               -- 读写
+dbAdmin                 -- 数据库管理
+userAdmin               -- 用户管理
+root                    -- 超级管理员
+
+-- 查看用户
+db.getUsers()
+show users
+
+-- 删除用户
+db.dropUser("app_user")
+
+-- 更新密码
+db.changeUserPassword("app_user", "new_password")`}</pre>
+            </div>
+
+            <h2>备份与恢复</h2>
+            <div className="code-block">
+              <pre>{`-- mongodump 备份
+mongodump --db mydb --out /backup/
+mongodump --uri="mongodb://user:pass@localhost:27017/mydb" --out /backup/
+mongodump --db mydb --collection users --out /backup/
+
+-- mongorestore 恢复
+mongorestore --db mydb /backup/mydb/
+mongorestore --drop --db mydb /backup/mydb/  -- 恢复前删除
+
+-- mongoexport 导出
+mongoexport --db mydb --collection users --out users.json
+mongoexport --db mydb --collection users --type=csv --fields name,age --out users.csv
+
+-- mongoimport 导入
+mongoimport --db mydb --collection users --file users.json
+mongoimport --db mydb --collection users --type=csv --headerline --file users.csv`}</pre>
+            </div>
+
+            <h2>副本集管理</h2>
+            <div className="code-block">
+              <pre>{`-- 初始化副本集
+rs.initiate({
+    _id: "rs0",
+    members: [
+        { _id: 0, host: "mongo1:27017" },
+        { _id: 1, host: "mongo2:27017" },
+        { _id: 2, host: "mongo3:27017" }
+    ]
+})
+
+-- 查看状态
+rs.status()
+rs.conf()
+
+-- 添加/删除成员
+rs.add("mongo4:27017")
+rs.remove("mongo4:27017")
+
+-- 添加仲裁节点
+rs.addArb("arbiter:27017")
+
+-- 查看复制延迟
+rs.printSlaveReplicationInfo()
+
+-- 切换主节点
+rs.stepDown()`}</pre>
+            </div>
+
+            <h2>性能监控</h2>
+            <div className="code-block">
+              <pre>{`-- 慢查询日志
+db.setProfilingLevel(1, 50)    -- 记录超过50ms的查询
+db.system.profile.find().sort({ ts: -1 }).limit(10)
+
+-- 当前操作
+db.currentOp()
+db.currentOp({ "secs_running": { $gt: 5 } })  -- 运行超过5秒
+
+-- 终止操作
+db.killOp(opId)
+
+-- 集合统计
+db.users.stats()
+db.users.dataSize()
+db.users.storageSize()
+
+-- 服务器指标
+db.serverStatus().connections
+db.serverStatus().opcounters
+db.serverStatus().mem
+
+-- 索引使用情况
+db.users.aggregate([ { $indexStats: {} } ])`}</pre>
+            </div>
+
+            <h2>实用技巧</h2>
+            <div className="code-block">
+              <pre>{`-- 分页查询
+db.users.find().skip(100).limit(20)
+
+-- 批量更新
+var bulk = db.users.initializeUnorderedBulkOp();
+bulk.find({ age: { $lt: 30 } }).update({ $set: { category: "young" } });
+bulk.find({ age: { $gte: 30 } }).update({ $set: { category: "adult" } });
+bulk.execute();
+
+-- 查找重复
+db.users.aggregate([
+    { $group: { _id: "$email", count: { $sum: 1 } } },
+    { $match: { count: { $gt: 1 } } }
+])
+
+-- 批量删除
+db.users.deleteMany({ createdAt: { $lt: new Date("2024-01-01") } })
+
+-- 计时查询
+db.users.find({ name: "张三" }).explain("executionStats").executionStats.executionTimeMillis
+
+-- 格式化输出
+db.users.find().pretty()`}</pre>
+            </div>
           </div>
         )}
 
@@ -164,35 +472,19 @@ coll.InsertOne(context.TODO(), bson.D{
 })
 
 // 查询
-cursor, _ := coll.Find(context.TODO(), bson.M{"age": bson.M{"$gte": 20}})`}</pre>
+cursor, _ := coll.Find(context.TODO(), bson.M{"age": bson.M{"$gte": 20}})
+var results []bson.M
+cursor.All(context.TODO(), &results)
+
+// 聚合
+pipeline := mongo.Pipeline{
+    {{"$match", bson.D{{"age", bson.D{{"$gte", 20}}}}}},
+    {{"$group", bson.D{{"_id", "$city"}, {"count", bson.D{{"$sum", 1}}}}}},
+}
+cursor, _ = coll.Aggregate(context.TODO(), pipeline)`}</pre>
             </div>
           </div>
         )}
-      </div>
-    </div>
-  )
-}
-
-function AggregationDemo() {
-  const [pipeline, setPipeline] = useState(`[
-  { "$match": { "status": "active" } },
-  { "$group": { "_id": "$category", "total": { "$sum": "$amount" } } },
-  { "$sort": { "total": -1 } }
-]`)
-
-  return (
-    <div>
-      <label>聚合管道:</label>
-      <textarea value={pipeline} onChange={(e) => setPipeline(e.target.value)} style={{ width: '100%', height: '120px', fontFamily: 'monospace', marginTop: '8px' }} />
-      <div style={{ marginTop: '12px', padding: '12px', background: '#f5f5f5', borderRadius: '6px' }}>
-        <h4>阶段说明:</h4>
-        <ul style={{ fontSize: '13px' }}>
-          <li><code>$match</code> - 过滤文档，类似 WHERE</li>
-          <li><code>$group</code> - 分组聚合，类似 GROUP BY</li>
-          <li><code>$sort</code> - 排序，类似 ORDER BY</li>
-          <li><code>$project</code> - 字段投影，类似 SELECT</li>
-          <li><code>$lookup</code> - 关联查询，类似 LEFT JOIN</li>
-        </ul>
       </div>
     </div>
   )

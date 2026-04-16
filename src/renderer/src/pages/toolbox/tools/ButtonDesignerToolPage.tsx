@@ -299,6 +299,15 @@ ${hoverCss}
                 </select>
               </div>
             </div>
+
+            <h2>生成的 CSS 代码</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: '13px', color: '#666' }}>实时更新</span>
+              <button onClick={() => onCopy(generateCss())} style={{ padding: '4px 12px', fontSize: '12px', background: '#e0e0e0', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>复制 CSS</button>
+            </div>
+            <pre style={{ background: '#1e1e1e', color: '#d4d4d4', padding: '12px', borderRadius: '6px', fontSize: '13px', overflow: 'auto', maxHeight: '300px' }}>
+              {generateCss()}
+            </pre>
           </div>
         )}
 

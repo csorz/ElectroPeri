@@ -4,6 +4,8 @@ import type { SerialPortDevice } from '../../store/deviceStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
 import '../toolbox/tools/ToolPage.css'
 
+const baudRateOptions = [9600, 19200, 38400, 57600, 115200]
+
 export default function SerialPage() {
   return (
     <ElectronOnly>
@@ -222,7 +224,6 @@ public class SerialExample {
   )
 }
 
-// 串口演示组件
 function SerialDemo() {
   const {
     serialPorts,
@@ -312,11 +313,9 @@ function SerialDemo() {
           disabled={serialStatus === 'connected'}
           style={{ padding: '8px 12px', borderRadius: 4, border: '1px solid #ddd' }}
         >
-          <option value={9600}>9600</option>
-          <option value={19200}>19200</option>
-          <option value={38400}>38400</option>
-          <option value={57600}>57600</option>
-          <option value={115200}>115200</option>
+          {baudRateOptions.map(rate => (
+            <option key={rate} value={rate}>{rate}</option>
+          ))}
         </select>
         <button
           onClick={handleScan}
@@ -328,8 +327,8 @@ function SerialDemo() {
       </div>
 
       {serialError && (
-        <div style={{ padding: 12, background: '#ffebee', borderRadius: 6, marginBottom: 16, color: '#c62828' }}>
-          {serialError}
+        <div style={{ marginBottom: 16, padding: 16, background: '#fff5f5', borderRadius: 8, border: '1px solid #ffcdd2' }}>
+          <div style={{ fontWeight: 500, color: '#c62828' }}>⚠️ {serialError.split('。')[0]}</div>
         </div>
       )}
 

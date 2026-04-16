@@ -471,24 +471,40 @@ function VoiceSynthesisDemo() {
 
   return (
     <div className="voice-demo">
-      <div className="voice-input">
-        <label>输入文本</label>
+      <div className="voice-preview">
+        <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>输入文本</label>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="输入要朗读的文字..."
           rows={4}
+          style={{
+            width: '100%',
+            padding: '12px',
+            border: '1px solid #ddd',
+            borderRadius: '6px',
+            fontSize: '14px',
+            resize: 'vertical'
+          }}
         />
       </div>
 
-      <div className="preset-buttons">
-        <label>快捷文本</label>
-        <div className="button-group">
+      <div style={{ marginTop: 16 }}>
+        <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>快捷文本</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {presetTexts.map((preset, index) => (
             <button
               key={index}
-              className="preset-btn"
               onClick={() => setText(preset)}
+              style={{
+                padding: '6px 12px',
+                background: '#e3f2fd',
+                color: '#1976d2',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
             >
               {preset.length > 15 ? preset.substring(0, 15) + '...' : preset}
             </button>
@@ -496,10 +512,9 @@ function VoiceSynthesisDemo() {
         </div>
       </div>
 
-      <div className="voice-settings">
-        <h4>语音设置</h4>
-
-        <div className="setting-row">
+      <h3 style={{ marginTop: 20, marginBottom: 12 }}>语音设置</h3>
+      <div className="voice-config">
+        <div className="config-item">
           <label>语音</label>
           <select
             value={selectedVoice}
@@ -512,8 +527,7 @@ function VoiceSynthesisDemo() {
             ))}
           </select>
         </div>
-
-        <div className="setting-row">
+        <div className="config-item">
           <label>语速: {rate.toFixed(1)}x</label>
           <input
             type="range"
@@ -524,8 +538,7 @@ function VoiceSynthesisDemo() {
             onChange={(e) => setRate(parseFloat(e.target.value))}
           />
         </div>
-
-        <div className="setting-row">
+        <div className="config-item">
           <label>音调: {pitch.toFixed(1)}</label>
           <input
             type="range"
@@ -536,8 +549,7 @@ function VoiceSynthesisDemo() {
             onChange={(e) => setPitch(parseFloat(e.target.value))}
           />
         </div>
-
-        <div className="setting-row">
+        <div className="config-item">
           <label>音量: {Math.round(volume * 100)}%</label>
           <input
             type="range"
@@ -550,20 +562,19 @@ function VoiceSynthesisDemo() {
         </div>
       </div>
 
-      <div className="demo-controls">
+      <div className="demo-controls" style={{ marginTop: 16 }}>
         <button
-          className="play-btn"
           onClick={handleSpeak}
           disabled={speaking || !text.trim()}
         >
           {speaking ? '播放中...' : '播放'}
         </button>
-        <button className="control-btn" onClick={handlePause}>暂停</button>
-        <button className="control-btn" onClick={handleResume}>继续</button>
-        <button className="control-btn" onClick={handleStop}>停止</button>
+        <button onClick={handlePause} style={{ background: '#e0e0e0', color: '#333' }}>暂停</button>
+        <button onClick={handleResume} style={{ background: '#e0e0e0', color: '#333' }}>继续</button>
+        <button onClick={handleStop} style={{ background: '#e0e0e0', color: '#333' }}>停止</button>
       </div>
 
-      <div className="usage-tips">
+      <div className="usage-tips" style={{ marginTop: 20 }}>
         <h4>使用说明</h4>
         <ul>
           <li>不同浏览器支持的语音可能不同</li>
