@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDeviceStore } from '../../store/deviceStore'
 import type { BluetoothDevice } from '../../store/deviceStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
@@ -288,9 +288,33 @@ function BluetoothDemo() {
   const [selectedDevice, setSelectedDevice] = useState<BluetoothDevice | null>(null)
   const [message, setMessage] = useState('')
   const [serviceUuid, setServiceUuid] = useState('')
+  const [moduleAvailable, setModuleAvailable] = useState<boolean | null>(null)
+  const [moduleError, setModuleError] = useState<string | null>(null)
+  const [dataCleanup, setDataCleanup] = useState<(() => void) | null>(null)
+
+  // 检查蓝牙模块是否可用
+  useEffect(() => {
+    const checkModule = async () => {
+      try {
+        const result = await window.api.bluetooth.check()
+        setModuleAvailable(result.available)
+        if (!result.available && result.error) {
+          setModuleError(result.error)
+        }
+      } catch {
+        setModuleAvailable(false)
+        setModuleError('无法检查蓝牙模块状态')
+      }
+    }
+    checkModule()
+  }, [])
 
   // 扫描蓝牙设备
   const handleScan = async () => {
+    if (!moduleAvailable) {
+      setBluetoothError(moduleError || '蓝牙模块不可用')
+      return
+    }
     setBluetoothStatus('scanning')
     setBluetoothError(null)
     try {
@@ -323,9 +347,10 @@ function BluetoothDemo() {
       setBluetoothStatus('connected')
 
       // 监听数据
-      window.api.bluetooth.onData((data: string) => {
+      const cleanup = window.api.bluetooth.onData((data: string) => {
         setBluetoothData(data)
       })
+      setDataCleanup(() => cleanup)
     } catch (err) {
       setBluetoothError(err instanceof Error ? err.message : '连接失败')
       setBluetoothStatus('error')
@@ -335,6 +360,8 @@ function BluetoothDemo() {
   // 断开连接
   const handleDisconnect = async () => {
     try {
+      dataCleanup?.()
+      setDataCleanup(null)
       await window.api.bluetooth.disconnect()
       setSelectedDevice(null)
       setBluetoothStatus('idle')
@@ -388,6 +415,17 @@ function BluetoothDemo() {
     <div className="connection-demo">
       <h3>设备连接</h3>
 
+      {/* 模块不可用警告 */}
+      {moduleAvailable === false && (
+        <div style={{ marginBottom: 16, padding: 16, background: '#fff3e0', borderRadius: 8, border: '1px solid #ffcc80' }}>
+          <div style={{ fontWeight: 500, color: '#e65100', marginBottom: 8 }}>⚠️ 蓝牙模块不可用</div>
+          <div style={{ fontSize: 13, color: '#666' }}>{moduleError}</div>
+          <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>
+            请使用 Web Bluetooth 页面，或安装 Visual Studio Build Tools 后运行: pnpm rebuild @abandonware/noble
+          </div>
+        </div>
+      )}
+
       <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
         {bluetoothStatus === 'scanning' ? (
           <button
@@ -399,8 +437,8 @@ function BluetoothDemo() {
         ) : (
           <button
             onClick={handleScan}
-            disabled={bluetoothStatus === 'connected'}
-            style={{ padding: '8px 16px', background: '#4fc3f7', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+            disabled={bluetoothStatus === 'connected' || moduleAvailable === false}
+            style={{ padding: '8px 16px', background: moduleAvailable === false ? '#ccc' : '#4fc3f7', color: '#fff', border: 'none', borderRadius: 4, cursor: moduleAvailable === false ? 'not-allowed' : 'pointer' }}
           >
             扫描设备
           </button>

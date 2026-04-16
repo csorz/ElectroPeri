@@ -10,40 +10,78 @@ type BluetoothDeviceInfo = {
   services?: string[]
 }
 
-let noble: any | null = null
+let noble: any = null
 let mainWindow: BrowserWindow | null = null
 
 let scanning = false
 const peripherals = new Map<string, any>()
 
-let currentPeripheral: any | null = null
-let currentWriteChar: any | null = null
-let currentNotifyChar: any | null = null
+let currentPeripheral: any = null
+let currentWriteChar: any = null
+let currentNotifyChar: any = null
 
-async function ensureNoble() {
-  if (noble) return noble
+let bluetoothAvailable = false
+let bluetoothModuleError: string | null = null
+
+async function ensureNoble(): Promise<any> {
+  if (bluetoothAvailable && noble) return noble
+  if (bluetoothModuleError) throw new Error(bluetoothModuleError)
+
   try {
     const mod: any = await import('@abandonware/noble')
     noble = mod.default ?? mod
+    bluetoothAvailable = true
     return noble
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error)
-    if (errMsg.includes('Could not locate the bindings file') || errMsg.includes('Module version mismatch')) {
-      throw new Error(
-        '蓝牙模块未正确编译。请运行: pnpm electron-builder install-app-deps 或 pnpm rebuild @abandonware/noble'
-      )
+    if (
+      errMsg.includes('Could not locate the bindings file') ||
+      errMsg.includes('Module version mismatch') ||
+      errMsg.includes('Cannot find module')
+    ) {
+      bluetoothModuleError =
+        '蓝牙模块未安装或编译失败。Windows需要安装 Visual Studio Build Tools 后运行: pnpm rebuild @abandonware/noble'
+    } else {
+      bluetoothModuleError = `蓝牙模块加载失败: ${errMsg}`
     }
-    throw new Error(`蓝牙模块加载失败: ${errMsg}`)
+    throw new Error(bluetoothModuleError)
   }
 }
 
-async function waitPoweredOn(n: any) {
+// 检查蓝牙模块是否可用
+async function checkBluetoothAvailable(): Promise<{ available: boolean; error?: string }> {
+  if (bluetoothAvailable) return { available: true }
+  if (bluetoothModuleError) return { available: false, error: bluetoothModuleError }
+
+  try {
+    await ensureNoble()
+    return { available: true }
+  } catch (error) {
+    return {
+      available: false,
+      error: error instanceof Error ? error.message : String(error)
+    }
+  }
+}
+
+async function waitPoweredOn(n: any): Promise<void> {
   if (n.state === 'poweredOn') return
   await new Promise<void>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error(`蓝牙适配器状态超时: 当前状态 ${n.state}。请确认蓝牙已开启且适配器可用。`))
+    }, 10000)
+
     const onChange = (state: string) => {
-      if (state === 'poweredOn') resolve()
-      else if (state === 'unsupported' || state === 'unauthorized') {
-        reject(new Error(`Bluetooth state: ${state}`))
+      if (state === 'poweredOn') {
+        clearTimeout(timeout)
+        resolve()
+      } else if (state === 'unsupported' || state === 'unauthorized') {
+        clearTimeout(timeout)
+        reject(
+          new Error(
+            `蓝牙状态: ${state}。${state === 'unsupported' ? '蓝牙适配器不受支持' : '蓝牙未授权，请在系统设置中开启蓝牙'}`
+          )
+        )
       }
     }
     n.once('stateChange', onChange)
@@ -51,6 +89,11 @@ async function waitPoweredOn(n: any) {
 }
 
 export function setupBluetoothHandlers(): void {
+  // 检查蓝牙模块状态
+  ipcMain.handle('bluetooth:check', async () => {
+    return checkBluetoothAvailable()
+  })
+
   ipcMain.handle('bluetooth:scan', async (event) => {
     const n = await ensureNoble()
     mainWindow = BrowserWindow.fromWebContents(event.sender)
@@ -60,32 +103,34 @@ export function setupBluetoothHandlers(): void {
     const results = new Map<string, any>()
 
     const onDiscover = (peripheral: any) => {
+      // Don't clear peripherals - keep them for connect
       peripherals.set(peripheral.id, peripheral)
       results.set(peripheral.id, peripheral)
     }
 
     n.on('discover', onDiscover)
     try {
-      peripherals.clear()
+      // Don't clear peripherals - connected devices may still be there
       results.clear()
 
-      n.startScanning([], true)
+      // false = allow duplicates so we get updated RSSI and don't miss devices
+      n.startScanning([], false)
       scanning = true
 
-      // 简单扫描 3 秒
-      await new Promise((r) => setTimeout(r, 3000))
+      // Scan for 5 seconds (increased from 3 for better discovery)
+      await new Promise((r) => setTimeout(r, 5000))
 
       n.stopScanning()
       scanning = false
 
       const list: BluetoothDeviceInfo[] = Array.from(results.values()).map((p: any) => ({
         id: p.id,
-        name: p.advertisement?.localName || 'BLE 设备',
+        name: p.advertisement?.localName || '',
         address: p.address || p.id,
         rssi: p.rssi,
         deviceClass: 0,
         connected: p.state === 'connected',
-        services: []
+        services: p.advertisement?.serviceUuids || []
       }))
 
       return list
@@ -110,8 +155,9 @@ export function setupBluetoothHandlers(): void {
     await waitPoweredOn(n)
 
     const peripheral = peripherals.get(deviceId)
-    if (!peripheral) throw new Error('Device not found')
+    if (!peripheral) throw new Error('设备未找到，请重新扫描')
 
+    // Disconnect previous peripheral if different
     if (currentPeripheral && currentPeripheral.id !== peripheral.id) {
       try {
         await new Promise<void>((resolve) => currentPeripheral.disconnect(() => resolve()))
@@ -124,8 +170,8 @@ export function setupBluetoothHandlers(): void {
     }
 
     await new Promise<void>((resolve, reject) => {
-      peripheral.connect((err: Error) => {
-        if (err) reject(err)
+      peripheral.connect((err: Error | null) => {
+        if (err) reject(new Error(`蓝牙连接失败: ${err.message}`))
         else resolve()
       })
     })
@@ -136,14 +182,14 @@ export function setupBluetoothHandlers(): void {
       characteristics: any[]
     }>((resolve, reject) => {
       peripheral.discoverAllServicesAndCharacteristics(
-        (err: Error, svcs: any[], chars: any[]) => {
-          if (err) reject(err)
+        (err: Error | null, svcs: any[], chars: any[]) => {
+          if (err) reject(new Error(`发现服务失败: ${err.message}`))
           else resolve({ services: svcs, characteristics: chars })
         }
       )
     })
 
-    // 选择一条可写特征 + 一条可通知特征（尽量通用）
+    // 选择可写特征 + 可通知特征
     currentWriteChar =
       characteristics.find((c) => c.properties?.includes('write')) ||
       characteristics.find((c) => c.properties?.includes('writeWithoutResponse')) ||
@@ -153,18 +199,20 @@ export function setupBluetoothHandlers(): void {
     if (currentNotifyChar) {
       currentNotifyChar.removeAllListeners('data')
       currentNotifyChar.on('data', (data: Buffer) => {
-        // 这里先按 utf8 尝试输出；如需 hex 可以在页面层切换展示
-        mainWindow?.webContents.send('bluetooth:data', data.toString('utf8'))
+        const hex = Array.from(data)
+          .map((b) => b.toString(16).padStart(2, '0'))
+          .join(' ')
+        mainWindow?.webContents.send('bluetooth:data', hex)
       })
       await new Promise<void>((resolve, reject) => {
-        currentNotifyChar.subscribe((err: Error) => {
-          if (err) reject(err)
+        currentNotifyChar.subscribe((err: Error | null) => {
+          if (err) reject(new Error(`订阅通知失败: ${err.message}`))
           else resolve()
         })
       })
     }
 
-    // 将服务列表返回给 discoverServices 复用（也可直接返回）
+    // Store service UUIDs for discoverServices
     peripheral.__services = services.map((s) => s.uuid)
 
     return { success: true }
@@ -183,15 +231,24 @@ export function setupBluetoothHandlers(): void {
   })
 
   ipcMain.handle('bluetooth:write', async (_event, data: string) => {
-    if (!currentPeripheral) throw new Error('Not connected')
-    if (!currentWriteChar) throw new Error('No writable characteristic available')
+    if (!currentPeripheral) throw new Error('未连接蓝牙设备')
+    if (!currentWriteChar) throw new Error('无可写特征可用')
 
-    const buf = Buffer.from(data, 'utf8')
-    const withoutResponse = currentWriteChar.properties?.includes('writeWithoutResponse') ?? false
+    // Support hex string input like "01 02 03" or "010203"
+    let buf: Buffer
+    if (/^[0-9a-fA-F\s]+$/.test(data) && data.trim().length > 0) {
+      const hex = data.replace(/\s/g, '')
+      buf = Buffer.from(hex, 'hex')
+    } else {
+      buf = Buffer.from(data, 'utf8')
+    }
+
+    const withoutResponse =
+      currentWriteChar.properties?.includes('writeWithoutResponse') ?? false
 
     await new Promise<void>((resolve, reject) => {
-      currentWriteChar.write(buf, withoutResponse, (err: Error) => {
-        if (err) reject(err)
+      currentWriteChar.write(buf, withoutResponse, (err: Error | null) => {
+        if (err) reject(new Error(`写入失败: ${err.message}`))
         else resolve()
       })
     })
@@ -199,13 +256,23 @@ export function setupBluetoothHandlers(): void {
     return { success: true }
   })
 
-  ipcMain.handle('bluetooth:discoverServices', async () => {
+  ipcMain.handle('bluetooth:discoverServices', async (_event, serviceUuid?: string) => {
     if (!currentPeripheral) return []
-    if (Array.isArray(currentPeripheral.__services)) return currentPeripheral.__services
+
+    // If we already discovered services during connect, return them
+    if (Array.isArray(currentPeripheral.__services)) {
+      if (serviceUuid) {
+        return currentPeripheral.__services.filter((u: string) =>
+          u.includes(serviceUuid.toLowerCase())
+        )
+      }
+      return currentPeripheral.__services
+    }
 
     const services = await new Promise<any[]>((resolve, reject) => {
-      currentPeripheral.discoverServices([], (err: Error, svcs: any[]) => {
-        if (err) reject(err)
+      const uuids = serviceUuid ? [serviceUuid] : []
+      currentPeripheral.discoverServices(uuids, (err: Error | null, svcs: any[]) => {
+        if (err) reject(new Error(`发现服务失败: ${err.message}`))
         else resolve(svcs)
       })
     })

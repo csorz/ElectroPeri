@@ -266,23 +266,52 @@ function HidDemo() {
   const [log, setLog] = useState('')
   const [message, setMessage] = useState('')
   const [reportId, setReportId] = useState(0)
+  const [moduleAvailable, setModuleAvailable] = useState<boolean | null>(null)
+  const [moduleError, setModuleError] = useState<string | null>(null)
 
   const appendLog = (line: string) => setLog((prev) => prev + line + '\n')
 
+  // 检查HID模块是否可用
   useEffect(() => {
-    window.api.hid.onData((data: string) => appendLog(`RX: ${data}`))
-    window.api.hid.onError((err: string) => setError(err))
-    window.api.hid.onClosed(() => {
+    const checkModule = async () => {
+      try {
+        const result = await window.api.hid.check()
+        setModuleAvailable(result.available)
+        if (!result.available && result.error) {
+          setModuleError(result.error)
+        }
+      } catch {
+        setModuleAvailable(false)
+        setModuleError('无法检查HID模块状态')
+      }
+    }
+    checkModule()
+  }, [])
+
+  useEffect(() => {
+    if (!moduleAvailable) return
+    const cleanupData = window.api.hid.onData((data: string) => appendLog(`RX: ${data}`))
+    const cleanupError = window.api.hid.onError((err: string) => setError(err))
+    const cleanupClosed = window.api.hid.onClosed(() => {
       appendLog('设备已关闭')
       setSelected(null)
       setStatus('idle')
     })
+    return () => {
+      cleanupData()
+      cleanupError()
+      cleanupClosed()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [moduleAvailable])
 
   const formatId = (id: number) => `0x${id.toString(16).toUpperCase().padStart(4, '0')}`
 
   const handleScan = async () => {
+    if (!moduleAvailable) {
+      setError(moduleError || 'HID模块不可用')
+      return
+    }
     setStatus('scanning')
     setError(null)
     try {
@@ -340,11 +369,22 @@ function HidDemo() {
     <div className="connection-demo">
       <h3>设备连接</h3>
 
+      {/* 模块不可用警告 */}
+      {moduleAvailable === false && (
+        <div style={{ marginBottom: 16, padding: 16, background: '#fff3e0', borderRadius: 8, border: '1px solid #ffcc80' }}>
+          <div style={{ fontWeight: 500, color: '#e65100', marginBottom: 8 }}>⚠️ HID模块不可用</div>
+          <div style={{ fontSize: 13, color: '#666' }}>{moduleError}</div>
+          <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>
+            请使用 WebHID 页面，或安装 Visual Studio Build Tools 后运行: pnpm rebuild node-hid
+          </div>
+        </div>
+      )}
+
       <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
         <button
           onClick={handleScan}
-          disabled={status === 'scanning'}
-          style={{ padding: '8px 16px', background: '#4fc3f7', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+          disabled={status === 'scanning' || moduleAvailable === false}
+          style={{ padding: '8px 16px', background: moduleAvailable === false ? '#ccc' : '#4fc3f7', color: '#fff', border: 'none', borderRadius: 4, cursor: moduleAvailable === false ? 'not-allowed' : 'pointer' }}
         >
           {status === 'scanning' ? '扫描中...' : '扫描设备'}
         </button>

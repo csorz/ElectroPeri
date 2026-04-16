@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import '../toolbox/tools/ToolPage.css'
 import { usePageSnapshotStore } from '../../store/pageSnapshotStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
+import { GaugeBar, StatCard, SectionCard, InfoRow } from '../../components/dashboard'
 
 const toGB = (value = 0) => `${(value / 1024 / 1024 / 1024).toFixed(1)} GB`
 
@@ -64,24 +65,11 @@ function StoragePageContent() {
           <div className="concept-section">
             <h2>核心能力</h2>
             <div className="feature-grid">
-              <div className="feature-card">
-                <h3>磁盘信息</h3>
-                <p>获取物理磁盘的型号、类型（HDD/SSD）、容量、接口类型等</p>
-              </div>
-              <div className="feature-card">
-                <h3>分区信息</h3>
-                <p>获取磁盘分区表、分区类型、大小、挂载点等信息</p>
-              </div>
-              <div className="feature-card">
-                <h3>文件系统</h3>
-                <p>获取文件系统类型、使用量、可用空间、挂载信息</p>
-              </div>
-              <div className="feature-card">
-                <h3>块设备</h3>
-                <p>获取块设备的详细信息，包括读写速度、IO 状态</p>
-              </div>
+              <div className="feature-card"><h3>磁盘信息</h3><p>获取物理磁盘的型号、类型（HDD/SSD）、容量、接口类型等</p></div>
+              <div className="feature-card"><h3>分区信息</h3><p>获取磁盘分区表、分区类型、大小、挂载点等信息</p></div>
+              <div className="feature-card"><h3>文件系统</h3><p>获取文件系统类型、使用量、可用空间、挂载信息</p></div>
+              <div className="feature-card"><h3>块设备</h3><p>获取块设备的详细信息，包括读写速度、IO 状态</p></div>
             </div>
-
             <h2>存储层次结构</h2>
             <div className="diagram-box">
               <pre className="ascii-art">{`
@@ -110,80 +98,23 @@ function StoragePageContent() {
   +------------+  +------------+  +------------+
               `}</pre>
             </div>
-
             <h2>常见文件系统</h2>
             <table className="comparison-table">
-              <thead>
-                <tr>
-                  <th>文件系统</th>
-                  <th>平台</th>
-                  <th>最大文件</th>
-                  <th>特点</th>
-                </tr>
-              </thead>
+              <thead><tr><th>文件系统</th><th>平台</th><th>最大文件</th><th>特点</th></tr></thead>
               <tbody>
-                <tr>
-                  <td>NTFS</td>
-                  <td>Windows</td>
-                  <td>16 EB</td>
-                  <td>支持权限、加密、压缩</td>
-                </tr>
-                <tr>
-                  <td>FAT32</td>
-                  <td>跨平台</td>
-                  <td>4 GB</td>
-                  <td>兼容性好，适合 U 盘</td>
-                </tr>
-                <tr>
-                  <td>exFAT</td>
-                  <td>跨平台</td>
-                  <td>16 EB</td>
-                  <td>大文件支持，适合移动设备</td>
-                </tr>
-                <tr>
-                  <td>ext4</td>
-                  <td>Linux</td>
-                  <td>16 TB</td>
-                  <td>日志文件系统，稳定性好</td>
-                </tr>
-                <tr>
-                  <td>APFS</td>
-                  <td>macOS</td>
-                  <td>8 EB</td>
-                  <td>快照、加密、空间共享</td>
-                </tr>
+                <tr><td>NTFS</td><td>Windows</td><td>16 EB</td><td>支持权限、加密、压缩</td></tr>
+                <tr><td>FAT32</td><td>跨平台</td><td>4 GB</td><td>兼容性好，适合 U 盘</td></tr>
+                <tr><td>exFAT</td><td>跨平台</td><td>16 EB</td><td>大文件支持，适合移动设备</td></tr>
+                <tr><td>ext4</td><td>Linux</td><td>16 TB</td><td>日志文件系统，稳定性好</td></tr>
+                <tr><td>APFS</td><td>macOS</td><td>8 EB</td><td>快照、加密、空间共享</td></tr>
               </tbody>
             </table>
-
             <h2>应用场景</h2>
             <div className="scenario-grid">
-              <div className="scenario-card">
-                <h4>磁盘监控</h4>
-                <p>实时监控磁盘使用率，提前预警空间不足</p>
-              </div>
-              <div className="scenario-card">
-                <h4>容量规划</h4>
-                <p>分析磁盘使用趋势，规划扩容方案</p>
-              </div>
-              <div className="scenario-card">
-                <h4>系统诊断</h4>
-                <p>检测磁盘健康状态，预防硬件故障</p>
-              </div>
-              <div className="scenario-card">
-                <h4>资产管理</h4>
-                <p>收集服务器存储配置，生成资产报告</p>
-              </div>
-            </div>
-
-            <h2>注意事项</h2>
-            <div className="info-box warning">
-              <strong>安全提示</strong>
-              <ul>
-                <li><strong>权限要求</strong> - 某些信息需要管理员权限才能获取</li>
-                <li><strong>性能影响</strong> - 频繁查询可能影响系统性能</li>
-                <li><strong>隐私考虑</strong> - 磁盘信息可能包含敏感数据</li>
-                <li><strong>跨平台差异</strong> - 不同操作系统返回的信息字段可能不同</li>
-              </ul>
+              <div className="scenario-card"><h4>磁盘监控</h4><p>实时监控磁盘使用率，提前预警空间不足</p></div>
+              <div className="scenario-card"><h4>容量规划</h4><p>分析磁盘使用趋势，规划扩容方案</p></div>
+              <div className="scenario-card"><h4>系统诊断</h4><p>检测磁盘健康状态，预防硬件故障</p></div>
+              <div className="scenario-card"><h4>资产管理</h4><p>收集服务器存储配置，生成资产报告</p></div>
             </div>
           </div>
         )}
@@ -205,53 +136,73 @@ function StoragePageContent() {
               )}
 
               {!data ? (
-                <div className="step-info">
-                  <p>点击"采集"获取磁盘/分区/块设备信息</p>
-                </div>
+                <div className="step-info"><p>点击"采集"获取磁盘/分区/块设备信息</p></div>
               ) : (
-                <div style={{ marginTop: '16px' }}>
-                  <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>文件系统容量</h3>
-                  <table className="comparison-table">
-                    <thead>
-                      <tr>
-                        <th>挂载点</th>
-                        <th>文件系统</th>
-                        <th>已用/总量</th>
-                        <th>使用率</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(data.fsSize || []).map((item: any, i: number) => (
-                        <tr key={i}>
-                          <td>{item.mount || '-'}</td>
-                          <td>{item.fs || '-'}</td>
-                          <td>
-                            {toGB(item.used)} / {toGB(item.size)}
-                          </td>
-                          <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <div style={{
-                                flex: 1,
-                                height: '8px',
-                                background: '#e0e0e0',
-                                borderRadius: '4px',
-                                overflow: 'hidden',
-                                maxWidth: '100px'
-                              }}>
-                                <div style={{
-                                  width: `${item.use || 0}%`,
-                                  height: '100%',
-                                  background: (item.use || 0) > 80 ? '#ef5350' : '#4caf50',
-                                  borderRadius: '4px'
-                                }} />
-                              </div>
-                              <span style={{ fontSize: '13px' }}>{item.use || 0}%</span>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div style={{ marginTop: 16 }}>
+                  {/* Physical disks */}
+                  {(data.disks || []).length > 0 && (
+                    <div style={{ marginBottom: 20 }}>
+                      <h3 style={{ marginBottom: 12, fontSize: 16 }}>物理磁盘</h3>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
+                        {(data.disks || []).map((disk: any, i: number) => (
+                          <SectionCard
+                            key={i}
+                            title={disk.name || disk.device || `磁盘 ${i + 1}`}
+                            icon={disk.type?.toLowerCase().includes('ssd') || disk.type?.toLowerCase().includes('nvme') ? '⚡' : '💿'}
+                            accentColor={disk.type?.toLowerCase().includes('ssd') ? '#4fc3f7' : '#ff9800'}
+                          >
+                            <InfoRow label="型号" value={disk.device} />
+                            <InfoRow label="类型" value={disk.type} />
+                            <InfoRow label="容量" value={toGB(disk.size)} />
+                            <InfoRow label="接口" value={disk.interfaceType} />
+                            <InfoRow label="序列号" value={disk.serialNum} />
+                          </SectionCard>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* File systems */}
+                  <SectionCard title="文件系统" icon="📁" accentColor="#66bb6a">
+                    <table className="comparison-table">
+                      <thead>
+                        <tr><th>挂载点</th><th>文件系统</th><th>已用/总量</th><th>使用率</th></tr>
+                      </thead>
+                      <tbody>
+                        {(data.fsSize || []).map((item: any, i: number) => (
+                          <tr key={i}>
+                            <td>{item.mount || '-'}</td>
+                            <td>{item.fs || '-'}</td>
+                            <td>{toGB(item.used)} / {toGB(item.size)}</td>
+                            <td style={{ minWidth: 160 }}>
+                              <GaugeBar value={item.use || 0} showPercent height={6} />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </SectionCard>
+
+                  {/* Block devices */}
+                  {(data.block || []).length > 0 && (
+                    <SectionCard title="块设备" icon="📦" accentColor="#9c27b0" >
+                      <table className="comparison-table">
+                        <thead>
+                          <tr><th>设备</th><th>类型</th><th>文件系统</th><th>挂载点</th></tr>
+                        </thead>
+                        <tbody>
+                          {(data.block || []).map((b: any, i: number) => (
+                            <tr key={i}>
+                              <td>{b.name || '-'}</td>
+                              <td>{b.type || '-'}</td>
+                              <td>{b.fsType || '-'}</td>
+                              <td>{b.mount || '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </SectionCard>
+                  )}
                 </div>
               )}
             </div>
@@ -276,17 +227,6 @@ async function getFsInfo() {
   });
 }
 
-// 获取磁盘信息
-async function getDiskInfo() {
-  const disks = await si.blockDevices();
-  disks.forEach(disk => {
-    console.log(\`设备: \${disk.name}\`);
-    console.log(\`  类型: \${disk.type}\`);
-    console.log(\`  文件系统: \${disk.fsType}\`);
-    console.log(\`  挂载点: \${disk.mount}\`);
-  });
-}
-
 // 获取物理磁盘
 async function getPhysicalDisks() {
   const disks = await si.diskLayout();
@@ -298,69 +238,7 @@ async function getPhysicalDisks() {
   });
 }
 
-// 执行
-(async () => {
-  await getFsInfo();
-  await getDiskInfo();
-  await getPhysicalDisks();
-})();`}</pre>
-            </div>
-
-            <h2>Python 示例</h2>
-            <div className="code-block">
-              <pre>{`import psutil
-import shutil
-
-# 获取磁盘分区信息
-def get_partitions():
-    partitions = psutil.disk_partitions()
-    for p in partitions:
-        print(f"设备: {p.device}")
-        print(f"  挂载点: {p.mountpoint}")
-        print(f"  文件系统: {p.fstype}")
-        # 获取使用情况
-        usage = psutil.disk_usage(p.mountpoint)
-        total_gb = usage.total / (1024 ** 3)
-        used_gb = usage.used / (1024 ** 3)
-        print(f"  总容量: {total_gb:.2f} GB")
-        print(f"  已使用: {used_gb:.2f} GB")
-        print(f"  使用率: {usage.percent}%")
-
-# 获取磁盘 IO 统计
-def get_disk_io():
-    io = psutil.disk_io_counters()
-    print(f"读取: {io.read_bytes / (1024**3):.2f} GB")
-    print(f"写入: {io.write_bytes / (1024**3):.2f} GB")
-
-# 执行
-get_partitions()
-get_disk_io()`}</pre>
-            </div>
-
-            <h2>Electron 主进程示例</h2>
-            <div className="code-block">
-              <pre>{`// main.ts - Electron 主进程
-import { ipcMain } from 'electron';
-import si from 'systeminformation';
-
-// 注册 IPC 处理器
-ipcMain.handle('storage:fs', async () => {
-  const [fsSize, blockDevices, diskLayout] = await Promise.all([
-    si.fsSize(),
-    si.blockDevices(),
-    si.diskLayout()
-  ]);
-
-  return {
-    fsSize,
-    blockDevices,
-    diskLayout
-  };
-});
-
-// 渲染进程调用
-const result = await window.api.storage.fs();
-console.log('存储信息:', result);`}</pre>
+(async () => { await getFsInfo(); await getPhysicalDisks(); })();`}</pre>
             </div>
           </div>
         )}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import '../toolbox/tools/ToolPage.css'
 import { usePageSnapshotStore } from '../../store/pageSnapshotStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
+import { SectionCard, InfoRow } from '../../components/dashboard'
 
 export default function PrinterPage() {
   return (
@@ -44,6 +45,18 @@ function PrinterPageContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const statusColor = (s: number) => {
+    if (s === 0) return '#4caf50' // Ready
+    if (s === 1) return '#2196f3' // Paused
+    if (s === 2) return '#ff9800' // Error
+    return '#999'
+  }
+
+  const statusText = (s: number) => {
+    const map: Record<number, string> = { 0: '就绪', 1: '暂停', 2: '错误', 3: '删除中', 4: '脱机', 5: '缺纸' }
+    return map[s] || `状态 ${s}`
+  }
+
   return (
     <div className="tool-page">
       <div className="tool-header">
@@ -62,24 +75,11 @@ function PrinterPageContent() {
           <div className="concept-section">
             <h2>核心能力</h2>
             <div className="feature-grid">
-              <div className="feature-card">
-                <h3>打印机列表</h3>
-                <p>获取系统已安装的所有打印机设备信息</p>
-              </div>
-              <div className="feature-card">
-                <h3>默认打印机</h3>
-                <p>识别系统默认打印机，支持设置默认打印设备</p>
-              </div>
-              <div className="feature-card">
-                <h3>打印状态</h3>
-                <p>获取打印机在线/离线状态、错误状态等信息</p>
-              </div>
-              <div className="feature-card">
-                <h3>打印任务</h3>
-                <p>监控打印队列，支持取消、暂停打印任务</p>
-              </div>
+              <div className="feature-card"><h3>打印机列表</h3><p>获取系统已安装的所有打印机设备信息</p></div>
+              <div className="feature-card"><h3>默认打印机</h3><p>识别系统默认打印机，支持设置默认打印设备</p></div>
+              <div className="feature-card"><h3>打印状态</h3><p>获取打印机在线/离线状态、错误状态等信息</p></div>
+              <div className="feature-card"><h3>打印任务</h3><p>监控打印队列，支持取消、暂停打印任务</p></div>
             </div>
-
             <h2>打印机类型</h2>
             <div className="diagram-box">
               <pre className="ascii-art">{`
@@ -99,80 +99,23 @@ function PrinterPageContent() {
   并口    AirPrint XPS   打印   文件   标签
               `}</pre>
             </div>
-
             <h2>打印机状态</h2>
             <table className="comparison-table">
-              <thead>
-                <tr>
-                  <th>状态</th>
-                  <th>说明</th>
-                  <th>可操作</th>
-                </tr>
-              </thead>
+              <thead><tr><th>状态</th><th>说明</th><th>可操作</th></tr></thead>
               <tbody>
-                <tr>
-                  <td>Ready</td>
-                  <td>就绪，可以打印</td>
-                  <td>发送打印任务</td>
-                </tr>
-                <tr>
-                  <td>Printing</td>
-                  <td>正在打印</td>
-                  <td>等待完成</td>
-                </tr>
-                <tr>
-                  <td>Offline</td>
-                  <td>离线，不可用</td>
-                  <td>检查连接</td>
-                </tr>
-                <tr>
-                  <td>Error</td>
-                  <td>错误状态</td>
-                  <td>检查故障</td>
-                </tr>
-                <tr>
-                  <td>Paused</td>
-                  <td>已暂停</td>
-                  <td>恢复打印</td>
-                </tr>
-                <tr>
-                  <td>Out of Paper</td>
-                  <td>缺纸</td>
-                  <td>添加纸张</td>
-                </tr>
+                <tr><td>Ready</td><td>就绪，可以打印</td><td>发送打印任务</td></tr>
+                <tr><td>Printing</td><td>正在打印</td><td>等待完成</td></tr>
+                <tr><td>Offline</td><td>离线，不可用</td><td>检查连接</td></tr>
+                <tr><td>Error</td><td>错误状态</td><td>检查故障</td></tr>
+                <tr><td>Paused</td><td>已暂停</td><td>恢复打印</td></tr>
               </tbody>
             </table>
-
             <h2>应用场景</h2>
             <div className="scenario-grid">
-              <div className="scenario-card">
-                <h4>文档打印</h4>
-                <p>快速打印文档、报告、发票等纸质材料</p>
-              </div>
-              <div className="scenario-card">
-                <h4>批量打印</h4>
-                <p>批量处理打印任务，支持队列管理</p>
-              </div>
-              <div className="scenario-card">
-                <h4>设备管理</h4>
-                <p>统一管理多个打印机设备，监控状态</p>
-              </div>
-              <div className="scenario-card">
-                <h4>票据打印</h4>
-                <p>小票打印机、标签打印机专用场景</p>
-              </div>
-            </div>
-
-            <h2>打印流程</h2>
-            <div className="info-box">
-              <strong>打印任务流程</strong>
-              <ul>
-                <li><strong>1. 选择打印机</strong> - 获取可用打印机列表，选择目标设备</li>
-                <li><strong>2. 设置参数</strong> - 纸张大小、方向、份数、颜色等</li>
-                <li><strong>3. 发送任务</strong> - 将文档发送到打印队列</li>
-                <li><strong>4. 监控进度</strong> - 实时监控打印状态和进度</li>
-                <li><strong>5. 完成确认</strong> - 打印完成通知或错误处理</li>
-              </ul>
+              <div className="scenario-card"><h4>文档打印</h4><p>快速打印文档、报告、发票等纸质材料</p></div>
+              <div className="scenario-card"><h4>批量打印</h4><p>批量处理打印任务，支持队列管理</p></div>
+              <div className="scenario-card"><h4>设备管理</h4><p>统一管理多个打印机设备，监控状态</p></div>
+              <div className="scenario-card"><h4>票据打印</h4><p>小票打印机、标签打印机专用场景</p></div>
             </div>
           </div>
         )}
@@ -194,30 +137,40 @@ function PrinterPageContent() {
               )}
 
               {printers.length === 0 ? (
-                <div className="step-info">
-                  <p>点击"获取列表"读取系统打印机</p>
-                </div>
+                <div className="step-info"><p>点击"获取列表"读取系统打印机</p></div>
               ) : (
-                <div style={{ marginTop: '16px' }}>
-                  <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>打印机列表 ({printers.length})</h3>
-                  <table className="comparison-table">
-                    <thead>
-                      <tr>
-                        <th>名称</th>
-                        <th>状态</th>
-                        <th>默认</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {printers.map((p, i) => (
-                        <tr key={i}>
-                          <td>{p.name}</td>
-                          <td>{p.status || '-'}</td>
-                          <td>{p.isDefault ? '是' : '否'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div style={{ marginTop: 16 }}>
+                  <h3 style={{ marginBottom: 12, fontSize: 16 }}>打印机列表 ({printers.length})</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
+                    {printers.map((p, i) => (
+                      <SectionCard
+                        key={i}
+                        title={p.name || `打印机 ${i + 1}`}
+                        icon="🖨️"
+                        accentColor={p.isDefault ? '#4caf50' : '#9e9e9e'}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                          <span style={{
+                            width: 8, height: 8, borderRadius: '50%',
+                            background: statusColor(p.status),
+                            display: 'inline-block'
+                          }} />
+                          <span style={{ fontSize: 13, color: statusColor(p.status) }}>
+                            {statusText(p.status)}
+                          </span>
+                          {p.isDefault && (
+                            <span style={{
+                              fontSize: 11, background: '#e8f5e9', color: '#2e7d32',
+                              padding: '2px 6px', borderRadius: 3, marginLeft: 4
+                            }}>默认</span>
+                          )}
+                        </div>
+                        <InfoRow label="描述" value={p.description} />
+                        <InfoRow label="URI" value={p.options?.['printer-uri'] || p.uri} />
+                        <InfoRow label="状态码" value={p.status} />
+                      </SectionCard>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -237,116 +190,7 @@ printers.forEach(p => {
   console.log(\`  状态: \${p.status}\`);
   console.log(\`  默认: \${p.isDefault}\`);
   console.log(\`  描述: \${p.description}\`);
-});
-
-// 使用 electron-pdf 打印 PDF
-const { webContents } = require('electron');
-webContents.print({
-  silent: false,
-  printBackground: true,
-  deviceName: 'HP-LaserJet'
-}, (success, errorType) => {
-  if (success) {
-    console.log('打印成功');
-  } else {
-    console.log('打印失败:', errorType);
-  }
 });`}</pre>
-            </div>
-
-            <h2>Python 示例</h2>
-            <div className="code-block">
-              <pre>{`import subprocess
-import platform
-
-# Windows: 使用 wmic 获取打印机信息
-def get_printers_windows():
-    result = subprocess.run(
-        ['wmic', 'printer', 'get', 'name,status,default', '/format:csv'],
-        capture_output=True, text=True
-    )
-    print(result.stdout)
-
-# macOS: 使用 lpstat
-def get_printers_macos():
-    result = subprocess.run(['lpstat', '-p'], capture_output=True, text=True)
-    for line in result.stdout.split('\\n'):
-        if line.strip():
-            print(line)
-
-# Linux: 使用 lpstat
-def get_printers_linux():
-    result = subprocess.run(['lpstat', '-a'], capture_output=True, text=True)
-    for line in result.stdout.split('\\n'):
-        if line.strip():
-            print(line)
-
-# 打印文件
-def print_file(filepath, printer_name=None):
-    if platform.system() == 'Windows':
-        cmd = ['print', filepath]
-        if printer_name:
-            cmd.extend(['/D:', printer_name])
-    else:
-        cmd = ['lpr']
-        if printer_name:
-            cmd.extend(['-P', printer_name])
-        cmd.append(filepath)
-    subprocess.run(cmd)
-
-# 根据平台执行
-if platform.system() == 'Windows':
-    get_printers_windows()
-elif platform.system() == 'Darwin':
-    get_printers_macos()
-else:
-    get_printers_linux()`}</pre>
-            </div>
-
-            <h2>Electron 主进程示例</h2>
-            <div className="code-block">
-              <pre>{`// main.ts - Electron 主进程
-import { ipcMain, BrowserWindow } from 'electron';
-
-// 获取打印机列表
-ipcMain.handle('printer:list', async (event) => {
-  const win = BrowserWindow.fromWebContents(event.sender);
-  return win?.webContents.getPrintersAsync();
-});
-
-// 打印当前页面
-ipcMain.handle('printer:print', async (event, options) => {
-  const win = BrowserWindow.fromWebContents(event.sender);
-  return new Promise((resolve, reject) => {
-    win?.webContents.print(options, (success, errorType) => {
-      if (success) {
-        resolve({ success: true });
-      } else {
-        reject(new Error(errorType));
-      }
-    });
-  });
-});
-
-// 打印 PDF 文件
-ipcMain.handle('printer:printPDF', async (event, pdfPath, options) => {
-  const win = new BrowserWindow({ show: false });
-  await win.loadFile(pdfPath);
-  return new Promise((resolve, reject) => {
-    win.webContents.print(options, (success, errorType) => {
-      win.close();
-      if (success) {
-        resolve({ success: true });
-      } else {
-        reject(new Error(errorType));
-      }
-    });
-  });
-});
-
-// 渲染进程调用
-const printers = await window.api.printer.list();
-console.log('打印机列表:', printers);`}</pre>
             </div>
           </div>
         )}

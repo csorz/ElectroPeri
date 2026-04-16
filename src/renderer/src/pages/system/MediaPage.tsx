@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import '../toolbox/tools/ToolPage.css'
 import { usePageSnapshotStore } from '../../store/pageSnapshotStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
+import { StatCard, SectionCard, InfoRow } from '../../components/dashboard'
+
+const formatHex = (n: number | undefined) => n !== undefined ? `0x${n.toString(16).toUpperCase().padStart(4, '0')}` : '-'
 
 export default function MediaPage() {
   return (
@@ -62,116 +65,27 @@ function MediaPageContent() {
           <div className="concept-section">
             <h2>核心能力</h2>
             <div className="feature-grid">
-              <div className="feature-card">
-                <h3>音频设备</h3>
-                <p>获取输入/输出音频设备，如麦克风、扬声器</p>
-              </div>
-              <div className="feature-card">
-                <h3>视频设备</h3>
-                <p>获取摄像头、采集卡等视频输入设备信息</p>
-              </div>
-              <div className="feature-card">
-                <h3>USB 设备</h3>
-                <p>列出所有 USB 设备，获取厂商、型号、VID/PID</p>
-              </div>
-              <div className="feature-card">
-                <h3>图形设备</h3>
-                <p>获取 GPU、显卡等图形处理设备信息</p>
-              </div>
+              <div className="feature-card"><h3>音频设备</h3><p>获取输入/输出音频设备，如麦克风、扬声器</p></div>
+              <div className="feature-card"><h3>视频设备</h3><p>获取摄像头、采集卡等视频输入设备信息</p></div>
+              <div className="feature-card"><h3>USB 设备</h3><p>列出所有 USB 设备，获取厂商、型号、VID/PID</p></div>
+              <div className="feature-card"><h3>图形设备</h3><p>获取 GPU、显卡等图形处理设备信息</p></div>
             </div>
-
-            <h2>设备层次结构</h2>
-            <div className="diagram-box">
-              <pre className="ascii-art">{`
-  +------------------------------------------------+
-  |                   系统总线                     |
-  +------------------------------------------------+
-          |                |                |
-          v                v                v
-  +---------------+ +---------------+ +---------------+
-  |    USB 总线   | |   PCIe 总线   | |  音频控制器   |
-  +---------------+ +---------------+ +---------------+
-          |                |                |
-    +-----+-----+    +-----+-----+    +-----+-----+
-    |     |     |    |     |     |    |     |     |
-    v     v     v    v     v     v    v     v     v
-  +---+ +---+ +---++---+ +---+ +---++---+ +---+ +---+
-  |键 | |鼠 | |摄 ||GPU| |网卡| |声 ||扬 | |麦 | |蓝 |
-  |盘 | |标 | |像 ||   | |   | |卡 ||声 | |克 | |牙 |
-  +---+ +---+ +---++---+ +---+ +---++---+ +---+ +---+
-  |HID| |HID| |UVC||PCI| |PCI| |PCI||HDA| |HDA| |USB|
-  +---+ +---+ +---++---+ +---+ +---++---+ +---+ +---+
-              `}</pre>
-            </div>
-
             <h2>设备类型对比</h2>
             <table className="comparison-table">
-              <thead>
-                <tr>
-                  <th>设备类型</th>
-                  <th>接口</th>
-                  <th>驱动</th>
-                  <th>特点</th>
-                </tr>
-              </thead>
+              <thead><tr><th>设备类型</th><th>接口</th><th>驱动</th><th>特点</th></tr></thead>
               <tbody>
-                <tr>
-                  <td>键盘/鼠标</td>
-                  <td>USB/蓝牙</td>
-                  <td>HID</td>
-                  <td>低延迟，即插即用</td>
-                </tr>
-                <tr>
-                  <td>摄像头</td>
-                  <td>USB 3.0</td>
-                  <td>UVC</td>
-                  <td>标准协议，跨平台</td>
-                </tr>
-                <tr>
-                  <td>音频设备</td>
-                  <td>USB/HDA</td>
-                  <td>USB Audio</td>
-                  <td>数字/模拟混合</td>
-                </tr>
-                <tr>
-                  <td>存储设备</td>
-                  <td>USB/NVMe</td>
-                  <td>Mass Storage</td>
-                  <td>大容量，高速传输</td>
-                </tr>
+                <tr><td>键盘/鼠标</td><td>USB/蓝牙</td><td>HID</td><td>低延迟，即插即用</td></tr>
+                <tr><td>摄像头</td><td>USB 3.0</td><td>UVC</td><td>标准协议，跨平台</td></tr>
+                <tr><td>音频设备</td><td>USB/HDA</td><td>USB Audio</td><td>数字/模拟混合</td></tr>
+                <tr><td>存储设备</td><td>USB/NVMe</td><td>Mass Storage</td><td>大容量，高速传输</td></tr>
               </tbody>
             </table>
-
             <h2>应用场景</h2>
             <div className="scenario-grid">
-              <div className="scenario-card">
-                <h4>音视频通话</h4>
-                <p>枚举可用摄像头和麦克风，支持设备选择</p>
-              </div>
-              <div className="scenario-card">
-                <h4>设备诊断</h4>
-                <p>检测设备是否正常连接，排查驱动问题</p>
-              </div>
-              <div className="scenario-card">
-                <h4>资产管理</h4>
-                <p>收集外设信息，生成硬件清单报告</p>
-              </div>
-              <div className="scenario-card">
-                <h4>权限管理</h4>
-                <p>检测设备权限状态，申请必要权限</p>
-              </div>
-            </div>
-
-            <h2>USB 设备标识</h2>
-            <div className="info-box">
-              <strong>VID/PID 解读</strong>
-              <ul>
-                <li><strong>VID (Vendor ID)</strong> - 厂商标识，由 USB-IF 分配，如 0x046D (罗技)</li>
-                <li><strong>PID (Product ID)</strong> - 产品标识，厂商自行分配</li>
-                <li><strong>序列号</strong> - 设备唯一标识，可用于授权绑定</li>
-                <li><strong>设备类</strong> - 如 HID (0x03)、Audio (0x01)、Mass Storage (0x08)</li>
-                <li><strong>USB 设备数据库</strong> - http://www.linux-usb.org/usb.ids 可查询厂商和设备信息</li>
-              </ul>
+              <div className="scenario-card"><h4>音视频通话</h4><p>枚举可用摄像头和麦克风，支持设备选择</p></div>
+              <div className="scenario-card"><h4>设备诊断</h4><p>检测设备是否正常连接，排查驱动问题</p></div>
+              <div className="scenario-card"><h4>资产管理</h4><p>收集外设信息，生成硬件清单报告</p></div>
+              <div className="scenario-card"><h4>权限管理</h4><p>检测设备权限状态，申请必要权限</p></div>
             </div>
           </div>
         )}
@@ -193,54 +107,80 @@ function MediaPageContent() {
               )}
 
               {!data ? (
-                <div className="step-info">
-                  <p>点击"采集"获取音频设备、图形设备、USB 设备等信息</p>
-                </div>
+                <div className="step-info"><p>点击"采集"获取音频设备、图形设备、USB 设备等信息</p></div>
               ) : (
-                <div style={{ marginTop: '16px' }}>
-                  <div className="feature-grid" style={{ marginBottom: '16px' }}>
-                    <div className="feature-card">
-                      <h3>音频设备</h3>
-                      <p style={{ fontSize: '20px', fontWeight: 600 }}>{(data.audio || []).length}</p>
-                    </div>
-                    <div className="feature-card">
-                      <h3>图形控制器</h3>
-                      <p style={{ fontSize: '20px', fontWeight: 600 }}>{(data.graphics?.controllers || []).length}</p>
-                    </div>
-                    <div className="feature-card">
-                      <h3>USB 设备</h3>
-                      <p style={{ fontSize: '20px', fontWeight: 600 }}>{(data.usb || []).length}</p>
-                    </div>
+                <div style={{ marginTop: 16 }}>
+                  {/* Summary cards */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
+                    <StatCard icon="🔊" title="音频设备" value={(data.audio || []).length} />
+                    <StatCard icon="🎮" title="图形控制器" value={(data.graphics?.controllers || []).length} />
+                    <StatCard icon="🔌" title="USB 设备" value={(data.usb || []).length} />
                   </div>
 
-                  <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>音频设备</h3>
-                  <ul style={{ listStyle: 'none', padding: 0, marginBottom: '20px' }}>
-                    {(data.audio || []).slice(0, 20).map((a: any, i: number) => (
-                      <li key={i} style={{ padding: '10px', background: '#f5f5f5', marginBottom: '8px', borderRadius: '6px' }}>
-                        {a.name || a.driver || 'Unknown Audio Device'}
-                      </li>
-                    ))}
-                  </ul>
+                  {/* Audio devices */}
+                  <SectionCard title="音频设备" icon="🔊" accentColor="#4fc3f7" >
+                    {(data.audio || []).length === 0 ? (
+                      <div style={{ color: '#999', fontSize: 13, textAlign: 'center', padding: 12 }}>未检测到音频设备</div>
+                    ) : (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 8 }}>
+                        {(data.audio || []).map((a: any, i: number) => (
+                          <div key={i} style={{
+                            padding: '10px 12px',
+                            background: '#f8f9fa',
+                            borderRadius: 6,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 2
+                          }}>
+                            <div style={{ fontWeight: 500, fontSize: 13 }}>{a.name || a.driver || '未知音频设备'}</div>
+                            <div style={{ fontSize: 11, color: '#888' }}>
+                              {a.type && <span>{a.type} </span>}
+                              {a.default && <span style={{ color: '#4caf50' }}>默认 </span>}
+                              {a.status && <span>| {a.status}</span>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </SectionCard>
 
-                  <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>USB 设备</h3>
-                  <table className="comparison-table">
-                    <thead>
-                      <tr>
-                        <th>厂商</th>
-                        <th>设备</th>
-                        <th>VID:PID</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(data.usb || []).slice(0, 20).map((u: any, i: number) => (
-                        <tr key={i}>
-                          <td>{u.manufacturer || '-'}</td>
-                          <td>{u.name || '-'}</td>
-                          <td>{u.idVendor || '-'}:{u.idProduct || '-'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  {/* GPU controllers */}
+                  {(data.graphics?.controllers || []).length > 0 && (
+                    <SectionCard title="GPU 控制器" icon="🎮" accentColor="#7c4dff" >
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 8 }}>
+                        {(data.graphics.controllers || []).map((g: any, i: number) => (
+                          <div key={i} style={{ padding: '10px 12px', background: '#f8f9fa', borderRadius: 6 }}>
+                            <div style={{ fontWeight: 500, fontSize: 13 }}>{g.model || g.vendor || 'Unknown GPU'}</div>
+                            <div style={{ fontSize: 11, color: '#888' }}>
+                              {g.vendor && <span>{g.vendor} </span>}
+                              {g.vram && <span>| {g.vram} MB </span>}
+                              {g.driverVersion && <span>| 驱动 {g.driverVersion}</span>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </SectionCard>
+                  )}
+
+                  {/* USB devices */}
+                  <SectionCard title="USB 设备" icon="🔌" accentColor="#ff9800" >
+                    <table className="comparison-table">
+                      <thead>
+                        <tr><th>厂商</th><th>设备</th><th>VID</th><th>PID</th><th>类型</th></tr>
+                      </thead>
+                      <tbody>
+                        {(data.usb || []).slice(0, 30).map((u: any, i: number) => (
+                          <tr key={i}>
+                            <td>{u.manufacturer || '-'}</td>
+                            <td>{u.name || '-'}</td>
+                            <td style={{ fontFamily: 'Consolas, monospace', fontSize: 12 }}>{formatHex(u.idVendor)}</td>
+                            <td style={{ fontFamily: 'Consolas, monospace', fontSize: 12 }}>{formatHex(u.idProduct)}</td>
+                            <td>{u.type || '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </SectionCard>
                 </div>
               )}
             </div>
@@ -256,9 +196,8 @@ function MediaPageContent() {
 // 获取音频设备
 async function getAudioDevices() {
   const audio = await si.audio();
-  console.log('音频设备:');
   audio.forEach(a => {
-    console.log(\`  名称: \${a.name}\`);
+    console.log(\`名称: \${a.name}\`);
     console.log(\`  类型: \${a.type}\`);
     console.log(\`  状态: \${a.status}\`);
     console.log(\`  默认: \${a.default}\`);
@@ -268,130 +207,14 @@ async function getAudioDevices() {
 // 获取 USB 设备
 async function getUsbDevices() {
   const usb = await si.usb();
-  console.log('USB 设备:');
   usb.forEach(u => {
-    console.log(\`  设备: \${u.name}\`);
+    console.log(\`设备: \${u.name}\`);
     console.log(\`  厂商: \${u.manufacturer}\`);
-    console.log(\`  VID:PID: \${u.vendor}: \${u.product}\`);
+    console.log(\`  VID:PID: 0x\${u.idVendor}:0x\${u.idProduct}\`);
   });
 }
 
-// 获取图形设备
-async function getGraphicsDevices() {
-  const graphics = await si.graphics();
-  console.log('图形控制器:');
-  graphics.controllers.forEach(g => {
-    console.log(\`  型号: \${g.model}\`);
-    console.log(\`  厂商: \${g.vendor}\`);
-    console.log(\`  显存: \${g.vram} MB\`);
-  });
-}
-
-// 执行
-(async () => {
-  await getAudioDevices();
-  await getUsbDevices();
-  await getGraphicsDevices();
-})();`}</pre>
-            </div>
-
-            <h2>Python 示例</h2>
-            <div className="code-block">
-              <pre>{`import subprocess
-import platform
-
-# Linux: 使用 lsusb 获取 USB 设备
-def get_usb_devices_linux():
-    result = subprocess.run(['lsusb'], capture_output=True, text=True)
-    for line in result.stdout.split('\\n'):
-        if line.strip():
-            print(line)
-
-# Linux: 使用 arecord/aplay 获取音频设备
-def get_audio_devices_linux():
-    # 录音设备
-    print("录音设备:")
-    result = subprocess.run(['arecord', '-l'], capture_output=True, text=True)
-    print(result.stdout)
-    # 播放设备
-    print("播放设备:")
-    result = subprocess.run(['aplay', '-l'], capture_output=True, text=True)
-    print(result.stdout)
-
-# Windows: 使用 wmic
-def get_usb_devices_windows():
-    result = subprocess.run(
-        ['wmic', 'path', 'Win32_PnPEntity', 'where', 'DeviceID like "USB%"', 'get', 'Name,DeviceID', '/format:csv'],
-        capture_output=True, text=True
-    )
-    print(result.stdout)
-
-# macOS: 使用 system_profiler
-def get_usb_devices_macos():
-    result = subprocess.run(
-        ['system_profiler', 'SPUSBDataType'],
-        capture_output=True, text=True
-    )
-    print(result.stdout)
-
-# 根据平台执行
-if platform.system() == 'Linux':
-    get_usb_devices_linux()
-    get_audio_devices_linux()
-elif platform.system() == 'Windows':
-    get_usb_devices_windows()
-elif platform.system() == 'Darwin':
-    get_usb_devices_macos()`}</pre>
-            </div>
-
-            <h2>Electron 主进程示例</h2>
-            <div className="code-block">
-              <pre>{`// main.ts - Electron 主进程
-import { ipcMain, desktopCapturer, systemPreferences } from 'electron';
-import si from 'systeminformation';
-
-// 获取媒体设备
-ipcMain.handle('media:devices', async () => {
-  const [audio, graphics, usb] = await Promise.all([
-    si.audio(),
-    si.graphics(),
-    si.usb()
-  ]);
-
-  return {
-    audio,
-    graphics,
-    usb
-  };
-});
-
-// 获取摄像头列表（需要权限）
-ipcMain.handle('media:cameras', async () => {
-  const sources = await desktopCapturer.getSources({
-    types: ['window', 'screen']
-  });
-  return sources;
-});
-
-// 检查媒体权限（macOS）
-ipcMain.handle('media:checkPermission', async (event, type) => {
-  if (process.platform === 'darwin') {
-    return systemPreferences.getMediaAccessPermission(type);
-  }
-  return true;
-});
-
-// 申请媒体权限（macOS）
-ipcMain.handle('media:requestPermission', async (event, type) => {
-  if (process.platform === 'darwin') {
-    return systemPreferences.askForMediaAccessPermission(type);
-  }
-  return true;
-});
-
-// 渲染进程调用
-const devices = await window.api.media.devices();
-console.log('媒体设备:', devices);`}</pre>
+(async () => { await getAudioDevices(); await getUsbDevices(); })();`}</pre>
             </div>
           </div>
         )}

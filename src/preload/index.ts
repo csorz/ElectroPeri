@@ -29,6 +29,7 @@ const serialApi = {
 
 // USB API
 const usbApi = {
+  check: () => ipcRenderer.invoke('usb:check'),
   list: () => ipcRenderer.invoke('usb:list'),
   open: (vendorId: number, productId: number) =>
     ipcRenderer.invoke('usb:open', vendorId, productId),
@@ -46,12 +47,15 @@ const usbApi = {
     data?: string
   }) => ipcRenderer.invoke('usb:controlTransfer', setup),
   onData: (callback: (data: string) => void) => {
-    ipcRenderer.on('usb:data', (_event, data) => callback(data))
+    const handler = (_event: Electron.IpcRendererEvent, data: string) => callback(data)
+    ipcRenderer.on('usb:data', handler)
+    return () => ipcRenderer.removeListener('usb:data', handler)
   }
 }
 
 // Bluetooth API
 const bluetoothApi = {
+  check: () => ipcRenderer.invoke('bluetooth:check'),
   scan: () => ipcRenderer.invoke('bluetooth:scan'),
   stopScan: () => ipcRenderer.invoke('bluetooth:stopScan'),
   connect: (deviceId: string) => ipcRenderer.invoke('bluetooth:connect', deviceId),
@@ -60,7 +64,9 @@ const bluetoothApi = {
   discoverServices: (serviceUuid: string) =>
     ipcRenderer.invoke('bluetooth:discoverServices', serviceUuid),
   onData: (callback: (data: string) => void) => {
-    ipcRenderer.on('bluetooth:data', (_event, data) => callback(data))
+    const handler = (_event: Electron.IpcRendererEvent, data: string) => callback(data)
+    ipcRenderer.on('bluetooth:data', handler)
+    return () => ipcRenderer.removeListener('bluetooth:data', handler)
   }
 }
 
@@ -91,18 +97,25 @@ const networkApi = {
 
 // HID API
 const hidApi = {
+  check: () => ipcRenderer.invoke('hid:check'),
   list: () => ipcRenderer.invoke('hid:list'),
   open: (vendorId: number, productId: number) => ipcRenderer.invoke('hid:open', vendorId, productId),
   close: () => ipcRenderer.invoke('hid:close'),
   send: (reportId: number, data: string) => ipcRenderer.invoke('hid:send', reportId, data),
   onData: (callback: (data: string) => void) => {
-    ipcRenderer.on('hid:data', (_event, data) => callback(data))
+    const handler = (_event: Electron.IpcRendererEvent, data: string) => callback(data)
+    ipcRenderer.on('hid:data', handler)
+    return () => ipcRenderer.removeListener('hid:data', handler)
   },
   onError: (callback: (error: string) => void) => {
-    ipcRenderer.on('hid:error', (_event, error) => callback(error))
+    const handler = (_event: Electron.IpcRendererEvent, error: string) => callback(error)
+    ipcRenderer.on('hid:error', handler)
+    return () => ipcRenderer.removeListener('hid:error', handler)
   },
   onClosed: (callback: () => void) => {
-    ipcRenderer.on('hid:closed', () => callback())
+    const handler = () => callback()
+    ipcRenderer.on('hid:closed', handler)
+    return () => ipcRenderer.removeListener('hid:closed', handler)
   }
 }
 

@@ -2,8 +2,15 @@ import { useEffect, useState } from 'react'
 import '../toolbox/tools/ToolPage.css'
 import { usePageSnapshotStore } from '../../store/pageSnapshotStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
+import { GaugeBar, StatCard, InfoRow, SectionCard } from '../../components/dashboard'
 
 const toGB = (bytes = 0) => `${(bytes / 1024 / 1024 / 1024).toFixed(1)} GB`
+const formatUptime = (sec = 0) => {
+  const d = Math.floor(sec / 86400)
+  const h = Math.floor((sec % 86400) / 3600)
+  const m = Math.floor((sec % 3600) / 60)
+  return d > 0 ? `${d}天 ${h}时 ${m}分` : `${h}时 ${m}分`
+}
 
 export default function SystemPage() {
   return (
@@ -56,6 +63,14 @@ function SystemPageContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshSec])
 
+  const cpuLoad = data?.load?.currentLoad ?? 0
+  const memUsed = data?.mem?.active ?? data?.mem?.used ?? 0
+  const memTotal = data?.mem?.total ?? 1
+  const memPercent = (memUsed / memTotal) * 100
+  const swapUsed = data?.mem?.swapused ?? 0
+  const swapTotal = data?.mem?.swaptotal ?? 0
+  const swapPercent = swapTotal > 0 ? (swapUsed / swapTotal) * 100 : 0
+
   return (
     <div className="tool-page">
       <div className="tool-header">
@@ -74,24 +89,11 @@ function SystemPageContent() {
           <div className="concept-section">
             <h2>核心能力</h2>
             <div className="feature-grid">
-              <div className="feature-card">
-                <h3>OS 信息</h3>
-                <p>获取操作系统类型、版本、发行版、架构等基础信息</p>
-              </div>
-              <div className="feature-card">
-                <h3>CPU 信息</h3>
-                <p>获取处理器品牌、核心数、速度、负载等详细信息</p>
-              </div>
-              <div className="feature-card">
-                <h3>内存状态</h3>
-                <p>获取总内存、可用内存、使用率等运行时状态</p>
-              </div>
-              <div className="feature-card">
-                <h3>系统负载</h3>
-                <p>获取系统当前负载情况，包括 CPU、内存使用百分比</p>
-              </div>
+              <div className="feature-card"><h3>OS 信息</h3><p>获取操作系统类型、版本、发行版、架构等基础信息</p></div>
+              <div className="feature-card"><h3>CPU 信息</h3><p>获取处理器品牌、核心数、速度、负载等详细信息</p></div>
+              <div className="feature-card"><h3>内存状态</h3><p>获取总内存、可用内存、使用率等运行时状态</p></div>
+              <div className="feature-card"><h3>系统负载</h3><p>获取系统当前负载情况，包括 CPU、内存使用百分比</p></div>
             </div>
-
             <h2>系统信息架构</h2>
             <div className="diagram-box">
               <pre className="ascii-art">{`
@@ -116,55 +118,22 @@ function SystemPageContent() {
   +-------------------+     +-------------------+
               `}</pre>
             </div>
-
             <h2>跨平台支持</h2>
             <table className="comparison-table">
-              <thead>
-                <tr>
-                  <th>平台</th>
-                  <th>支持情况</th>
-                  <th>特殊说明</th>
-                </tr>
-              </thead>
+              <thead><tr><th>平台</th><th>支持情况</th><th>特殊说明</th></tr></thead>
               <tbody>
-                <tr>
-                  <td>Windows</td>
-                  <td>完全支持</td>
-                  <td>使用 WMI 和系统 API</td>
-                </tr>
-                <tr>
-                  <td>macOS</td>
-                  <td>完全支持</td>
-                  <td>使用 system_profiler</td>
-                </tr>
-                <tr>
-                  <td>Linux</td>
-                  <td>完全支持</td>
-                  <td>读取 /proc 文件系统</td>
-                </tr>
+                <tr><td>Windows</td><td>完全支持</td><td>使用 WMI 和系统 API</td></tr>
+                <tr><td>macOS</td><td>完全支持</td><td>使用 system_profiler</td></tr>
+                <tr><td>Linux</td><td>完全支持</td><td>读取 /proc 文件系统</td></tr>
               </tbody>
             </table>
-
             <h2>应用场景</h2>
             <div className="scenario-grid">
-              <div className="scenario-card">
-                <h4>系统监控</h4>
-                <p>实时监控系统资源使用情况，及时发现性能瓶颈</p>
-              </div>
-              <div className="scenario-card">
-                <h4>硬件检测</h4>
-                <p>获取硬件配置信息，用于兼容性检查或系统诊断</p>
-              </div>
-              <div className="scenario-card">
-                <h4>运维自动化</h4>
-                <p>批量收集服务器信息，生成资产清单报告</p>
-              </div>
-              <div className="scenario-card">
-                <h4>性能分析</h4>
-                <p>分析系统负载趋势，优化资源配置</p>
-              </div>
+              <div className="scenario-card"><h4>系统监控</h4><p>实时监控系统资源使用情况，及时发现性能瓶颈</p></div>
+              <div className="scenario-card"><h4>硬件检测</h4><p>获取硬件配置信息，用于兼容性检查或系统诊断</p></div>
+              <div className="scenario-card"><h4>运维自动化</h4><p>批量收集服务器信息，生成资产清单报告</p></div>
+              <div className="scenario-card"><h4>性能分析</h4><p>分析系统负载趋势，优化资源配置</p></div>
             </div>
-
             <h2>技术要点</h2>
             <div className="info-box">
               <strong>systeminformation 库</strong>
@@ -209,30 +178,84 @@ function SystemPageContent() {
                 </div>
               ) : (
                 <>
-                  <div className="feature-grid" style={{ marginTop: '16px' }}>
-                    <div className="feature-card">
-                      <h3>操作系统</h3>
-                      <p style={{ fontSize: '15px', fontWeight: 500, color: '#333' }}>
-                        {data.osInfo?.distro} {data.osInfo?.release}
-                      </p>
-                      <p>{data.platform} / {data.osInfo?.arch} / {data.hostname}</p>
-                    </div>
-                    <div className="feature-card">
-                      <h3>CPU</h3>
-                      <p style={{ fontSize: '15px', fontWeight: 500, color: '#333' }}>{data.cpu?.brand || '-'}</p>
-                      <p>{data.cpu?.cores || '-'} 核，当前负载 {data.load?.currentLoad?.toFixed?.(1) ?? '-'}%</p>
-                    </div>
-                    <div className="feature-card">
-                      <h3>内存</h3>
-                      <p style={{ fontSize: '15px', fontWeight: 500, color: '#333' }}>
-                        {toGB(data.mem?.active)} / {toGB(data.mem?.total)}
-                      </p>
-                      <p>已用 {((data.mem?.active / data.mem?.total) * 100 || 0).toFixed(1)}%</p>
-                    </div>
+                  {/* Top stat cards */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, marginTop: 16 }}>
+                    <StatCard
+                      icon="💻"
+                      title="操作系统"
+                      value={data.osInfo?.distro || '-'}
+                      subtitle={`${data.osInfo?.release || ''} ${data.osInfo?.arch || ''}`}
+                    />
+                    <StatCard
+                      icon="🔲"
+                      title="CPU"
+                      value={data.cpu?.brand?.split(' ').slice(0, 3).join(' ') || '-'}
+                      subtitle={`${data.cpu?.cores || '-'} 核 / ${data.cpu?.speed?.toFixed?.(1) ?? '-'} GHz`}
+                    />
+                    <StatCard
+                      icon="💾"
+                      title="内存"
+                      value={toGB(memUsed)}
+                      subtitle={`总量 ${toGB(memTotal)}`}
+                      color={memPercent > 80 ? '#ef5350' : '#333'}
+                    />
+                    <StatCard
+                      icon="⏱️"
+                      title="运行时间"
+                      value={formatUptime(data.uptime)}
+                      subtitle={`更新: ${updatedAt}`}
+                    />
                   </div>
-                  <div className="step-info">
-                    <p>最近更新: {updatedAt}</p>
+
+                  {/* CPU Load */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 12, marginTop: 16 }}>
+                    <SectionCard title="CPU 负载" icon="🔲" accentColor="#4fc3f7">
+                      <GaugeBar value={cpuLoad} label="总负载" />
+                      {data.load?.cpus && (
+                        <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          {data.load.cpus.slice(0, 16).map((c: any, i: number) => (
+                            <GaugeBar key={i} value={c.load ?? c ?? 0} label={`核${i}`} height={4} showPercent={false} />
+                          ))}
+                        </div>
+                      )}
+                      {data.temp?.main > 0 && (
+                        <div style={{ marginTop: 12 }}>
+                          <InfoRow label="CPU 温度" value={`${data.temp.main}°C`} />
+                        </div>
+                      )}
+                    </SectionCard>
+
+                    {/* Memory */}
+                    <SectionCard title="内存" icon="💾" accentColor="#66bb6a">
+                      <GaugeBar value={memPercent} label="内存" />
+                      <div style={{ marginTop: 8 }}>
+                        <InfoRow label="已用" value={toGB(memUsed)} />
+                        <InfoRow label="可用" value={toGB(data.mem?.available ?? data.mem?.free)} />
+                        <InfoRow label="总量" value={toGB(memTotal)} />
+                      </div>
+                      {swapTotal > 0 && (
+                        <>
+                          <div style={{ marginTop: 12 }}><GaugeBar value={swapPercent} label="Swap" /></div>
+                          <div style={{ marginTop: 4 }}>
+                            <InfoRow label="Swap 已用" value={toGB(swapUsed)} />
+                            <InfoRow label="Swap 总量" value={toGB(swapTotal)} />
+                          </div>
+                        </>
+                      )}
+                    </SectionCard>
                   </div>
+
+                  {/* OS Details */}
+                  <SectionCard title="系统详情" icon="💻" accentColor="#ff9800" >
+                    <InfoRow label="主机名" value={data.hostname} />
+                    <InfoRow label="平台" value={data.platform} />
+                    <InfoRow label="架构" value={data.osInfo?.arch} />
+                    <InfoRow label="发行版" value={data.osInfo?.distro} />
+                    <InfoRow label="版本" value={data.osInfo?.release} />
+                    <InfoRow label="内核" value={data.osInfo?.kernel} />
+                    <InfoRow label="代号" value={data.osInfo?.codename} />
+                    <InfoRow label="构建" value={data.osInfo?.build} />
+                  </SectionCard>
                 </>
               )}
             </div>
@@ -284,77 +307,6 @@ async function getLoadInfo() {
   await getMemoryInfo();
   await getLoadInfo();
 })();`}</pre>
-            </div>
-
-            <h2>Python 示例</h2>
-            <div className="code-block">
-              <pre>{`import psutil
-import platform
-import socket
-
-# 获取操作系统信息
-def get_os_info():
-    print(f"系统: {platform.system()}")
-    print(f"版本: {platform.version()}")
-    print(f"架构: {platform.machine()}")
-    print(f"主机名: {socket.gethostname()}")
-
-# 获取 CPU 信息
-def get_cpu_info():
-    print(f"CPU 核心数: {psutil.cpu_count(logical=True)}")
-    print(f"CPU 使用率: {psutil.cpu_percent(interval=1)}%")
-
-# 获取内存信息
-def get_memory_info():
-    mem = psutil.virtual_memory()
-    total_gb = mem.total / (1024 ** 3)
-    used_gb = mem.used / (1024 ** 3)
-    print(f"总内存: {total_gb:.2f} GB")
-    print(f"已用内存: {used_gb:.2f} GB")
-    print(f"使用率: {mem.percent}%")
-
-# 获取系统负载
-def get_load_info():
-    load1, load5, load15 = psutil.getloadavg()
-    print(f"1分钟负载: {load1:.2f}")
-    print(f"5分钟负载: {load5:.2f}")
-    print(f"15分钟负载: {load15:.2f}")
-
-# 执行
-get_os_info()
-get_cpu_info()
-get_memory_info()
-get_load_info()`}</pre>
-            </div>
-
-            <h2>Electron 主进程示例</h2>
-            <div className="code-block">
-              <pre>{`// main.ts - Electron 主进程
-import { ipcMain } from 'electron';
-import si from 'systeminformation';
-
-// 注册 IPC 处理器
-ipcMain.handle('system:basic', async () => {
-  const [osInfo, cpu, mem, load] = await Promise.all([
-    si.osInfo(),
-    si.cpu(),
-    si.mem(),
-    si.currentLoad()
-  ]);
-
-  return {
-    platform: process.platform,
-    hostname: osInfo.hostname,
-    osInfo,
-    cpu,
-    mem,
-    load
-  };
-});
-
-// 渲染进程调用
-const result = await window.api.system.basic();
-console.log('系统信息:', result);`}</pre>
             </div>
           </div>
         )}

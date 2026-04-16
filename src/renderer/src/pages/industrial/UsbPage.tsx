@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDeviceStore } from '../../store/deviceStore'
 import type { UsbDevice } from '../../store/deviceStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
@@ -297,9 +297,33 @@ function UsbDemo() {
   const [selectedDevice, setSelectedDevice] = useState<UsbDevice | null>(null)
   const [endpoint, setEndpoint] = useState(1)
   const [message, setMessage] = useState('')
+  const [moduleAvailable, setModuleAvailable] = useState<boolean | null>(null)
+  const [moduleError, setModuleError] = useState<string | null>(null)
+  const [dataCleanup, setDataCleanup] = useState<(() => void) | null>(null)
+
+  // 检查USB模块是否可用
+  useEffect(() => {
+    const checkModule = async () => {
+      try {
+        const result = await window.api.usb.check()
+        setModuleAvailable(result.available)
+        if (!result.available && result.error) {
+          setModuleError(result.error)
+        }
+      } catch {
+        setModuleAvailable(false)
+        setModuleError('无法检查USB模块状态')
+      }
+    }
+    checkModule()
+  }, [])
 
   // 扫描USB设备
   const handleScan = async () => {
+    if (!moduleAvailable) {
+      setUsbError(moduleError || 'USB模块不可用')
+      return
+    }
     setUsbStatus('scanning')
     setUsbError(null)
     try {
@@ -322,9 +346,10 @@ function UsbDemo() {
       setUsbStatus('connected')
 
       // 监听数据
-      window.api.usb.onData((data: string) => {
+      const cleanup = window.api.usb.onData((data: string) => {
         setUsbData(data)
       })
+      setDataCleanup(() => cleanup)
     } catch (err) {
       setUsbError(err instanceof Error ? err.message : '连接失败')
       setUsbStatus('error')
@@ -334,6 +359,8 @@ function UsbDemo() {
   // 断开连接
   const handleDisconnect = async () => {
     try {
+      dataCleanup?.()
+      setDataCleanup(null)
       await window.api.usb.close()
       setSelectedDevice(null)
       setUsbStatus('idle')
@@ -372,11 +399,22 @@ function UsbDemo() {
     <div className="connection-demo">
       <h3>设备连接</h3>
 
+      {/* 模块不可用警告 */}
+      {moduleAvailable === false && (
+        <div style={{ marginBottom: 16, padding: 16, background: '#fff3e0', borderRadius: 8, border: '1px solid #ffcc80' }}>
+          <div style={{ fontWeight: 500, color: '#e65100', marginBottom: 8 }}>⚠️ USB模块不可用</div>
+          <div style={{ fontSize: 13, color: '#666' }}>{moduleError}</div>
+          <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>
+            请使用 WebUSB 页面，或安装 Visual Studio Build Tools 后运行: pnpm rebuild usb
+          </div>
+        </div>
+      )}
+
       <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
         <button
           onClick={handleScan}
-          disabled={usbStatus === 'scanning'}
-          style={{ padding: '8px 16px', background: '#4fc3f7', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+          disabled={usbStatus === 'scanning' || moduleAvailable === false}
+          style={{ padding: '8px 16px', background: moduleAvailable === false ? '#ccc' : '#4fc3f7', color: '#fff', border: 'none', borderRadius: 4, cursor: moduleAvailable === false ? 'not-allowed' : 'pointer' }}
         >
           {usbStatus === 'scanning' ? '扫描中...' : '扫描设备'}
         </button>

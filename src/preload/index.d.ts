@@ -21,6 +21,7 @@ interface SerialApi {
 }
 
 interface UsbApi {
+  check: () => Promise<{ available: boolean; error?: string }>
   list: () => Promise<Array<{
     deviceAddress: number
     vendorId: number
@@ -50,10 +51,11 @@ interface UsbApi {
     index: number
     data?: string
   }) => Promise<string>
-  onData: (callback: (data: string) => void) => void
+  onData: (callback: (data: string) => void) => () => void
 }
 
 interface BluetoothApi {
+  check: () => Promise<{ available: boolean; error?: string }>
   scan: () => Promise<Array<{
     id: string
     name: string
@@ -68,7 +70,7 @@ interface BluetoothApi {
   disconnect: () => Promise<{ success: boolean }>
   write: (data: string) => Promise<{ success: boolean }>
   discoverServices: (serviceUuid: string) => Promise<string[]>
-  onData: (callback: (data: string) => void) => void
+  onData: (callback: (data: string) => void) => () => void
 }
 
 interface NetworkApi {
@@ -93,6 +95,7 @@ interface NetworkApi {
 }
 
 interface HidApi {
+  check: () => Promise<{ available: boolean; error?: string }>
   list: () => Promise<Array<{
     vendorId: number
     productId: number
@@ -106,9 +109,9 @@ interface HidApi {
   open: (vendorId: number, productId: number) => Promise<{ success: boolean }>
   close: () => Promise<{ success: boolean }>
   send: (reportId: number, data: string) => Promise<{ success: boolean }>
-  onData: (callback: (data: string) => void) => void
-  onError: (callback: (error: string) => void) => void
-  onClosed: (callback: () => void) => void
+  onData: (callback: (data: string) => void) => () => void
+  onError: (callback: (error: string) => void) => () => void
+  onClosed: (callback: () => void) => () => void
 }
 
 interface GpioApi {
@@ -154,7 +157,18 @@ interface DisplayApi {
 }
 
 interface PowerApi {
-  snapshot: () => Promise<{ onBattery: boolean }>
+  snapshot: () => Promise<{
+    onBattery: boolean
+    percent: number
+    charging: boolean
+    acConnected: boolean
+    timeRemaining: number
+    type: string
+    manufacturer: string
+    model: string
+    serial: string
+    cycleCount: number
+  }>
 }
 
 interface ProcessApi {
