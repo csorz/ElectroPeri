@@ -120,14 +120,10 @@ function createWindow(): void {
       }
     })
 
-    // Handle serial device selection - return first port or empty to show picker
-    mainWindow.webContents.session.on('select-serial-port', (_event, portList, _webContents, callback) => {
-      if (portList && portList.length > 0) {
-        callback(portList[0].portId)
-      } else {
-        callback('')
-      }
-    })
+    // Note: Web Serial device selection in Electron
+    // Unlike browsers, Electron may auto-select or have limited picker support
+    // For full device selection, consider using native serial module instead
+    // The select-serial-port event is removed to allow Electron's default behavior
 
     // Handle HID device selection for WebHID API
     mainWindow.webContents.session.on('select-hid-device', (_event, details, callback) => {
