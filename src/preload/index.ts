@@ -4,17 +4,26 @@ import { electronAPI } from '@electron-toolkit/preload'
 // Serial Port API
 const serialApi = {
   list: () => ipcRenderer.invoke('serial:list'),
-  open: (path: string, baudRate: number) => ipcRenderer.invoke('serial:open', path, baudRate),
-  close: () => ipcRenderer.invoke('serial:close'),
-  write: (data: string) => ipcRenderer.invoke('serial:write', data),
-  onData: (callback: (data: string) => void) => {
-    ipcRenderer.on('serial:data', (_event, data) => callback(data))
+  open: (path: string, baudRate: number, dataBits = 8, stopBits = 1, parity = 'none') =>
+    ipcRenderer.invoke('serial:open', path, baudRate, dataBits, stopBits, parity),
+  close: (path?: string) => ipcRenderer.invoke('serial:close', path),
+  write: (path: string, data: string) => ipcRenderer.invoke('serial:write', path, data),
+  isOpen: (path: string) => ipcRenderer.invoke('serial:isOpen', path),
+  getOpenPorts: () => ipcRenderer.invoke('serial:getOpenPorts'),
+  onData: (callback: (path: string, data: string) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, { path, data }: { path: string; data: string }) => callback(path, data)
+    ipcRenderer.on('serial:data', handler)
+    return () => ipcRenderer.removeListener('serial:data', handler)
   },
-  onError: (callback: (error: string) => void) => {
-    ipcRenderer.on('serial:error', (_event, error) => callback(error))
+  onError: (callback: (path: string, error: string) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, { path, error }: { path: string; error: string }) => callback(path, error)
+    ipcRenderer.on('serial:error', handler)
+    return () => ipcRenderer.removeListener('serial:error', handler)
   },
-  onClosed: (callback: () => void) => {
-    ipcRenderer.on('serial:closed', () => callback())
+  onClosed: (callback: (path: string) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, { path }: { path: string }) => callback(path)
+    ipcRenderer.on('serial:closed', handler)
+    return () => ipcRenderer.removeListener('serial:closed', handler)
   }
 }
 

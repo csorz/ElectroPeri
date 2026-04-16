@@ -10,12 +10,14 @@ interface SerialApi {
     vendorId?: string
     productId?: string
   }>>
-  open: (path: string, baudRate: number) => Promise<{ success: boolean }>
-  close: () => Promise<{ success: boolean }>
-  write: (data: string) => Promise<{ success: boolean }>
-  onData: (callback: (data: string) => void) => void
-  onError: (callback: (error: string) => void) => void
-  onClosed: (callback: () => void) => void
+  open: (path: string, baudRate: number, dataBits?: number, stopBits?: number, parity?: string) => Promise<{ success: boolean; path: string }>
+  close: (path?: string) => Promise<{ success: boolean }>
+  write: (path: string, data: string) => Promise<{ success: boolean }>
+  isOpen: (path: string) => Promise<boolean>
+  getOpenPorts: () => Promise<string[]>
+  onData: (callback: (path: string, data: string) => void) => () => void
+  onError: (callback: (path: string, error: string) => void) => () => void
+  onClosed: (callback: (path: string) => void) => () => void
 }
 
 interface UsbApi {

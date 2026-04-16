@@ -1,9 +1,8 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import type { SerialPort } from 'serialport'
 
-// Store active connections
+// Store active connections by path
 const activePorts: Map<string, SerialPort> = new Map()
-let currentPort: SerialPort | null = null
 let mainWindow: BrowserWindow | null = null
 
 async function getSerialPort() {
@@ -13,13 +12,20 @@ async function getSerialPort() {
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error)
     if (errMsg.includes('Cannot find module') && errMsg.includes('bindings-cpp')) {
-      throw new Error('串口原生模块未安装。请运行: pnpm add @serialport/bindings-cpp && pnpm electron-builder install-app-deps')
+      throw new Error(
+        '串口原生模块未安装。请运行: pnpm add @serialport/bindings-cpp && pnpm electron-builder install-app-deps'
+      )
     }
-    if (errMsg.includes('Could not locate the bindings file') || errMsg.includes('Module version mismatch')) {
+    if (
+      errMsg.includes('Could not locate the bindings file') ||
+      errMsg.includes('Module version mismatch')
+    ) {
       throw new Error('串口模块未正确编译。请运行: pnpm electron-builder install-app-deps')
     }
     if (errMsg.includes('Visual Studio')) {
-      throw new Error('缺少编译工具。请安装 Visual Studio Build Tools (C++ 工作负载)，然后运行: pnpm electron-builder install-app-deps')
+      throw new Error(
+        '缺少编译工具。请安装 Visual Studio Build Tools (C++ 工作负载)，然后运行: pnpm electron-builder install-app-deps'
+      )
     }
     throw new Error(`串口模块加载失败: ${errMsg}`)
   }
@@ -46,55 +52,99 @@ export function setupSerialHandlers(): void {
     }
   })
 
-  ipcMain.handle('serial:open', async (event, path: string, baudRate: number) => {
-    try {
-      const SerialPort = await getSerialPort()
-      mainWindow = BrowserWindow.fromWebContents(event.sender)
+  ipcMain.handle(
+    'serial:open',
+    async (
+      event,
+      path: string,
+      baudRate: number,
+      dataBits: number,
+      stopBits: number,
+      parity: string
+    ) => {
+      try {
+        const SerialPort = await getSerialPort()
+        mainWindow = BrowserWindow.fromWebContents(event.sender)
 
-      if (currentPort && currentPort.isOpen) {
-        await new Promise<void>((resolve) => currentPort!.close(() => resolve()))
-      }
+        // Check if already connected to this port
+        if (activePorts.has(path)) {
+          const existingPort = activePorts.get(path)!
+          if (existingPort.isOpen) {
+            return { success: true, path, message: 'Already connected' }
+          }
+        }
 
-      currentPort = new SerialPort({
-        path,
-        baudRate,
-        autoOpen: false
-      })
+        // Map parity string to SerialPort parity type
+        const parityMap: Record<string, 'none' | 'even' | 'odd' | 'mark' | 'space'> = {
+          none: 'none',
+          even: 'even',
+          odd: 'odd',
+          mark: 'mark',
+          space: 'space'
+        }
 
-      await new Promise<void>((resolve, reject) => {
-        currentPort!.open((err) => {
-          if (err) reject(err)
-          else resolve()
+        const options = {
+          path,
+          baudRate,
+          dataBits: dataBits as 5 | 6 | 7 | 8,
+          stopBits: stopBits as 1 | 1.5 | 2,
+          parity: parityMap[parity] || 'none',
+          autoOpen: false
+        }
+
+        const port = new SerialPort(options)
+
+        await new Promise<void>((resolve, reject) => {
+          port.open((err) => {
+            if (err) reject(err)
+            else resolve()
+          })
         })
-      })
 
-      // Listen for data
-      currentPort.on('data', (data: Buffer) => {
-        mainWindow?.webContents.send('serial:data', data.toString())
-      })
+        // Listen for data - include path in the event
+        port.on('data', (data: Buffer) => {
+          const hexStr = data.toString('hex').toUpperCase()
+          const textStr = data.toString()
+          console.log(`[Serial RX] ${path}: "${textStr}" (HEX: ${hexStr})`)
+          mainWindow?.webContents.send('serial:data', { path, data: data.toString() })
+        })
 
-      currentPort.on('error', (err: Error) => {
-        mainWindow?.webContents.send('serial:error', err.message)
-      })
+        port.on('error', (err: Error) => {
+          mainWindow?.webContents.send('serial:error', { path, error: err.message })
+        })
 
-      currentPort.on('close', () => {
-        mainWindow?.webContents.send('serial:closed')
-        currentPort = null
-      })
+        port.on('close', () => {
+          mainWindow?.webContents.send('serial:closed', { path })
+          activePorts.delete(path)
+        })
 
-      activePorts.set(path, currentPort)
-      return { success: true }
-    } catch (error) {
-      console.error('Failed to open serial port:', error)
-      throw error
+        activePorts.set(path, port)
+        console.log(`[Serial] Opened ${path}: ${baudRate} baud, ${dataBits} data bits, ${stopBits} stop bits, ${parity} parity`)
+        return { success: true, path }
+      } catch (error) {
+        console.error('Failed to open serial port:', error)
+        throw error
+      }
     }
-  })
+  )
 
-  ipcMain.handle('serial:close', async () => {
+  ipcMain.handle('serial:close', async (_event, path?: string) => {
     try {
-      if (currentPort && currentPort.isOpen) {
-        await new Promise<void>((resolve) => currentPort!.close(() => resolve()))
-        currentPort = null
+      if (path) {
+        // Close specific port
+        const port = activePorts.get(path)
+        if (port && port.isOpen) {
+          await new Promise<void>((resolve) => port.close(() => resolve()))
+          activePorts.delete(path)
+        }
+      } else {
+        // Close all ports (legacy behavior)
+        for (const port of activePorts.values()) {
+          if (port.isOpen) {
+            await new Promise<void>((resolve) => port.close(() => resolve()))
+          }
+        }
+        activePorts.clear()
       }
       return { success: true }
     } catch (error) {
@@ -103,14 +153,20 @@ export function setupSerialHandlers(): void {
     }
   })
 
-  ipcMain.handle('serial:write', async (_event, data: string) => {
+  ipcMain.handle('serial:write', async (_event, path: string, data: string) => {
     try {
-      if (!currentPort || !currentPort.isOpen) {
-        throw new Error('Serial port not open')
+      const port = activePorts.get(path)
+      if (!port || !port.isOpen) {
+        throw new Error(`Serial port ${path} not open`)
       }
 
+      // 打印发送的数据
+      const buffer = Buffer.from(data)
+      const hexStr = buffer.toString('hex').toUpperCase()
+      console.log(`[Serial TX] ${path}: "${data}" (HEX: ${hexStr})`)
+
       await new Promise<void>((resolve, reject) => {
-        currentPort!.write(data, (err) => {
+        port.write(data, (err) => {
           if (err) reject(err)
           else resolve()
         })
@@ -121,5 +177,14 @@ export function setupSerialHandlers(): void {
       console.error('Failed to write to serial port:', error)
       throw error
     }
+  })
+
+  ipcMain.handle('serial:isOpen', async (_event, path: string) => {
+    const port = activePorts.get(path)
+    return port?.isOpen ?? false
+  })
+
+  ipcMain.handle('serial:getOpenPorts', async () => {
+    return Array.from(activePorts.keys())
   })
 }
