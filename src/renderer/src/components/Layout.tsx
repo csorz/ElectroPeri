@@ -285,14 +285,14 @@ const navGroups: { key: string; title: string; items: NavItem[] }[] = [
     title: 'P1 工业核心接口',
     items: [
       { to: '/serial', icon: '🔌', label: '串口采集' },
-      { to: '/web-serial', icon: '🧪', label: 'Web 串口' },
       { to: '/usb', icon: '📱', label: 'USB采集' },
-      { to: '/web-usb', icon: '🔌', label: 'WebUSB' },
       { to: '/bluetooth', icon: '📶', label: '蓝牙采集' },
-      { to: '/web-bluetooth', icon: '📶', label: 'Web Bluetooth' },
       { to: '/hid', icon: '⌨️', label: 'HID采集' },
-      { to: '/web-hid', icon: '⌨️', label: 'WebHID' },
-      { to: '/network', icon: '🌐', label: '网络采集' }
+      { to: '/network', icon: '🌐', label: '网络采集' },
+      { to: '/web-serial', icon: '🧪', label: 'Web 串口' },
+      { to: '/web-usb', icon: '🔌', label: 'WebUSB' },
+      { to: '/web-bluetooth', icon: '📶', label: 'Web Bluetooth' },
+      { to: '/web-hid', icon: '⌨️', label: 'WebHID' }
     ]
   },
   {
