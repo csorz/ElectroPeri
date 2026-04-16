@@ -34,6 +34,8 @@
     "jsqr": "^1.4.0",
     "jszip": "^3.10.1",
     "mqtt": "^5.15.1",
+    "node-gyp-build": "^4.8.4",
+    "pkg-prebuilds": "^1.0.0",
     "ps-list": "^9.0.0",
     "qrcode": "^1.5.4",
     "react-router-dom": "^7.14.0",
@@ -92,5 +94,20 @@
         "arm64"
       ]
     }
-  }
+  },
+  "asarUnpack": [
+    "node_modules/node-hid/**/*",
+    "node_modules/usb/**/*",
+    "node_modules/@abandonware/**/*",
+    "node_modules/pkg-prebuilds/**/*",
+    "node_modules/node-gyp-build/**/*",
+    "node_modules/.pnpm/node-hid*/**/*",
+    "node_modules/.pnpm/usb@*/**/*",
+    "node_modules/.pnpm/@abandonware+noble*/**/*",
+    "node_modules/.pnpm/@abandonware+bluetooth-hci-socket*/**/*",
+    "node_modules/.pnpm/pkg-prebuilds*/**/*",
+    "node_modules/.pnpm/node-gyp-build*/**/*",
+    "node_modules/@serialport/bindings-cpp/**/*",
+    "node_modules/.pnpm/@serialport+bindings-cpp*/**/*"
+  ]
 }

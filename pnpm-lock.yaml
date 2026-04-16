@@ -38,6 +38,12 @@ importers:
       mqtt:
         specifier: ^5.15.1
         version: 5.15.1
+      node-gyp-build:
+        specifier: ^4.8.4
+        version: 4.8.4
+      pkg-prebuilds:
+        specifier: ^1.0.0
+        version: 1.0.0
       ps-list:
         specifier: ^9.0.0
         version: 9.0.0
@@ -6488,7 +6494,6 @@ snapshots:
   pkg-prebuilds@1.0.0:
     dependencies:
       yargs: 17.7.2
-    optional: true
 
   plist@3.1.0:
     dependencies:
