@@ -12,7 +12,7 @@ interface SerialApi {
   }>>
   open: (path: string, baudRate: number, dataBits?: number, stopBits?: number, parity?: string) => Promise<{ success: boolean; path: string }>
   close: (path?: string) => Promise<{ success: boolean }>
-  write: (path: string, data: string) => Promise<{ success: boolean }>
+  write: (path: string, data: string, format?: 'text' | 'hex') => Promise<{ success: boolean }>
   isOpen: (path: string) => Promise<boolean>
   getOpenPorts: () => Promise<string[]>
   onData: (callback: (path: string, data: string) => void) => () => void

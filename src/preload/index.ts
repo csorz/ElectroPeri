@@ -7,7 +7,7 @@ const serialApi = {
   open: (path: string, baudRate: number, dataBits = 8, stopBits = 1, parity = 'none') =>
     ipcRenderer.invoke('serial:open', path, baudRate, dataBits, stopBits, parity),
   close: (path?: string) => ipcRenderer.invoke('serial:close', path),
-  write: (path: string, data: string) => ipcRenderer.invoke('serial:write', path, data),
+  write: (path: string, data: string, format?: 'text' | 'hex') => ipcRenderer.invoke('serial:write', path, data, format),
   isOpen: (path: string) => ipcRenderer.invoke('serial:isOpen', path),
   getOpenPorts: () => ipcRenderer.invoke('serial:getOpenPorts'),
   onData: (callback: (path: string, data: string) => void) => {

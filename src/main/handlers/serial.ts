@@ -104,9 +104,8 @@ export function setupSerialHandlers(): void {
         // Listen for data - include path in the event
         port.on('data', (data: Buffer) => {
           const hexStr = data.toString('hex').toUpperCase()
-          const textStr = data.toString()
-          console.log(`[Serial RX] ${path}: "${textStr}" (HEX: ${hexStr})`)
-          mainWindow?.webContents.send('serial:data', { path, data: data.toString() })
+          console.log(`[Serial RX] ${path}: (HEX: ${hexStr})`)
+          mainWindow?.webContents.send('serial:data', { path, data: hexStr })
         })
 
         port.on('error', (err: Error) => {
@@ -153,20 +152,29 @@ export function setupSerialHandlers(): void {
     }
   })
 
-  ipcMain.handle('serial:write', async (_event, path: string, data: string) => {
+  ipcMain.handle('serial:write', async (_event, path: string, data: string, format: 'text' | 'hex' = 'text') => {
     try {
       const port = activePorts.get(path)
       if (!port || !port.isOpen) {
         throw new Error(`Serial port ${path} not open`)
       }
 
-      // 打印发送的数据
-      const buffer = Buffer.from(data)
+      let buffer: Buffer
+      if (format === 'hex') {
+        const hexStr = data.replace(/[\s,]/g, '')
+        if (!/^[0-9a-fA-F]*$/.test(hexStr) || hexStr.length % 2 !== 0) {
+          throw new Error('Invalid hex format')
+        }
+        buffer = Buffer.from(hexStr, 'hex')
+      } else {
+        buffer = Buffer.from(data, 'latin1')
+      }
+
       const hexStr = buffer.toString('hex').toUpperCase()
-      console.log(`[Serial TX] ${path}: "${data}" (HEX: ${hexStr})`)
+      console.log(`[Serial TX] ${path}: (HEX: ${hexStr})`)
 
       await new Promise<void>((resolve, reject) => {
-        port.write(data, (err) => {
+        port.write(buffer, (err) => {
           if (err) reject(err)
           else resolve()
         })

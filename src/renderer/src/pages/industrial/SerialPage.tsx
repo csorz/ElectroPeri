@@ -28,6 +28,7 @@ interface SerialConnection {
   config: SerialConfig
   data: string
   sendFormat: 'text' | 'hex'
+  recvFormat: 'hex' | 'text'
   appendNewline: boolean
   showTimestamp: boolean
 }
@@ -36,7 +37,7 @@ interface SerialConnection {
 const hexExamples = [
   { label: 'AT', value: '4154' },
   { label: 'AT+RST', value: '41542B525354' },
-  { label: '01 02 03', value: '010203' },
+  { label: 'Modbus读', value: '01 03 00 06 00 01 64 0B' },
   { label: 'FF FE', value: 'FFFE' }
 ]
 
@@ -399,7 +400,7 @@ function SerialDemo() {
       await window.api.serial.open(path, config.baudRate, config.dataBits, config.stopBits, config.parity)
       setConnections((prev) => [
         ...prev,
-        { path, config, data: '', sendFormat: 'text', appendNewline: false, showTimestamp: true }
+        { path, config, data: '', sendFormat: 'text', recvFormat: 'hex', appendNewline: false, showTimestamp: true }
       ])
     } catch (err) {
       setError(err instanceof Error ? err.message : '连接失败')
@@ -633,30 +634,21 @@ function SerialCard({
   const handleSend = async () => {
     if (!message.trim()) return
 
-    let dataToSend = message
-
-    // 16进制格式转换
-    if (connection.sendFormat === 'hex') {
-      // 移除空格和常见分隔符，然后转换为 Buffer
-      const hexStr = message.replace(/[\s,]/g, '')
-      if (!/^[0-9a-fA-F]*$/.test(hexStr) || hexStr.length % 2 !== 0) {
-        alert('16进制格式错误，请输入偶数个十六进制字符')
-        return
-      }
-      const bytes: number[] = []
-      for (let i = 0; i < hexStr.length; i += 2) {
-        bytes.push(parseInt(hexStr.substring(i, i + 2), 16))
-      }
-      dataToSend = String.fromCharCode(...bytes)
-    }
-
-    // 添加换行
-    if (connection.appendNewline) {
-      dataToSend += '\n'
-    }
-
     try {
-      await window.api.serial.write(connection.path, dataToSend)
+      if (connection.sendFormat === 'hex') {
+        const hexStr = message.replace(/[\s,]/g, '')
+        if (!/^[0-9a-fA-F]*$/.test(hexStr) || hexStr.length % 2 !== 0) {
+          alert('16进制格式错误，请输入偶数个十六进制字符')
+          return
+        }
+        await window.api.serial.write(connection.path, hexStr, 'hex')
+      } else {
+        let dataToSend = message
+        if (connection.appendNewline) {
+          dataToSend += '\n'
+        }
+        await window.api.serial.write(connection.path, dataToSend, 'text')
+      }
       setMessage('')
     } catch (err) {
       console.error('发送失败:', err)
@@ -668,35 +660,50 @@ function SerialCard({
     onUpdateConnection({ data: '' })
   }
 
-  // 格式化显示数据 - 每次接收新数据换行显示
+  // 格式化显示数据 - data 现在存储的是 hex 字符串
   const formatDisplayData = (rawData: string): string => {
     const lines = rawData.split('\n')
     const result: string[] = []
 
     lines.forEach((line, index) => {
-      if (line === '' && index === lines.length - 1) return // 忽略最后的空行
+      if (line === '' && index === lines.length - 1) return
 
-      let formattedLine = ''
-      for (let i = 0; i < line.length; i++) {
-        const code = line.charCodeAt(i)
-        if (code >= 32 && code <= 126) {
-          formattedLine += line[i]
-        } else if (code === 13) {
-          formattedLine += '↵'
-        } else if (code === 9) {
-          formattedLine += '→'
-        } else {
-          formattedLine += `[${code.toString(16).padStart(2, '0').toUpperCase()}]`
+      if (connection.recvFormat === 'hex') {
+        // hex 模式：每两个字符一组，空格分隔
+        const hexStr = line.replace(/[\s,]/g, '').toUpperCase()
+        const groups: string[] = []
+        for (let i = 0; i < hexStr.length; i += 2) {
+          groups.push(hexStr.substring(i, i + 2))
         }
+        result.push(groups.join(' '))
+      } else {
+        // text 模式：从 hex 解码为文本
+        const hexStr = line.replace(/[\s,]/g, '')
+        let text = ''
+        for (let i = 0; i < hexStr.length; i += 2) {
+          const byte = parseInt(hexStr.substring(i, i + 2), 16)
+          if (byte >= 32 && byte <= 126) {
+            text += String.fromCharCode(byte)
+          } else if (byte === 13) {
+            text += '↵'
+          } else if (byte === 10) {
+            text += '↵'
+          } else if (byte === 9) {
+            text += '→'
+          } else {
+            text += `[${byte.toString(16).padStart(2, '0').toUpperCase()}]`
+          }
+        }
+        result.push(text)
       }
-      result.push(formattedLine)
     })
 
     return result.join('\n')
   }
 
-  // 快捷示例点击
+  // 快捷示例点击 - 直接设置输入值
   const handleExampleClick = (hexValue: string): void => {
+    onUpdateConnection({ sendFormat: 'hex' })
     setMessage(hexValue)
   }
 
@@ -788,6 +795,19 @@ function SerialCard({
             >
               <option value="text">文本</option>
               <option value="hex">16进制</option>
+            </select>
+          </div>
+
+          {/* 接收格式 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <label style={{ fontSize: 11, color: '#666' }}>接收格式</label>
+            <select
+              value={connection.recvFormat}
+              onChange={(e) => onUpdateConnection({ recvFormat: e.target.value as 'hex' | 'text' })}
+              style={{ padding: '4px 8px', borderRadius: 4, border: '1px solid #ddd', fontSize: 12 }}
+            >
+              <option value="hex">16进制</option>
+              <option value="text">文本</option>
             </select>
           </div>
 
