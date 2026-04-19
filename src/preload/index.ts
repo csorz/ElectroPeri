@@ -187,6 +187,34 @@ const mediaApi = {
   devices: () => ipcRenderer.invoke('media:devices')
 }
 
+const screenshotApi = {
+  getSources: () => ipcRenderer.invoke('screenshot:getSources'),
+  startCapture: (sourceId: string) => ipcRenderer.invoke('screenshot:startCapture', sourceId),
+  cropRegion: (args: { sourceId: string; x: number; y: number; width: number; height: number }) =>
+    ipcRenderer.invoke('screenshot:cropRegion', args),
+  save: (args: { dataURL: string; defaultName: string }) =>
+    ipcRenderer.invoke('screenshot:save', args),
+  onRegionSelected: (callback: (region: { x: number; y: number; width: number; height: number }) => void) => {
+    const listener = (_event: any, payload: any) => callback(payload)
+    ipcRenderer.on('screenshot:regionSelected', listener)
+    return () => ipcRenderer.removeListener('screenshot:regionSelected', listener)
+  },
+  onCaptureCancelled: (callback: () => void) => {
+    const listener = () => callback()
+    ipcRenderer.on('screenshot:captureCancelled', listener)
+    return () => ipcRenderer.removeListener('screenshot:captureCancelled', listener)
+  }
+}
+
+const mixerApi = {
+  getSources: () => ipcRenderer.invoke('mixer:getSources'),
+  selectVideo: () => ipcRenderer.invoke('mixer:selectVideo'),
+  saveRecording: (args: { defaultName: string }) =>
+    ipcRenderer.invoke('mixer:saveRecording', args),
+  writeFile: (args: { path: string; data: number[] }) =>
+    ipcRenderer.invoke('mixer:writeFile', args)
+}
+
 const eventsApi = {
   onHotplug: (callback: (event: { type: string; message: string; ts: number }) => void) => {
     const listener = (_event: any, payload: any) => callback(payload)
@@ -286,6 +314,8 @@ const api = {
   process: processApi,
   printer: printerApi,
   media: mediaApi,
+  screenshot: screenshotApi,
+  mixer: mixerApi,
   events: eventsApi,
   codeRunner: codeRunnerApi,
   dns: dnsApi,

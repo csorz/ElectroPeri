@@ -190,6 +190,8 @@ import PowerPage from './pages/system/PowerPage'
 import ProcessPage from './pages/system/ProcessPage'
 import PrinterPage from './pages/system/PrinterPage'
 import MediaPage from './pages/system/MediaPage'
+import ScreenshotPage from './pages/system/ScreenshotPage'
+import MixerPage from './pages/system/MixerPage'
 
 // P4 - 嵌入式扩展接口
 import GpioPage from './pages/embedded/GpioPage'
@@ -222,6 +224,8 @@ function App(): React.JSX.Element {
           <Route path="process" element={<ProcessPage />} />
           <Route path="printer" element={<PrinterPage />} />
           <Route path="media" element={<MediaPage />} />
+          <Route path="screenshot" element={<ScreenshotPage />} />
+          <Route path="mixer" element={<MixerPage />} />
           <Route path="web-serial" element={<WebSerialPage />} />
           <Route path="web-hid" element={<WebHidPage />} />
           <Route path="web-usb" element={<WebUsbPage />} />

@@ -184,6 +184,22 @@ interface MediaApi {
   devices: () => Promise<any>
 }
 
+interface ScreenshotApi {
+  getSources: () => Promise<{ id: string; name: string; thumbnail: string }[]>
+  startCapture: (sourceId: string) => Promise<void>
+  cropRegion: (args: { sourceId: string; x: number; y: number; width: number; height: number }) => Promise<string>
+  save: (args: { dataURL: string; defaultName: string }) => Promise<{ success: boolean; path?: string; error?: string }>
+  onRegionSelected: (callback: (region: { x: number; y: number; width: number; height: number }) => void) => () => void
+  onCaptureCancelled: (callback: () => void) => () => void
+}
+
+interface MixerApi {
+  getSources: () => Promise<{ id: string; name: string; thumbnail: string; type: 'screen' | 'window'; appIcon: string | null }[]>
+  selectVideo: () => Promise<{ canceled: boolean; path?: string }>
+  saveRecording: (args: { defaultName: string }) => Promise<{ success: boolean; path?: string; error?: string }>
+  writeFile: (args: { path: string; data: number[] }) => Promise<{ success: boolean; error?: string }>
+}
+
 interface EventsApi {
   onHotplug: (
     callback: (event: { type: string; message: string; ts: number }) => void
@@ -299,6 +315,8 @@ interface Api {
   process: ProcessApi
   printer: PrinterApi
   media: MediaApi
+  screenshot: ScreenshotApi
+  mixer: MixerApi
   events: EventsApi
   codeRunner: CodeRunnerApi
   dns: DnsApi

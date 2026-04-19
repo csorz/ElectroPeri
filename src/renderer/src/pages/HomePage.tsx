@@ -55,7 +55,9 @@ const groups = [
       { to: '/power', label: '电源状态', desc: '电池供电状态快照' },
       { to: '/process', label: '进程/负载', desc: '进程列表与系统负载' },
       { to: '/printer', label: '打印机', desc: '系统打印机列表读取' },
-      { to: '/media', label: '音视频/外设', desc: '音频、图形、USB 概览' }
+      { to: '/media', label: '音视频/外设', desc: '音频、图形、USB 概览' },
+      { to: '/screenshot', label: '屏幕截图', desc: '区域截图、多屏支持与即时预览' },
+      { to: '/mixer', label: '混流助手', desc: '多流源混流、画中画布局与录制' }
     ]
   },
   {

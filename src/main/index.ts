@@ -1,6 +1,8 @@
-import { app, shell, BrowserWindow, ipcMain, globalShortcut, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, globalShortcut, dialog, protocol } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
+import { setupScreenshotHandlers } from './handlers/screenshot'
+import { setupMixerHandlers } from './handlers/mixer'
 
 // 启用 Web API (WebHID, WebUSB, Web Serial, Web Bluetooth)
 // 必须在 app ready 之前调用
@@ -102,18 +104,18 @@ function createWindow(): void {
       return { action: 'deny' }
     })
 
-    // Handle Web API permission requests (Serial, USB, Bluetooth, HID)
+    // Handle Web API permission requests (Serial, USB, Bluetooth, HID, Camera, Microphone)
     mainWindow.webContents.session.setPermissionCheckHandler((_webContents, permission) => {
-      // Allow Web Serial, Web USB, Web Bluetooth, WebHID permissions
-      if (['serial', 'usb', 'bluetooth', 'hid'].includes(permission)) {
+      // Allow Web Serial, Web USB, Web Bluetooth, WebHID, Camera, Microphone permissions
+      if (['serial', 'usb', 'bluetooth', 'hid', 'camera', 'microphone', 'media'].includes(permission)) {
         return true
       }
       return false
     })
 
     mainWindow.webContents.session.setPermissionRequestHandler((_webContents, permission, callback) => {
-      // Auto-grant Web Serial, Web USB, Web Bluetooth, WebHID permissions
-      if (['serial', 'usb', 'bluetooth', 'hid'].includes(permission)) {
+      // Auto-grant Web Serial, Web USB, Web Bluetooth, WebHID, Camera, Microphone permissions
+      if (['serial', 'usb', 'bluetooth', 'hid', 'camera', 'microphone', 'media'].includes(permission)) {
         callback(true)
       } else {
         callback(false)
@@ -168,6 +170,14 @@ function createWindow(): void {
       startupLog.info('Loading file:', htmlPath)
       mainWindow.loadFile(htmlPath)
     }
+
+    // 注册 screenshot handler（需要 mainWindow 引用）
+    setupScreenshotHandlers(mainWindow)
+    startupLog.debug('Handler loaded: screenshot')
+
+    // 注册 mixer handler
+    setupMixerHandlers(mainWindow)
+    startupLog.debug('Handler loaded: mixer')
 
     startupLog.info('Window setup complete')
   } catch (err) {
@@ -242,6 +252,12 @@ app.whenReady().then(async () => {
     }
 
     startupLog.info('All handlers loaded')
+
+    // 注册 local-video:// 协议，允许渲染进程加载本地视频文件
+    protocol.registerFileProtocol('local-video', (request, callback) => {
+      const filePath = decodeURIComponent(request.url.replace('local-video://', ''))
+      callback({ path: filePath })
+    })
 
     createWindow()
 

@@ -305,7 +305,9 @@ const navGroups: { key: string; title: string; items: NavItem[] }[] = [
       { to: '/power', icon: '🔋', label: '电源' },
       { to: '/process', icon: '🧠', label: '进程/负载' },
       { to: '/printer', icon: '🖨️', label: '打印机' },
-      { to: '/media', icon: '🎙️', label: '音视频/外设' }
+      { to: '/media', icon: '🎙️', label: '音视频/外设' },
+      { to: '/screenshot', icon: '📷', label: '屏幕截图' },
+      { to: '/mixer', icon: '🎭', label: '混流助手' }
     ]
   },
   {

@@ -186,13 +186,13 @@ function ProcessPageContent() {
 
                   {/* Process table */}
                   <SectionCard title="进程列表" icon="📋" accentColor="#66bb6a" >
-                    <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: 12, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
                       <input
                         type="text"
                         placeholder="搜索进程名..."
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
-                        style={{ padding: '6px 10px', border: '1px solid #ddd', borderRadius: 4, flex: 1, minWidth: 120, fontSize: 13 }}
+                        style={{ padding: '6px 10px', border: '1px solid #ddd', borderRadius: 4, flex: 1, minWidth: 140, fontSize: 13 }}
                       />
                       <select
                         value={sortBy}
