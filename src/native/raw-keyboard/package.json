@@ -1,0 +1,12 @@
+{
+  "name": "raw-keyboard",
+  "version": "1.0.0",
+  "description": "Windows Raw Input keyboard listener - distinguish multiple physical keyboards",
+  "main": "index.js",
+  "gypfile": true,
+  "scripts": {
+    "install": "node-gyp rebuild"
+  },
+  "os": ["win32"],
+  "cpu": ["x64", "arm64"]
+}

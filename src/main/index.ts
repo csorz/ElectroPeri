@@ -238,7 +238,9 @@ app.whenReady().then(async () => {
       { name: 'dns', setup: () => import('./handlers/dns').then(m => m.setupDnsHandlers()) },
       { name: 'meta', setup: () => import('./handlers/meta').then(m => m.setupMetaHandlers()) },
       { name: 'fileTransfer', setup: () => import('./handlers/fileTransfer').then(m => m.setupFileTransferHandlers()) },
-      { name: 'mqtt', setup: () => import('./handlers/mqtt').then(m => m.setupMqttHandlers()) }
+      { name: 'mqtt', setup: () => import('./handlers/mqtt').then(m => m.setupMqttHandlers()) },
+      { name: 'macScan', setup: () => import('./handlers/macScan').then(m => m.setupMacScanHandlers()) },
+      { name: 'rawKeyboard', setup: () => import('./handlers/rawKeyboard').then(m => m.setupRawKeyboardHandlers()) }
     ]
 
     for (const handler of handlers) {

@@ -17,6 +17,9 @@ importers:
       '@serialport/bindings-cpp':
         specifier: ^13.0.1
         version: 13.0.1
+      advlib-ble-manufacturers:
+        specifier: ^1.15.2
+        version: 1.15.2
       crypto-js:
         specifier: ^4.2.0
         version: 4.2.0
@@ -154,6 +157,9 @@ importers:
       pigpio:
         specifier: ^3.3.1
         version: 3.3.1
+      raw-keyboard:
+        specifier: file:src/native/raw-keyboard
+        version: file:src/native/raw-keyboard
       spi-device:
         specifier: ^3.1.2
         version: 3.1.2
@@ -1138,6 +1144,10 @@ packages:
     resolution: {integrity: sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==}
     engines: {node: '>=0.4.0'}
     hasBin: true
+
+  advlib-ble-manufacturers@1.15.2:
+    resolution: {integrity: sha512-uOqwU7mpFx0wnUtMp7QNczwcTTviUp+tqfR3rvdJF/R38Ubw76RdMyEYTyeA77Dgphh4XDe7z192HAnLP5nCMQ==}
+    engines: {node: '>=6.0.0'}
 
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
@@ -2834,6 +2844,11 @@ packages:
     resolution: {integrity: sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==}
     engines: {node: '>=10'}
 
+  raw-keyboard@file:src/native/raw-keyboard:
+    resolution: {directory: src/native/raw-keyboard, type: directory}
+    cpu: [x64, arm64]
+    os: [win32]
+
   react-dom@19.2.5:
     resolution: {integrity: sha512-J5bAZz+DXMMwW/wV3xzKke59Af6CHY7G4uYLN1OvBcKEsWOs4pQExj86BBKamxl/Ik5bx9whOrvBlSDfWzgSag==}
     peerDependencies:
@@ -4477,6 +4492,8 @@ snapshots:
       acorn: 8.16.0
 
   acorn@8.16.0: {}
+
+  advlib-ble-manufacturers@1.15.2: {}
 
   agent-base@6.0.2:
     dependencies:
@@ -6568,6 +6585,9 @@ snapshots:
       yargs: 15.4.1
 
   quick-lru@5.1.1: {}
+
+  raw-keyboard@file:src/native/raw-keyboard:
+    optional: true
 
   react-dom@19.2.5(react@19.2.5):
     dependencies:

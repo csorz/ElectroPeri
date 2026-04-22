@@ -11,11 +11,13 @@ export default defineConfig({
           '@abandonware/bluetooth-hci-socket',
           'node-hid',
           'usb',
+          'raw-keyboard',
           /bluetooth_hci_socket\.node$/,
           /binding\.node$/,
           /noble\.node$/,
           /HID\.node$/,
-          /usb_bindings\.node$/
+          /usb_bindings\.node$/,
+          /raw_keyboard\.node$/
         ]
       }
     } as any

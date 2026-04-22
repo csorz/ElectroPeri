@@ -70,6 +70,48 @@ const bluetoothApi = {
   }
 }
 
+// BLE Scan API
+const bleScanApi = {
+  start: (companyId: string, targetName: string) => ipcRenderer.invoke('ble-scan:start', companyId, targetName),
+  stop: () => ipcRenderer.invoke('ble-scan:stop'),
+  onData: (callback: (device: { mac: string; name: string; rssi: number; manufacturerData: string; timestamp: string }) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, device: { mac: string; name: string; rssi: number; manufacturerData: string; timestamp: string }) => callback(device)
+    ipcRenderer.on('ble-scan:data', handler)
+    return () => ipcRenderer.removeListener('ble-scan:data', handler)
+  }
+}
+
+// MAC Scan API
+const macScanApi = {
+  check: () => ipcRenderer.invoke('mac-scan:check'),
+  listInterfaces: () => ipcRenderer.invoke('mac-scan:listInterfaces'),
+  start: (deviceIndex: number, filter?: string) => ipcRenderer.invoke('mac-scan:start', deviceIndex, filter),
+  stop: () => ipcRenderer.invoke('mac-scan:stop'),
+  onData: (callback: (packet: any) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, packet: any) => callback(packet)
+    ipcRenderer.on('mac-scan:data', handler)
+    return () => ipcRenderer.removeListener('mac-scan:data', handler)
+  },
+  onError: (callback: (msg: string) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, msg: string) => callback(msg)
+    ipcRenderer.on('mac-scan:error', handler)
+    return () => ipcRenderer.removeListener('mac-scan:error', handler)
+  }
+}
+
+// Raw Keyboard API
+const rawKeyboardApi = {
+  check: () => ipcRenderer.invoke('raw-keyboard:check'),
+  listDevices: () => ipcRenderer.invoke('raw-keyboard:listDevices'),
+  start: () => ipcRenderer.invoke('raw-keyboard:start'),
+  stop: () => ipcRenderer.invoke('raw-keyboard:stop'),
+  onData: (callback: (data: { handle: number; vKey: number; scanCode: number; keyDown: boolean; keyName: string }) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: any) => callback(data)
+    ipcRenderer.on('raw-keyboard:data', handler)
+    return () => ipcRenderer.removeListener('raw-keyboard:data', handler)
+  }
+}
+
 // Network API
 const networkApi = {
   listInterfaces: () => ipcRenderer.invoke('network:listInterfaces'),
@@ -301,6 +343,9 @@ const api = {
   serial: serialApi,
   usb: usbApi,
   bluetooth: bluetoothApi,
+  bleScan: bleScanApi,
+  macScan: macScanApi,
+  rawKeyboard: rawKeyboardApi,
   network: networkApi,
   hid: hidApi,
   gpio: gpioApi,

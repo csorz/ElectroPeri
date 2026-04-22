@@ -179,6 +179,9 @@ import WebUsbPage from './pages/industrial/WebUsbPage'
 import WebBluetoothPage from './pages/industrial/WebBluetoothPage'
 import UsbPage from './pages/industrial/UsbPage'
 import BluetoothPage from './pages/industrial/BluetoothPage'
+import BleScanPage from './pages/industrial/BleScanPage'
+import MacScanPage from './pages/industrial/MacScanPage'
+import RawKeyboardPage from './pages/industrial/RawKeyboardPage'
 import HidPage from './pages/industrial/HidPage'
 import NetworkPage from './pages/industrial/NetworkPage'
 
@@ -211,6 +214,9 @@ function App(): React.JSX.Element {
           <Route path="serial" element={<SerialPage />} />
           <Route path="usb" element={<UsbPage />} />
           <Route path="bluetooth" element={<BluetoothPage />} />
+          <Route path="ble-scan" element={<BleScanPage />} />
+          <Route path="mac-scan" element={<MacScanPage />} />
+          <Route path="raw-keyboard" element={<RawKeyboardPage />} />
           <Route path="hid" element={<HidPage />} />
           <Route path="network" element={<NetworkPage />} />
           <Route path="gpio" element={<GpioPage />} />

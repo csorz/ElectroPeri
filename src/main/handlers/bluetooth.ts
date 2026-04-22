@@ -1,5 +1,18 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
+let advlibBleManufacturers: any = null
+
+async function getAdvlib() {
+  if (!advlibBleManufacturers) {
+    try {
+      advlibBleManufacturers = await import('advlib-ble-manufacturers')
+    } catch {
+      // advlib not available, parsedData will be null
+    }
+  }
+  return advlibBleManufacturers
+}
+
 type BluetoothDeviceInfo = {
   id: string
   name: string
@@ -22,6 +35,10 @@ let currentNotifyChar: any = null
 
 let bluetoothAvailable = false
 let bluetoothModuleError: string | null = null
+
+// BLE 广播扫描状态
+let bleScanActive = false
+let bleScanDiscoverHandler: ((peripheral: any) => void) | null = null
 
 async function ensureNoble(): Promise<any> {
   if (bluetoothAvailable && noble) return noble
@@ -277,5 +294,104 @@ export function setupBluetoothHandlers(): void {
       })
     })
     return services.map((s) => s.uuid)
+  })
+
+  // BLE 广播扫描 - 开始
+  ipcMain.handle('ble-scan:start', async (event, companyIdStr: string, targetName: string) => {
+    const n = await ensureNoble()
+    mainWindow = BrowserWindow.fromWebContents(event.sender)
+
+    if (bleScanActive) {
+      return { success: true, message: 'already scanning' }
+    }
+
+    await waitPoweredOn(n)
+
+    // 解析 companyId，支持 "0x1012" 和 "4114" 两种格式
+    const companyId = companyIdStr.startsWith('0x') || companyIdStr.startsWith('0X')
+      ? parseInt(companyIdStr, 16)
+      : parseInt(companyIdStr, 10)
+
+    if (isNaN(companyId)) {
+      throw new Error(`无效的 Company ID: ${companyIdStr}`)
+    }
+
+    // 预加载 advlib 解析模块
+    const advlib = await getAdvlib()
+
+    bleScanDiscoverHandler = (peripheral: any) => {
+      const ad = peripheral.advertisement
+      const addr = peripheral.address || peripheral.id
+
+      // 过滤逻辑：companyId 匹配 manufacturerData 或 name 前缀匹配
+      let matched = false
+
+      if (targetName && ad.localName && ad.localName.startsWith(targetName)) {
+        matched = true
+      }
+
+      if (!matched && ad.manufacturerData && ad.manufacturerData.length >= 2) {
+        const buf = Buffer.isBuffer(ad.manufacturerData) ? ad.manufacturerData : Buffer.from(ad.manufacturerData)
+        const mfrCompanyId = buf.readUInt16LE(0)
+        if (mfrCompanyId === companyId) {
+          matched = true
+        }
+      }
+
+      if (!matched) return
+
+            // 构造推送数据
+      const mfrDataHex = ad.manufacturerData
+        ? (Buffer.isBuffer(ad.manufacturerData) ? ad.manufacturerData : Buffer.from(ad.manufacturerData)).toString('hex')
+        : ''
+
+      // 使用 advlib 解析 manufacturerData
+      let parsedData: any = null
+      if (ad.manufacturerData && ad.manufacturerData.length >= 2) {
+        const buf = Buffer.isBuffer(ad.manufacturerData) ? ad.manufacturerData : Buffer.from(ad.manufacturerData)
+        const mfrCode = buf.readUInt16LE(0)
+        if (advlib) {
+          try {
+            parsedData = advlib.processManufacturerSpecificData(mfrCode, mfrDataHex)
+          } catch {
+            // ignore parse errors
+          }
+        }
+      }
+
+      mainWindow?.webContents.send('ble-scan:data', {
+        mac: addr,
+        name: ad.localName || '',
+        rssi: peripheral.rssi,
+        manufacturerData: mfrDataHex,
+        parsedData,
+        timestamp: new Date().toISOString()
+      })
+    }
+
+    n.on('discover', bleScanDiscoverHandler)
+    n.startScanning([], true) // true = allow duplicates
+    bleScanActive = true
+
+    return { success: true }
+  })
+
+  // BLE 广播扫描 - 停止
+  ipcMain.handle('ble-scan:stop', async () => {
+    const n = await ensureNoble()
+
+    if (!bleScanActive) {
+      return { success: true, message: 'not scanning' }
+    }
+
+    if (bleScanDiscoverHandler) {
+      n.removeListener('discover', bleScanDiscoverHandler)
+      bleScanDiscoverHandler = null
+    }
+
+    n.stopScanning()
+    bleScanActive = false
+
+    return { success: true }
   })
 }

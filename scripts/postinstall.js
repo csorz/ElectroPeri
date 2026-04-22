@@ -19,7 +19,8 @@ const platformModules = {
   native: [
     '@abandonware/noble',
     'node-hid',
-    'usb'
+    'usb',
+    'raw-keyboard'
   ]
 };
 

@@ -73,6 +73,94 @@ interface BluetoothApi {
   onData: (callback: (data: string) => void) => () => void
 }
 
+interface BleScanDevice {
+  mac: string
+  name: string
+  rssi: number
+  manufacturerData: string
+  parsedData: Record<string, any> | null
+  timestamp: string
+}
+
+interface BleScanApi {
+  start: (companyId: string, targetName: string) => Promise<{ success: boolean; message?: string }>
+  stop: () => Promise<{ success: boolean; message?: string }>
+  onData: (callback: (device: BleScanDevice) => void) => () => void
+}
+
+interface MacScanInterface {
+  index: number
+  name: string
+  description: string
+  mac: string | null
+}
+
+interface MacScanApplication {
+  isIndustrial: boolean
+  protocol: string
+  port: number
+  parsed: {
+    valid: boolean
+    protocol?: string
+    error?: string
+    [key: string]: any
+  }
+}
+
+interface MacScanPacket {
+  timestamp: number
+  ethernet: {
+    srcMac: string
+    dstMac: string
+    etherType: string
+  }
+  ip?: {
+    srcIp: string
+    dstIp: string
+    protocol: string
+  }
+  transport?: {
+    srcPort: number
+    dstPort: number
+    protocol: string
+  }
+  application?: MacScanApplication
+  payload?: string
+  payloadLength?: number
+}
+
+interface MacScanApi {
+  check: () => Promise<{ available: boolean; version?: string; path?: string; error?: string }>
+  listInterfaces: () => Promise<MacScanInterface[]>
+  start: (deviceIndex: number, filter?: string) => Promise<{ success: boolean; message?: string }>
+  stop: () => Promise<{ success: boolean; message?: string }>
+  onData: (callback: (packet: MacScanPacket) => void) => () => void
+  onError: (callback: (msg: string) => void) => () => void
+}
+
+interface RawKeyboardDevice {
+  handle: number
+  name: string
+  vid: number
+  pid: number
+}
+
+interface RawKeyboardEvent {
+  handle: number
+  vKey: number
+  scanCode: number
+  keyDown: boolean
+  keyName: string
+}
+
+interface RawKeyboardApi {
+  check: () => Promise<{ available: boolean; error?: string }>
+  listDevices: () => Promise<RawKeyboardDevice[]>
+  start: () => Promise<{ success: boolean; message?: string; error?: string }>
+  stop: () => Promise<{ success: boolean; message?: string }>
+  onData: (callback: (data: RawKeyboardEvent) => void) => () => void
+}
+
 interface NetworkApi {
   listInterfaces: () => Promise<Array<{
     name: string
@@ -302,6 +390,9 @@ interface Api {
   serial: SerialApi
   usb: UsbApi
   bluetooth: BluetoothApi
+  bleScan: BleScanApi
+  macScan: MacScanApi
+  rawKeyboard: RawKeyboardApi
   network: NetworkApi
   hid: HidApi
   gpio: GpioApi
@@ -333,4 +424,4 @@ declare global {
   }
 }
 
-export type { SerialApi, UsbApi, BluetoothApi, NetworkApi, HidApi, Api, MqttApi }
+export type { SerialApi, UsbApi, BluetoothApi, BleScanApi, BleScanDevice, MacScanApi, MacScanInterface, MacScanPacket, RawKeyboardApi, RawKeyboardDevice, RawKeyboardEvent, NetworkApi, HidApi, Api, MqttApi }
