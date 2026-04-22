@@ -21,7 +21,7 @@ function MixerPageContent() {
   const [localVideoPlaying, setLocalVideoPlaying] = useState(false)
 
   const [cameraDevices, setCameraDevices] = useState<MediaDeviceInfo[]>([])
-  const [micDevices, setMicDevices] = useState<MediaDeviceInfo[]>([])
+  const [, setMicDevices] = useState<MediaDeviceInfo[]>([])
   const [selectedCameraId, setSelectedCameraId] = useState<string>('')
   const [selectedMicId, setSelectedMicId] = useState<string>('')
   const [cameraActive, setCameraActive] = useState(false)

@@ -115,8 +115,8 @@ function BleScanPageContent() {
     return d.toLocaleTimeString()
   }
 
-  const renderParsedData = (data: Record<string, any>, depth = 0): JSX.Element[] => {
-    const entries: JSX.Element[] = []
+  const renderParsedData = (data: Record<string, any>, depth = 0): React.ReactNode[] => {
+    const entries: React.ReactNode[] = []
     for (const [key, value] of Object.entries(data)) {
       if (value === null || value === undefined) continue
       if (typeof value === 'object' && !Array.isArray(value)) {

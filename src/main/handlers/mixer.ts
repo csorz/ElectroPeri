@@ -1,6 +1,5 @@
 import { ipcMain, desktopCapturer, BrowserWindow, dialog } from 'electron'
 import fs from 'fs'
-import path from 'path'
 
 let mainWindowRef: BrowserWindow | null = null
 
