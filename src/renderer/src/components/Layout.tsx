@@ -291,11 +291,7 @@ const navGroups: { key: string; title: string; items: NavItem[] }[] = [
       { to: '/mac-scan', icon: '🔌', label: 'MAC帧扫描' },
       { to: '/raw-keyboard', icon: '⌨️', label: '指定键盘监听' },
       { to: '/hid', icon: '⌨️', label: 'HID采集' },
-      { to: '/network', icon: '🌐', label: '网络采集' },
-      { to: '/web-serial', icon: '🧪', label: 'Web 串口' },
-      { to: '/web-usb', icon: '🔌', label: 'WebUSB' },
-      { to: '/web-bluetooth', icon: '📶', label: 'Web Bluetooth' },
-      { to: '/web-hid', icon: '⌨️', label: 'WebHID' }
+      { to: '/network', icon: '🌐', label: '网络采集' }
     ]
   },
   {

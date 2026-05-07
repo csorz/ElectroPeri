@@ -173,10 +173,6 @@ import AvatarGeneratorToolPage from './pages/toolbox/tools/AvatarGeneratorToolPa
 
 // P1 - 工业核心接口
 import SerialPage from './pages/industrial/SerialPage'
-import WebSerialPage from './pages/industrial/WebSerialPage'
-import WebHidPage from './pages/industrial/WebHidPage'
-import WebUsbPage from './pages/industrial/WebUsbPage'
-import WebBluetoothPage from './pages/industrial/WebBluetoothPage'
 import UsbPage from './pages/industrial/UsbPage'
 import BluetoothPage from './pages/industrial/BluetoothPage'
 import BleScanPage from './pages/industrial/BleScanPage'
@@ -232,10 +228,6 @@ function App(): React.JSX.Element {
           <Route path="media" element={<MediaPage />} />
           <Route path="screenshot" element={<ScreenshotPage />} />
           <Route path="mixer" element={<MixerPage />} />
-          <Route path="web-serial" element={<WebSerialPage />} />
-          <Route path="web-hid" element={<WebHidPage />} />
-          <Route path="web-usb" element={<WebUsbPage />} />
-          <Route path="web-bluetooth" element={<WebBluetoothPage />} />
 
           {/* Encoding Category & Tools */}
           <Route path="frontend-toolbox/encoding" element={<EncodingCategoryPage />} />
