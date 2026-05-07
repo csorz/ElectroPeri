@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useDeviceStore } from '../../store/deviceStore'
 import type { UsbDevice } from '../../store/deviceStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
-import '../toolbox/tools/ToolPage.css'
+import '../../styles/tool-page.css'
 
 export default function UsbPage() {
   return (

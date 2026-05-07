@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import '../toolbox/tools/ToolPage.css'
+import '../../styles/tool-page.css'
 import { usePageSnapshotStore } from '../../store/pageSnapshotStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
 import { StatCard, SectionCard } from '../../components/dashboard'

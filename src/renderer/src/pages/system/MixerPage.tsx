@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import '../toolbox/tools/ToolPage.css'
+import '../../styles/tool-page.css'
 import './MixerPage.css'
 import { ElectronOnly } from '../../components/ElectronOnly'
 

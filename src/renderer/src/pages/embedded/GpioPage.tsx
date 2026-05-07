@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ElectronOnly } from '../../components/ElectronOnly'
-import '../toolbox/tools/ToolPage.css'
+import '../../styles/tool-page.css'
 
 export default function GpioPage() {
   return (

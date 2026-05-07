@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { ElectronOnly } from '../../components/ElectronOnly'
-import '../toolbox/tools/ToolPage.css'
+import '../../styles/tool-page.css'
 
 interface NetInterface {
   index: number

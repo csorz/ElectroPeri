@@ -3,36 +3,6 @@ import './HomePage.css'
 
 const groups = [
   {
-    title: 'P0 全栈工具箱',
-    items: [
-      { to: '/frontend-toolbox/encoding', label: '编码与加解密', desc: 'Hash、Base64、加密解密' },
-      { to: '/frontend-toolbox/json', label: 'JSON 处理', desc: '格式化、压缩、校验' },
-      { to: '/frontend-toolbox/url', label: 'URL 与参数', desc: 'URL/Base64/Query 解析' },
-      { to: '/frontend-toolbox/time', label: '时间与时间戳', desc: '时间戳与日期互转' },
-      { to: '/frontend-toolbox/http', label: '请求调试', desc: 'HTTP、WebSocket、MQTT' },
-      { to: '/frontend-toolbox/text', label: '文本与数据转换', desc: '正则、Diff、CSV、YAML' },
-      { to: '/frontend-toolbox/color', label: '颜色工具', desc: '转换、调色板、渐变' },
-      { to: '/frontend-toolbox/css', label: 'CSS 样式工具', desc: '阴影、按钮、Grid布局' },
-      { to: '/frontend-toolbox/image', label: '图片工具', desc: '压缩、转换、水印、二维码' },
-      { to: '/frontend-toolbox/markdown', label: 'Markdown 工具', desc: '编辑器、表格、HTML互转' },
-      { to: '/frontend-toolbox/code', label: '代码编译运行', desc: 'JS、Python、Go、Java、Rust' },
-      { to: '/frontend-toolbox/dev', label: '开发辅助工具', desc: 'UUID、JWT、Cron、随机密码' },
-      { to: '/frontend-toolbox/seo', label: 'SEO 与站长工具', desc: 'IP、Whois、DNS查询' },
-      { to: '/frontend-toolbox/ocr', label: 'OCR 与识别', desc: '文字识别、SVG编辑' },
-      { to: '/frontend-toolbox/utils', label: '实用工具', desc: '视频解析、文件传输' },
-      { to: '/frontend-toolbox/fun', label: '娱乐工具', desc: '在线钢琴、语音合成' },
-      { to: '/frontend-toolbox/network', label: '网络编程', desc: 'TCP、UDP、KCP 协议' },
-      { to: '/frontend-toolbox/database', label: '数据库', desc: 'MySQL、PostgreSQL、MongoDB' },
-      { to: '/frontend-toolbox/pool', label: '连接池', desc: '连接池、线程池、对象池' },
-      { to: '/frontend-toolbox/redis', label: 'Redis', desc: '缓存策略、熔断限流' },
-      { to: '/frontend-toolbox/deploy', label: '部署运维', desc: 'Docker、K8s、Linux' },
-      { to: '/frontend-toolbox/monitor', label: '监控告警', desc: 'Grafana 监控面板' },
-      { to: '/frontend-toolbox/release', label: '发布策略', desc: '灰度、蓝绿、滚动更新' },
-      { to: '/frontend-toolbox/scaling', label: '集群扩容', desc: '多活架构、备份同步' },
-      { to: '/frontend-toolbox/ha', label: '高可用', desc: '负载均衡、DNS、CDN' }
-    ]
-  },
-  {
     title: 'P1 工业核心接口',
     items: [
       { to: '/serial', label: '串口采集', desc: 'SerialPort 扫描、连接、收发' },

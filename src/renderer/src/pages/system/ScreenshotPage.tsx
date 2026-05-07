@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import '../toolbox/tools/ToolPage.css'
+import '../../styles/tool-page.css'
 import './ScreenshotPage.css'
 import { ElectronOnly } from '../../components/ElectronOnly'
 

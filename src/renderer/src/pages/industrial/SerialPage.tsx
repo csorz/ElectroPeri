@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useDeviceStore } from '../../store/deviceStore'
 import type { SerialPortDevice } from '../../store/deviceStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
-import '../toolbox/tools/ToolPage.css'
+import '../../styles/tool-page.css'
 
 // 串口配置选项
 const baudRateOptions = [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600]

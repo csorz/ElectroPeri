@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useDeviceStore } from '../../store/deviceStore'
 import type { NetworkInterfaceItem } from '../../store/deviceStore'
 import { ElectronOnly } from '../../components/ElectronOnly'
-import '../toolbox/tools/ToolPage.css'
+import '../../styles/tool-page.css'
 
 export default function NetworkPage() {
   return (
